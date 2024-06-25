@@ -32,6 +32,10 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
+  INCLUDE_TOURNAMENTS = [
+    669570 # SuperNova 2024
+  ]
+
   def self.from_startgg(data)
     t = find_by(startgg_id: data.id) || new
 
@@ -53,6 +57,7 @@ class Tournament < ApplicationRecord
   end
 
   def interesting?
+    startgg_id.in? INCLUDE_TOURNAMENTS
     (melee_player_count.present? && melee_player_count > MELEE_THRESHOLD) ||
       (ultimate_player_count.present? && ultimate_player_count > ULTIMATE_THRESHOLD)
   end
