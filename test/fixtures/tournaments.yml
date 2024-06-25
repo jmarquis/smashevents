@@ -1,0 +1,46 @@
+# == Schema Information
+#
+# Table name: tournaments
+#
+#  id               :bigint           not null, primary key
+#  city             :string
+#  country          :string
+#  end_at           :date
+#  featured_players :string
+#  games            :string           is an Array
+#  name             :string
+#  player_count     :integer
+#  slug             :string
+#  start_at         :date
+#  state            :string
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
+# Indexes
+#
+#  index_tournaments_on_games     (games) USING gin
+#  index_tournaments_on_name      (name)
+#  index_tournaments_on_start_at  (start_at)
+#
+
+one:
+  name: MyString
+  start_at: 2024-06-24
+  end_at: 2024-06-24
+  games: MyString
+  city: MyString
+  state: MyString
+  country: MyString
+  player_count: 1
+  featured_players: MyString
+
+two:
+  name: MyString
+  start_at: 2024-06-24
+  end_at: 2024-06-24
+  games: MyString
+  city: MyString
+  state: MyString
+  country: MyString
+  player_count: 1
+  featured_players: MyString
