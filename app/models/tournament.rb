@@ -39,6 +39,7 @@ class Tournament < ApplicationRecord
   def self.from_startgg(data)
     t = find_by(startgg_id: data.id) || new
 
+    t.startgg_id = data.id
     t.slug = data.slug
     t.name = data.name
     t.start_at = data.start_at.present? ? Time.at(data.start_at).to_date : nil
