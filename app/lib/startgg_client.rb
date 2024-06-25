@@ -15,6 +15,7 @@ class StartggClient
           }
         }) {
           nodes {
+            id
             name
             slug
             startAt

@@ -2,14 +2,17 @@ namespace :tournaments do
 
   task sync: [:environment] do
     RETRIES_PER_FETCH = 5
+    analyzed = 0
+    added = 0
+    updated = 0
 
-    (1..3).each do |page|
+    (1..10).each do |page|
       tournaments = []
       retries = 0
 
       loop do
         puts "Fetching page #{page} of tournaments..."
-        tournaments = StartggClient.tournaments(batch_size: 10, page:)
+        tournaments = StartggClient.tournaments(batch_size: 100, page:)
         break
       rescue Graphlient::Errors::ExecutionError => e
         if retries < RETRIES_PER_FETCH
@@ -27,13 +30,22 @@ namespace :tournaments do
       end
 
       puts "#{tournaments.count} tournaments found."
-      tournaments.each do |t|
-        puts "Analyzing #{t.name}..."
-        tournament = Tournament.from_startgg(t)
+      analyzed += tournaments.count
+
+      tournaments.each do |data|
+        puts "Analyzing #{data.name}..."
+        tournament = Tournament.from_startgg(data)
         puts "#{tournament.player_count} players."
         if tournament.interesting?
-          puts 'Saved!'
+          if tournament.persisted?
+            msg = 'Updated!'
+            updated += 1
+          else
+            msg = 'Imported!'
+            added += 1
+          end
           tournament.save
+          puts msg
         end
       end
 

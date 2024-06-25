@@ -15,12 +15,14 @@
 #  state            :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  startgg_id       :integer
 #
 # Indexes
 #
-#  index_tournaments_on_games     (games) USING gin
-#  index_tournaments_on_name      (name)
-#  index_tournaments_on_start_at  (start_at)
+#  index_tournaments_on_games       (games) USING gin
+#  index_tournaments_on_name        (name)
+#  index_tournaments_on_start_at    (start_at)
+#  index_tournaments_on_startgg_id  (startgg_id) UNIQUE
 #
 class Tournament < ApplicationRecord
 
@@ -45,17 +47,19 @@ class Tournament < ApplicationRecord
       games << ID_TO_GAME[event.videogame.id]
     end
 
-    new({
-      slug: data.slug,
-      name: data.name,
-      start_at: data.start_at,
-      end_at: data.end_at,
-      player_count: data.num_attendees || 0,
-      city: data.city,
-      state: data.addr_state,
-      country: data.country_code,
-      games:
-    })
+    t = find_by(startgg_id: data.id) || new
+
+    t.slug = data.slug
+    t.name = data.name
+    t.start_at = data.start_at.present? ? Time.at(data.start_at).to_date : nil
+    t.end_at = data.end_at.present? ? Time.at(data.end_at).to_date : nil
+    t.player_count = data.num_attendees || 0
+    t.city = data.city
+    t.state = data.addr_state
+    t.country = data.country_code
+    t.games = games
+
+    t
   end
 
   def interesting?

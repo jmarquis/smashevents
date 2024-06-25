@@ -15,6 +15,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_161249) do
   enable_extension "plpgsql"
 
   create_table "tournaments", force: :cascade do |t|
+    t.integer "startgg_id"
     t.string "slug"
     t.string "name"
     t.date "start_at"
@@ -30,6 +31,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_161249) do
     t.index ["games"], name: "index_tournaments_on_games", using: :gin
     t.index ["name"], name: "index_tournaments_on_name"
     t.index ["start_at"], name: "index_tournaments_on_start_at"
+    t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true
   end
 
 end

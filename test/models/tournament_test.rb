@@ -15,12 +15,14 @@
 #  state            :string
 #  created_at       :datetime         not null
 #  updated_at       :datetime         not null
+#  startgg_id       :integer
 #
 # Indexes
 #
-#  index_tournaments_on_games     (games) USING gin
-#  index_tournaments_on_name      (name)
-#  index_tournaments_on_start_at  (start_at)
+#  index_tournaments_on_games       (games) USING gin
+#  index_tournaments_on_name        (name)
+#  index_tournaments_on_start_at    (start_at)
+#  index_tournaments_on_startgg_id  (startgg_id) UNIQUE
 #
 require "test_helper"
 

@@ -1,6 +1,7 @@
 class CreateTournaments < ActiveRecord::Migration[7.1]
   def change
     create_table :tournaments do |t|
+      t.integer :startgg_id
       t.string :slug
       t.string :name
       t.date :start_at
@@ -14,6 +15,7 @@ class CreateTournaments < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
+    add_index :tournaments, :startgg_id, unique: true
     add_index :tournaments, :name
     add_index :tournaments, :start_at
     add_index :tournaments, :games, using: 'gin'
