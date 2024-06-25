@@ -6,18 +6,18 @@ class CreateTournaments < ActiveRecord::Migration[7.1]
       t.string :name
       t.date :start_at
       t.date :end_at
-      t.string :games, array: true
       t.string :city
       t.string :state
       t.string :country
-      t.integer :player_count
-      t.string :featured_players
+      t.integer :melee_player_count
+      t.integer :ultimate_player_count
+      t.string :melee_featured_players, array: true
+      t.string :ultimate_featured_players, array: true
 
       t.timestamps
     end
     add_index :tournaments, :startgg_id, unique: true
     add_index :tournaments, :name
     add_index :tournaments, :start_at
-    add_index :tournaments, :games, using: 'gin'
   end
 end

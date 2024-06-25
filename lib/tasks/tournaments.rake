@@ -6,7 +6,7 @@ namespace :tournaments do
     added = 0
     updated = 0
 
-    (1..10).each do |page|
+    (1..50).each do |page|
       tournaments = []
       retries = 0
 
@@ -31,28 +31,32 @@ namespace :tournaments do
 
       puts "#{tournaments.count} tournaments found."
       analyzed += tournaments.count
+      break if tournaments.count.zero?
 
       tournaments.each do |data|
         puts "Analyzing #{data.name}..."
         tournament = Tournament.from_startgg(data)
-        puts "#{tournament.player_count} players."
-        if tournament.interesting?
-          if tournament.persisted?
-            msg = 'Updated!'
-            updated += 1
-          else
-            msg = 'Imported!'
-            added += 1
-          end
-          tournament.save
-          puts msg
+        puts "#{tournament.melee_player_count} Melee players, #{tournament.ultimate_player_count} Ultimate players."
+        next unless tournament.interesting?
+
+        if tournament.persisted?
+          msg = 'Updated!'
+          updated += 1
+        else
+          msg = 'Imported!'
+          added += 1
         end
+        tournament.save
+        puts msg
       end
 
       sleep 1
 
     end
-    puts "Done."
+    puts "----------------------------------"
+    puts "Analyzed: #{analyzed}"
+    puts "Imported: #{added}"
+    puts "Updated: #{updated}"
   end
 
 end

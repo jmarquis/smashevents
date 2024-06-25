@@ -20,15 +20,15 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_161249) do
     t.string "name"
     t.date "start_at"
     t.date "end_at"
-    t.string "games", array: true
     t.string "city"
     t.string "state"
     t.string "country"
-    t.integer "player_count"
-    t.string "featured_players"
+    t.integer "melee_player_count"
+    t.integer "ultimate_player_count"
+    t.string "melee_featured_players", array: true
+    t.string "ultimate_featured_players", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["games"], name: "index_tournaments_on_games", using: :gin
     t.index ["name"], name: "index_tournaments_on_name"
     t.index ["start_at"], name: "index_tournaments_on_start_at"
     t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true

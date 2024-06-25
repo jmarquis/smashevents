@@ -27,6 +27,7 @@ class StartggClient
             events(filter: {
               videogameId: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
             }) {
+              numEntrants
               videogame {
                 id
               }
