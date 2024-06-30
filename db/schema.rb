@@ -15,12 +15,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_30_141813) do
   enable_extension "plpgsql"
 
   create_table "tournament_overrides", force: :cascade do |t|
-    t.integer "startgg_id"
+    t.string "slug"
     t.boolean "include"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["include"], name: "index_tournament_overrides_on_include"
-    t.index ["startgg_id"], name: "index_tournament_overrides_on_startgg_id", unique: true
+    t.index ["slug"], name: "index_tournament_overrides_on_slug", unique: true
   end
 
   create_table "tournaments", force: :cascade do |t|

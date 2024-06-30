@@ -36,7 +36,7 @@ class Tournament < ApplicationRecord
     t = find_by(startgg_id: data.id) || new
 
     t.startgg_id = data.id
-    t.slug = data.slug
+    t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
     t.start_at = data.start_at.present? ? Time.at(data.start_at).to_date : nil
     t.end_at = data.end_at.present? ? Time.at(data.end_at).to_date : nil
@@ -54,8 +54,8 @@ class Tournament < ApplicationRecord
   end
 
   def interesting?
-    override = TournamentOverrides.find_by(startgg_id:)
-    return override.include if override.include.present?
+    override = TournamentOverride.find_by(slug:)
+    return override.include if override&.include.present?
 
     interesting_melee? || interesting_ultimate?
   end

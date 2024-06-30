@@ -40,10 +40,10 @@ class StartggClient
     client.query(query, perPage: batch_size, page:)&.data&.tournaments&.nodes
   end
 
-  def self.tournament(startgg_id:)
+  def self.tournament(slug:)
     query = <<~GRAPHQL
-      query($startgg_id: ID) {
-        tournament(id: $startgg_id) {
+      query($slug: String) {
+        tournament(slug: $slug) {
           id
           name
           slug
@@ -65,7 +65,7 @@ class StartggClient
       }
     GRAPHQL
 
-    client.query(query, startgg_id:)&.data&.tournament
+    client.query(query, slug:)&.data&.tournament
   end
 
   def self.client

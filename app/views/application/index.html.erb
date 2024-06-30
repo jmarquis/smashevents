@@ -18,19 +18,13 @@
       <time><%= date_range(tournament) %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
-      <div><%= player_count(tournament, melee: @melee, ultimate: @ultimate) %> players</div>
+      <% if player_count(tournament, melee: @melee, ultimate: @ultimate) %>
+        <div><%= player_count(tournament, melee: @melee, ultimate: @ultimate) %> players</div>
+      <% end %>
       <ul class="players">
-        <li>Zain</li>
-        <li>Aklo</li>
-        <li>Plup</li>
-        <li>Mang0</li>
-        <li>Hungrybox</li>
-        <li>aMSa</li>
-        <li>Moky</li>
-        <li>Joshman</li>
-        <li>Cody Schwab</li>
-        <li>n0ne</li>
-        <li>Trif</li>
+        <% if (@melee && tournament.melee_featured_players.blank?) || (@ultimate && tournament.ultimate_featured_players.blank?) %>
+          <li>Featured players coming soon</li>
+        <% end %>
       </ul>
     </article>
   <% end %>

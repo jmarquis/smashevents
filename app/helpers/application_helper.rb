@@ -17,6 +17,8 @@ module ApplicationHelper
     num += tournament.melee_player_count if melee
     num += tournament.ultimate_player_count if ultimate
 
+    return nil if num == 0
+
     "#{num.round(-1)}+"
   end
 

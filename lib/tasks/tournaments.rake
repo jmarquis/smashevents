@@ -70,7 +70,7 @@ namespace :tournaments do
     TournamentOverride.all.each do |override|
 
       if !override.include
-        tournament = Tournament.find_by(startgg_id: override.startgg_id)
+        tournament = Tournament.find_by(slug: override.slug)
         if tournament.present?
           tournament.destroy
           deleted += 1
@@ -80,8 +80,8 @@ namespace :tournaments do
         retries = 0
 
         loop do
-          puts "Fetching tournament #{override.startgg_id}..."
-          data = StartggClient.tournament(startgg_id: override.startgg_id)
+          puts "Fetching tournament #{override.slug}..."
+          data = StartggClient.tournament(slug: override.slug)
           break
         rescue Graphlient::Errors::ExecutionError => e
           if retries < RETRIES_PER_FETCH
