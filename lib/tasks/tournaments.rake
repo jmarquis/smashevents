@@ -3,8 +3,8 @@ namespace :tournaments do
   task sync: [:environment] do
     RETRIES_PER_FETCH = 5
     analyzed = 0
-    added = 0
-    updated = 0
+    added = []
+    updated = []
 
     (1..50).each do |page|
       tournaments = []
@@ -40,13 +40,19 @@ namespace :tournaments do
         next unless tournament.interesting?
 
         if tournament.persisted?
-          msg = 'Updated!'
-          updated += 1
+          if tournament.changed?
+            tournament.save
+            msg = 'Updated!'
+            updated << tournament.slug
+          else
+            msg = 'No updates found.'
+          end
         else
+          tournament.save
           msg = 'Imported!'
-          added += 1
+          added << tournament.slug
         end
-        tournament.save
+
         puts msg
       end
 
@@ -56,16 +62,18 @@ namespace :tournaments do
 
     puts '----------------------------------'
     puts "Analyzed: #{analyzed}"
-    puts "Imported: #{added}"
-    puts "Updated: #{updated}"
+    puts "Imported: #{added.count}"
+    added.each { |t| puts "+ #{t}" }
+    puts "Updated: #{updated.count}"
+    updated.each { |t| puts "~ #{t}" }
   end
 
   task sync_overrides: [:environment] do
     RETRIES_PER_FETCH = 5
     analyzed = 0
-    added = 0
-    updated = 0
-    deleted = 0
+    added = []
+    updated = []
+    deleted = []
 
     TournamentOverride.all.each do |override|
 
@@ -73,7 +81,7 @@ namespace :tournaments do
         tournament = Tournament.find_by(slug: override.slug)
         if tournament.present?
           tournament.destroy
-          deleted += 1
+          deleted << tournament.slug
         end
       else
         data = nil
@@ -103,15 +111,20 @@ namespace :tournaments do
         puts "#{tournament.melee_player_count} Melee players, #{tournament.ultimate_player_count} Ultimate players."
 
         if tournament.persisted?
-          msg = 'Updated!'
-          updated += 1
+          if tournament.changed?
+            tournament.save
+            msg = 'Updated!'
+            updated << tournament.slug
+          else
+            msg = 'No updates found.'
+          end
         else
+          tournament.save
           msg = 'Imported!'
-          added += 1
+          added << tournament.slug
         end
-        tournament.save
-        puts msg
 
+        puts msg
         sleep 1
 
       end
@@ -120,9 +133,12 @@ namespace :tournaments do
 
     puts '----------------------------------'
     puts "Analyzed: #{analyzed}"
-    puts "Imported: #{added}"
-    puts "Updated: #{updated}"
-    puts "Deleted: #{deleted}"
+    puts "Imported: #{added.count}"
+    added.each { |t| puts "+ #{t}" }
+    puts "Updated: #{updated.count}"
+    updated.each { |t| puts "~ #{t}" }
+    puts "Deleted: #{deleted.count}"
+    deleted.each { |t| puts "- #{t}" }
   end
 
 end
