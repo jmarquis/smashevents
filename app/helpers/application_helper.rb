@@ -12,4 +12,12 @@ module ApplicationHelper
     end
   end
 
+  def player_count(tournament, melee: true, ultimate: true)
+    num = 0
+    num += tournament.melee_player_count if melee
+    num += tournament.ultimate_player_count if ultimate
+
+    "#{num.round(-1)}+"
+  end
+
 end

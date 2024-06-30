@@ -1,12 +1,14 @@
 <h1>Smash Events</h1>
 
 <nav>
-  <label>
-    <div><input type="checkbox"><span></span></div>Melee
-  </label>
-  <label>
-    <div><input type="checkbox"><span></span></div>Ultimate
-  </label>
+  <form method="get" action="/">
+    <label>
+      <div><input type="checkbox" name="melee" value="1" <%= 'checked' if @melee %> onchange="this.form.submit()"><span></span></div>Melee
+    </label>
+    <label>
+      <div><input type="checkbox" name="ultimate" value="1" <%= 'checked' if @ultimate %> onchange="this.form.submit()"><span></span></div>Ultimate
+    </label>
+  </form>
 </nav>
 
 <main>
@@ -16,7 +18,7 @@
       <time><%= date_range(tournament) %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
-      <div><%= tournament.melee_player_count %>+ players</div>
+      <div><%= player_count(tournament, melee: @melee, ultimate: @ultimate) %> players</div>
       <ul class="players">
         <li>Zain</li>
         <li>Aklo</li>

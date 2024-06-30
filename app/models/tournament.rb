@@ -58,9 +58,15 @@ class Tournament < ApplicationRecord
   end
 
   def interesting?
-    startgg_id.in? INCLUDE_TOURNAMENTS
-    (melee_player_count.present? && melee_player_count > MELEE_THRESHOLD) ||
-      (ultimate_player_count.present? && ultimate_player_count > ULTIMATE_THRESHOLD)
+    interesting_melee? || interesting_ultimate?
+  end
+
+  def interesting_melee?
+    melee_player_count.present? && melee_player_count > MELEE_THRESHOLD
+  end
+
+  def interesting_ultimate?
+    ultimate_player_count.present? && ultimate_player_count > ULTIMATE_THRESHOLD
   end
 
 end
