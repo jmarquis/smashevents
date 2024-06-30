@@ -40,6 +40,34 @@ class StartggClient
     client.query(query, perPage: batch_size, page:)&.data&.tournaments&.nodes
   end
 
+  def self.tournament(startgg_id:)
+    query = <<~GRAPHQL
+      query($startgg_id: ID) {
+        tournament(id: $startgg_id) {
+          id
+          name
+          slug
+          startAt
+          endAt
+          numAttendees
+          city
+          addrState
+          countryCode
+          events(filter: {
+            videogameId: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
+          }) {
+            numEntrants
+            videogame {
+              id
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    client.query(query, startgg_id:)&.data&.tournament
+  end
+
   def self.client
     return @@client if @@client
 

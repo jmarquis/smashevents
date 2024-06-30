@@ -32,10 +32,6 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
-  INCLUDE_TOURNAMENTS = [
-    669570 # SuperNova 2024
-  ]
-
   def self.from_startgg(data)
     t = find_by(startgg_id: data.id) || new
 
@@ -58,6 +54,9 @@ class Tournament < ApplicationRecord
   end
 
   def interesting?
+    override = TournamentOverrides.find_by(startgg_id:)
+    return override.include if override.include.present?
+
     interesting_melee? || interesting_ultimate?
   end
 
