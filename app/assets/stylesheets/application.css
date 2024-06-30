@@ -33,7 +33,7 @@ h1 {
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 24px;
-  margin: 96px 0 24px;
+  margin: 96px -24px 24px 0;
   pointer-events: none;
 }
 
@@ -47,7 +47,7 @@ nav {
 
 nav label {
   flex: none;
-  margin: 0 24px;
+  margin: 0 16px;
   cursor: pointer;
 }
 
