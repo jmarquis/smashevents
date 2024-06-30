@@ -63,6 +63,4 @@ class Tournament < ApplicationRecord
       (ultimate_player_count.present? && ultimate_player_count > ULTIMATE_THRESHOLD)
   end
 
-
-
 end

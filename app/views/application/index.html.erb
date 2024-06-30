@@ -13,7 +13,7 @@
 
   <% @tournaments.each do |tournament| %>
     <article>
-      <time>Aug 8–11, 2024</time>
+      <time><%= date_range(tournament) %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
       <div><%= tournament.melee_player_count %>+ players</div>
