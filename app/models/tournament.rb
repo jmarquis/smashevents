@@ -32,6 +32,8 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
+  scope :upcoming, -> { where('end_at >= ?', Date.today) }
+
   def self.from_startgg(data)
     t = find_by(startgg_id: data.id) || new
 

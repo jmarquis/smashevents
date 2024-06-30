@@ -147,4 +147,42 @@ namespace :tournaments do
     deleted.each { |t| puts "- #{t}" }
   end
 
+  task sync_entrants: [:environment] do
+    RETRIES_PER_FETCH = 5
+    analyzed = 0
+    added = []
+    updated = []
+    deleted = []
+
+    Tournament.upcoming.each do |tournament|
+      events = []
+      retries = 0
+
+      loop do
+        puts "Fetching tournament #{tournament.slug}..."
+        events = StartggClient.tournament_events_with_entrants(slug: tournament.slug)
+        break
+      rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError => e
+        if retries < RETRIES_PER_FETCH
+          puts "Transient error fetching tournament, will retry: #{e.message}"
+          retries += 1
+          sleep 1
+          next
+        else
+          puts "Retry threshold exceeded, exiting: #{e.message}"
+          raise e
+        end
+      rescue => e
+        puts "Unexpected error fetching tournament: #{e.message}"
+        raise e
+      end
+
+      events.each do |event|
+        puts "Analyzing #{event.name}..."
+      end
+
+    end
+
+  end
+
 end
