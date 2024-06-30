@@ -55,7 +55,7 @@ class Tournament < ApplicationRecord
 
   def interesting?
     override = TournamentOverride.find_by(slug:)
-    return override.include if override&.include.present?
+    return override.include unless override&.include.nil?
 
     interesting_melee? || interesting_ultimate?
   end

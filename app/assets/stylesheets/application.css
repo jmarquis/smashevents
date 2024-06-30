@@ -33,7 +33,10 @@ h1 {
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 24px;
-  margin: 96px -24px 24px 0;
+  margin: 96px 0 24px;
+  width: calc(100% - 24px);
+  position: relative;
+  left: 24px;
   pointer-events: none;
 }
 

@@ -42,15 +42,15 @@ namespace :tournaments do
         if tournament.persisted?
           if tournament.changed?
             tournament.save
+            updated << tournament
             msg = 'Updated!'
-            updated << tournament.slug
           else
             msg = 'No updates found.'
           end
         else
           tournament.save
-          msg = 'Imported!'
           added << tournament.slug
+          msg = 'Imported!'
         end
 
         puts msg
@@ -65,7 +65,10 @@ namespace :tournaments do
     puts "Imported: #{added.count}"
     added.each { |t| puts "+ #{t}" }
     puts "Updated: #{updated.count}"
-    updated.each { |t| puts "~ #{t}" }
+    updated.each do |t|
+      changes = t.saved_changes.reject { |k| k == 'updated_at' }
+      puts "~ #{t.slug}: #{changes}"
+    end
   end
 
   task sync_overrides: [:environment] do
@@ -91,7 +94,7 @@ namespace :tournaments do
           puts "Fetching tournament #{override.slug}..."
           data = StartggClient.tournament(slug: override.slug)
           break
-        rescue Graphlient::Errors::ExecutionError => e
+        rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError => e
           if retries < RETRIES_PER_FETCH
             puts "Transient error fetching tournament, will retry: #{e.message}"
             retries += 1
@@ -113,15 +116,15 @@ namespace :tournaments do
         if tournament.persisted?
           if tournament.changed?
             tournament.save
+            updated << tournament
             msg = 'Updated!'
-            updated << tournament.slug
           else
             msg = 'No updates found.'
           end
         else
           tournament.save
-          msg = 'Imported!'
           added << tournament.slug
+          msg = 'Imported!'
         end
 
         puts msg
@@ -136,7 +139,10 @@ namespace :tournaments do
     puts "Imported: #{added.count}"
     added.each { |t| puts "+ #{t}" }
     puts "Updated: #{updated.count}"
-    updated.each { |t| puts "~ #{t}" }
+    updated.each do |t|
+      changes = t.saved_changes.reject { |k| k == 'updated_at' }
+      puts "~ #{t.slug}: #{changes}"
+    end
     puts "Deleted: #{deleted.count}"
     deleted.each { |t| puts "- #{t}" }
   end
