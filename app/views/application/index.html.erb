@@ -11,64 +11,26 @@
 
 <main>
 
-  <article>
-    <time>Aug 8–11, 2024</time>
-    <h2><a href="blah">Supernova 2024</a></h2>
-    <div>Chantilly, VA</div>
-    <div>600+ players</div>
-    <ul class="players">
-      <li>Zain</li>
-      <li>Aklo</li>
-      <li>Plup</li>
-      <li>Mang0</li>
-      <li>Hungrybox</li>
-      <li>aMSa</li>
-      <li>Moky</li>
-      <li>Joshman</li>
-      <li>Cody Schwab</li>
-      <li>n0ne</li>
-      <li>Trif</li>
-    </ul>
-  </article>
-
-  <article>
-    <time>Aug 8–11, 2024</time>
-    <h2><a href="blah">Supernova 2024</a></h2>
-    <div>Chantilly, VA</div>
-    <div>600+ players</div>
-    <ul class="players">
-      <li>Zain</li>
-      <li>Aklo</li>
-      <li>Plup</li>
-      <li>Mang0</li>
-      <li>Hungrybox</li>
-      <li>aMSa</li>
-      <li>Moky</li>
-      <li>Joshman</li>
-      <li>Cody Schwab</li>
-      <li>n0ne</li>
-      <li>Trif</li>
-    </ul>
-  </article>
-
-  <article>
-    <time>Aug 8–11, 2024</time>
-    <h2><a href="blah">Supernova 2024</a></h2>
-    <div>Chantilly, VA</div>
-    <div>600+ players</div>
-    <ul class="players">
-      <li>Zain</li>
-      <li>Aklo</li>
-      <li>Plup</li>
-      <li>Mang0</li>
-      <li>Hungrybox</li>
-      <li>aMSa</li>
-      <li>Moky</li>
-      <li>Joshman</li>
-      <li>Cody Schwab</li>
-      <li>n0ne</li>
-      <li>Trif</li>
-    </ul>
-  </article>
+  <% @tournaments.each do |tournament| %>
+    <article>
+      <time>Aug 8–11, 2024</time>
+      <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
+      <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country == 'US' %></div>
+      <div><%= tournament.melee_player_count %>+ players</div>
+      <ul class="players">
+        <li>Zain</li>
+        <li>Aklo</li>
+        <li>Plup</li>
+        <li>Mang0</li>
+        <li>Hungrybox</li>
+        <li>aMSa</li>
+        <li>Moky</li>
+        <li>Joshman</li>
+        <li>Cody Schwab</li>
+        <li>n0ne</li>
+        <li>Trif</li>
+      </ul>
+    </article>
+  <% end %>
 
 </main>
