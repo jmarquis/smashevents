@@ -21,11 +21,23 @@
       <% if player_count(tournament, melee: @melee, ultimate: @ultimate) %>
         <div><%= player_count(tournament, melee: @melee, ultimate: @ultimate) %> players</div>
       <% end %>
-      <ul class="players">
-        <% if (@melee && tournament.melee_featured_players.blank?) || (@ultimate && tournament.ultimate_featured_players.blank?) %>
-          <li>Featured players coming soon</li>
-        <% end %>
-      </ul>
+      <% if @melee && tournament.melee_featured_players.present? %>
+        <ul class="players">
+          <% tournament.melee_featured_players.each do |player| %>
+            <li><%= player %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if @ultimate && tournament.ultimate_featured_players.present? %>
+        <ul class="players">
+          <% tournament.ultimate_featured_players.each do |player| %>
+            <li><%= player %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if (!@ultimate && tournament.melee_featured_players.blank?) || (!@melee && tournament.ultimate_featured_players.blank?) || (tournament.melee_featured_players.blank? && tournament.ultimate_featured_players.blank?) %>
+        <ul class="players"><li>Featured players coming soon</li></ul>
+      <% end %>
     </article>
   <% end %>
 

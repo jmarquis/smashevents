@@ -177,9 +177,39 @@ namespace :tournaments do
         raise e
       end
 
+      biggest_events = {
+        Tournament::MELEE_ID => nil,
+        Tournament::ULTIMATE_ID => nil
+      }
+
       events.each do |event|
-        puts "Analyzing #{event.name}..."
+        puts "#{event.num_entrants || 0} entrants in #{event.name} (#{event.videogame.id.to_i == Tournament::MELEE_ID ? 'Melee' : 'Ultimate'})"
+        biggest_events[event.videogame.id.to_i] = event if event.num_entrants.present? && event.num_entrants > (biggest_events[event.videogame.id.to_i]&.num_entrants || 0)
       end
+
+      if biggest_events[Tournament::MELEE_ID].present?
+        melee_players = []
+        biggest_events[Tournament::MELEE_ID].entrants.nodes.each do |entrant|
+          if entrant.initial_seed_num.present? && entrant.initial_seed_num <= 10
+            melee_players[entrant.initial_seed_num - 1] = entrant.name.split('|').last.strip
+          end
+        end
+      end
+
+      tournament.melee_featured_players = melee_players
+
+      if biggest_events[Tournament::ULTIMATE_ID].present?
+        ultimate_players = []
+        biggest_events[Tournament::ULTIMATE_ID].entrants.nodes.each do |entrant|
+          if entrant.initial_seed_num.present? && entrant.initial_seed_num <= 10
+            ultimate_players[entrant.initial_seed_num - 1] = entrant.name.split('|').last.strip
+          end
+        end
+      end
+
+      tournament.ultimate_featured_players = ultimate_players
+
+      tournament.save
 
     end
 
