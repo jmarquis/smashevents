@@ -1,4 +1,3 @@
 #!/bin/sh
 
-rails assets:precompile
-rails db:migrate
+bundle exec rails db:migrate

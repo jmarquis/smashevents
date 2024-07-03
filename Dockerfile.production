@@ -20,6 +20,7 @@ WORKDIR /opt/rails
 
 COPY . ./
 RUN bundle install
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 EXPOSE 3000
 EXPOSE 3036
