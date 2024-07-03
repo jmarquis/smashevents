@@ -10,8 +10,8 @@ build:
   config:
     RAILS_ENV: production
 release:
+  image: web
   command:
     - ./deployment-tasks.sh
-  image: web
 # run:
 #   web: rails s -b0

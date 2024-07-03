@@ -3,6 +3,7 @@ FROM ruby:3.3.3-alpine
 ARG RAILS_ENV=development
 
 RUN apk add --update --no-cache \
+      curl \
       build-base \
       less \
       postgresql-dev \
