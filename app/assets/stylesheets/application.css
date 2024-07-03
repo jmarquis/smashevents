@@ -18,13 +18,14 @@ body {
 }
 
 a {
-  text-decoration: none;
+  text-decoration: underline;
   color: inherit;
+  text-decoration-color: #183535;
 }
 
 a:hover {
   color: #fff;
-  text-decoration: underline;
+  text-decoration-color: #fff;
 }
 
 h1 {
@@ -139,4 +140,10 @@ article > .players {
 
 .players > li {
   margin: 2px 16px;
+}
+
+footer {
+  margin: 96px 0 40px;
+  text-align: center;
+  opacity: 0.5;
 }
