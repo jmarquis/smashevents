@@ -1,6 +1,8 @@
-namespace :tournaments do
+namespace :startgg do
 
-  task sync: [:environment] do
+  task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
+
+  task sync_tournaments: [:environment] do
     RETRIES_PER_FETCH = 5
     analyzed = 0
     added = []
