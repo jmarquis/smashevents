@@ -2,8 +2,8 @@ setup:
   # addons:
   #   - plan: heroku-postgresql
   #     as: DATABASE
-  # config:
-  #   S3_BUCKET: my-example-bucket
+  config:
+    S3_BUCKET: my-example-bucket
 build:
   docker:
     web: Dockerfile
