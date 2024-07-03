@@ -6,7 +6,7 @@ setup:
     S3_BUCKET: my-example-bucket
 build:
   docker:
-    web: Dockerfile
+    web: Dockerfile.production
   config:
     RAILS_ENV: production
 release:
