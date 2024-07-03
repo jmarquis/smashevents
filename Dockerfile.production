@@ -19,6 +19,7 @@ WORKDIR /opt/rails
 
 COPY . ./
 RUN bundle install
+RUN rails assets:precompile
 
 EXPOSE 3000
 EXPOSE 3036
