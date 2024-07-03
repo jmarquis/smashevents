@@ -11,7 +11,6 @@ RUN apk add --update --no-cache \
       git \
       tzdata \
       gcompat \
-      libssl1.1 \
       inotify-tools
 
 RUN mkdir -p /opt/rails
