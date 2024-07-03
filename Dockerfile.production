@@ -19,6 +19,9 @@ RUN apk add --update --no-cache \
       iproute2 \
       jq
 
+ADD ./.profile.d /app/.profile.d
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
 RUN mkdir -p /opt/rails
 WORKDIR /opt/rails
 
