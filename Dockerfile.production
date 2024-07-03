@@ -19,7 +19,7 @@ RUN apk add --update --no-cache \
       iproute2 \
       jq
 
-ADD ./.profile.d /app/.profile.d
+ADD heroku-exec.sh /app/.profile.d/heroku-exec.sh
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 RUN mkdir -p /opt/rails
