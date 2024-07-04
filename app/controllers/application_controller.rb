@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
       @ultimate = true unless ActiveModel::Type::Boolean.new.cast(cookies[:ultimate]) == false
     end
 
-    @tournaments = Tournament.where('end_at > ?', Date.today).order(start_at: :asc, name: :asc)
+    @tournaments = Tournament.where('end_at > ?', Date.today - 1.day).order(start_at: :asc, name: :asc)
 
     if !@melee
       @tournaments = @tournaments.where('ultimate_player_count > ?', 0)
