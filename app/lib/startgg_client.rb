@@ -20,6 +20,7 @@ class StartggClient
             slug
             startAt
             endAt
+            timezone
             numAttendees
             city
             addrState
@@ -49,6 +50,7 @@ class StartggClient
           slug
           startAt
           endAt
+          timezone
           numAttendees
           city
           addrState
