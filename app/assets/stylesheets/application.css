@@ -123,15 +123,19 @@ time {
 }
 
 article + article {
-  margin-top: 64px;
+  margin-top: 80px;
 }
 
 article > div + div {
   margin-top: 8px;
 }
 
-article > .players {
-  margin: 24px 0 0;
+article > .game {
+  margin-top: 32px;
+}
+
+article > .game > .players {
+  margin: 12px 0 0;
   padding: 0;
   list-style: none;
   display: flex;

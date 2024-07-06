@@ -18,26 +18,37 @@
       <time><%= date_range(tournament) %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
-      <% if player_count(tournament, melee: @melee, ultimate: @ultimate) %>
-        <div><%= player_count(tournament, melee: @melee, ultimate: @ultimate) %> players</div>
+
+      <% if @melee && tournament.melee_player_count.present? && tournament.melee_player_count != 0 %>
+        <div class="game">
+          <p><% if @ultimate %>SSBM: <% end %><%= tournament.melee_player_count.round(-1) %>+ players</p>
+          <ul class="players">
+            <% if tournament.melee_featured_players.present? %>
+              <% tournament.melee_featured_players.each do |player| %>
+                <li><%= player %></li>
+              <% end %>
+            <% else %>
+              <li>Featured players coming soon
+            <% end %>
+          </ul>
+        </div>
       <% end %>
-      <% if @melee && tournament.melee_featured_players.present? %>
-        <ul class="players">
-          <% tournament.melee_featured_players.each do |player| %>
-            <li><%= player %></li>
-          <% end %>
-        </ul>
+
+      <% if @ultimate && tournament.ultimate_player_count.present? && tournament.ultimate_player_count != 0 %>
+        <div class="game">
+          <p><% if @melee %>SSBU: <% end %><%= tournament.ultimate_player_count.round(-1) %>+ players</p>
+          <ul class="players">
+            <% if tournament.ultimate_featured_players.present? %>
+              <% tournament.ultimate_featured_players.each do |player| %>
+                <li><%= player %></li>
+              <% end %>
+            <% else %>
+              <li>Featured players coming soon
+            <% end %>
+          </ul>
+        </div>
       <% end %>
-      <% if @ultimate && tournament.ultimate_featured_players.present? %>
-        <ul class="players">
-          <% tournament.ultimate_featured_players.each do |player| %>
-            <li><%= player %></li>
-          <% end %>
-        </ul>
-      <% end %>
-      <% if (!@ultimate && tournament.melee_featured_players.blank?) || (!@melee && tournament.ultimate_featured_players.blank?) || (tournament.melee_featured_players.blank? && tournament.ultimate_featured_players.blank?) %>
-        <ul class="players"><li>Featured players coming soon</li></ul>
-      <% end %>
+
     </article>
   <% end %>
 
