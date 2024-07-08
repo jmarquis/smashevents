@@ -1,5 +1,5 @@
 class Game
-  attr_accessor :name, :slug, :startgg_id, :ranking_regex, :player_count_threshold
+  attr_accessor :name, :slug, :startgg_id, :rankings_regex, :player_count_threshold
 
   def initialize(params)
     params.each do |key, value|

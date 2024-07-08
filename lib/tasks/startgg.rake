@@ -160,10 +160,13 @@ namespace :startgg do
 
           puts "Found #{event_entrants.count} entrants."
 
-          # We get 0 back if there are no more past this page
+          # This means there are no available entrants
           break if event_entrants.count.zero?
 
           entrants = [*entrants, *event_entrants]
+
+          # If we don't have a full batch, this is the last page
+          break if event_entrants.count != 100
 
           sleep 1
         end
@@ -179,8 +182,8 @@ namespace :startgg do
           puts "Top seeds: #{featured_players.join(', ')}"
         else
           # Otherwise try to use rankings
-          rankings_key = Game.by_startgg_id(game_id).rankings_key
-          rankings_regex = Game.by_startgg_id(game_id).rankings_regex
+          rankings_key = Game.by_slug(event.game).rankings_key
+          rankings_regex = Game.by_slug(event.game).rankings_regex
           ranked_entrants = entrants.filter do |entrant|
             entrant.participants[0]&.player&.send(rankings_key)&.filter{ |ranking| ranking.title&.match(rankings_regex) }.present?
           end
