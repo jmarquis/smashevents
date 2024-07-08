@@ -26,12 +26,6 @@
 #
 class Tournament < ApplicationRecord
 
-  MELEE_ID = 1
-  ULTIMATE_ID = 1386
-
-  MELEE_THRESHOLD = 100
-  ULTIMATE_THRESHOLD = 300
-
   has_many :events, dependent: :destroy
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
