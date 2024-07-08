@@ -85,28 +85,7 @@ class StartggClient
     client.query(query, slug:)&.data&.tournament
   end
 
-  def self.tournament_events(slug:)
-    query = <<~GRAPHQL
-      query($slug: String) {
-        tournament(slug: $slug) {
-          events(filter: {
-            videogameId: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
-          }) {
-            id
-            name
-            numEntrants
-            videogame {
-              id
-            }
-          }
-        }
-      }
-    GRAPHQL
-
-    client.query(query, slug:)&.data&.tournament&.events
-  end
-
-  def self.event_entrants(id:, batch_size:, page:)
+  def self.event_entrants(id:, game:, batch_size:, page:)
     query = <<~GRAPHQL
       query($id: ID, $perPage: Int, $page: Int) {
         event(id: $id) {
@@ -116,11 +95,7 @@ class StartggClient
               participants {
                 player {
                   gamerTag
-                  #{RANKINGS_KEY_MELEE}: rankings(limit: 5, videogameId: #{Tournament::MELEE_ID}) {
-                    rank
-                    title
-                  }
-                  #{RANKINGS_KEY_ULTIMATE}: rankings(limit: 5, videogameId: #{Tournament::ULTIMATE_ID}) {
+                  #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
                     rank
                     title
                   }

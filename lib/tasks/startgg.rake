@@ -155,7 +155,12 @@ namespace :startgg do
         (1..100).each do |page|
           event_entrants = with_retries(5) do
             puts "Fetching #{event.game} entrants for #{tournament.name} (#{page})..."
-            StartggClient.event_entrants(id: event.startgg_id, batch_size: 100, page:)
+            StartggClient.event_entrants(
+              id: event.startgg_id,
+              game: Game.by_slug(event.game),
+              batch_size: 100,
+              page:
+            )
           end
 
           puts "Found #{event_entrants.count} entrants."
