@@ -1,18 +1,5 @@
 class StartggClient
 
-  RANKINGS_KEY_MELEE = :melee_rankings
-  RANKINGS_KEY_ULTIMATE = :ultimate_rankings
-
-  RANKINGS_KEY_MAP = {
-    Tournament::MELEE_ID => RANKINGS_KEY_MELEE,
-    Tournament::ULTIMATE_ID => RANKINGS_KEY_ULTIMATE
-  }
-
-  RANKINGS_REGEX_MAP = {
-    Tournament::MELEE_ID => /^SSBMRank/,
-    Tournament::ULTIMATE_ID => /^UltRank/
-  }
-
   @@client = nil
 
   def self.tournaments(batch_size: 100, page: 1)
@@ -24,7 +11,7 @@ class StartggClient
           sortBy: "startAt asc"
           filter: {
             upcoming: true
-            videogameIds: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
+            videogameIds: [#{Game::GAMES.map(&:startgg_id).join(',')}]
           }
         }) {
           nodes {
@@ -39,7 +26,7 @@ class StartggClient
             addrState
             countryCode
             events(filter: {
-              videogameId: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
+              videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
             }) {
               id
               numEntrants
@@ -70,7 +57,7 @@ class StartggClient
           addrState
           countryCode
           events(filter: {
-            videogameId: [#{Tournament::MELEE_ID}, #{Tournament::ULTIMATE_ID}]
+            videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
           }) {
             id
             numEntrants
