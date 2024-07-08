@@ -48,7 +48,7 @@ class Tournament < ApplicationRecord
     t.state = data.addr_state
     t.country = data.country_code
 
-    any_events_changed = false
+    events = []
     Game::GAMES.each do |game|
       biggest_event = data.events
         .filter { |event| event.videogame.id.to_i == game.startgg_id }
@@ -61,11 +61,11 @@ class Tournament < ApplicationRecord
         e.game = game.slug
         e.player_count = biggest_event.num_entrants
 
-        any_events_changed = any_events_changed || e.changed?
+        events << e
       end
     end
 
-    return t, any_events_changed
+    return t, events
   end
 
   def interesting?
@@ -75,12 +75,9 @@ class Tournament < ApplicationRecord
     events.any?(&:interesting?)
   end
 
-  def interesting_melee?
-    melee_player_count.present? && melee_player_count > MELEE_THRESHOLD
-  end
-
-  def interesting_ultimate?
-    ultimate_player_count.present? && ultimate_player_count > ULTIMATE_THRESHOLD
+  def exclude?
+    override = TournamentOverride.find_by(slug:)
+    override&.include == false
   end
 
 end

@@ -19,18 +19,23 @@ namespace :startgg do
 
       tournaments.each do |data|
         puts "Analyzing #{data.name}..."
-        tournament, any_events_changed = Tournament.from_startgg(data)
+        tournament, events = Tournament.from_startgg(data)
 
-        tournament.events.each do |event|
+        events.each do |event|
           puts "#{event.game.upcase}: #{event.player_count || 0} players"
         end
 
-        next unless tournament.interesting?
+        next if tournament.exclude?
+        next unless events.any?(&:interesting?) || tournament.interesting?
 
         if tournament.persisted?
-          if tournament.changed? || any_events_changed
+          if tournament.changed? || events.any?(&:changed?)
             tournament.save
-            updated << tournament
+            events.each(&:save)
+            updated << {
+              tournament:,
+              events:
+            }
             msg = 'Updated!'
           else
             msg = 'No updates found.'
@@ -53,13 +58,13 @@ namespace :startgg do
     puts "Imported: #{added.count}"
     added.each { |t| puts "+ #{t}" }
     puts "Updated: #{updated.count}"
-    updated.each do |t|
-      changes = t.saved_changes.reject { |k| k == 'updated_at' }
-      puts "~ #{t.slug}: #{changes}"
-      t.events.each do |e|
-        changes = e.saved_changes.reject { |k| k == 'updated_at' }
-        next if changes.empty?
-        puts "~ #{t.slug} / #{e.game}: #{changes}"
+    updated.each do |update|
+      tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
+      puts "~ #{update[:tournament].slug}: #{tournament_changes}"
+      update[:events].each do |event|
+        event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
+        next if event_changes.blank?
+        puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
       end
     end
   end
@@ -85,16 +90,20 @@ namespace :startgg do
         end
 
         puts "Analyzing #{data.name}..."
-        tournament, any_events_changed = Tournament.from_startgg(data)
+        tournament, events = Tournament.from_startgg(data)
 
-        tournament.events.each do |event|
+        events.each do |event|
           puts "#{event.game.upcase}: #{event.player_count || 0} players"
         end
 
         if tournament.persisted?
-          if tournament.changed? || any_events_changed
+          if tournament.changed? || events.any?(&:changed?)
             tournament.save
-            updated << tournament
+            events.each(&:save)
+            updated << {
+              tournament:,
+              events:
+            }
             msg = 'Updated!'
           else
             msg = 'No updates found.'
@@ -117,13 +126,13 @@ namespace :startgg do
     puts "Imported: #{added.count}"
     added.each { |t| puts "+ #{t}" }
     puts "Updated: #{updated.count}"
-    updated.each do |t|
-      changes = t.saved_changes.reject { |k| k == 'updated_at' }
-      puts "~ #{t.slug}: #{changes}"
-      t.events.each do |e|
-        changes = e.saved_changes.reject { |k| k == 'updated_at' }
-        next if changes.empty?
-        puts "~ #{t.slug} / #{e.game}: #{changes}"
+    updated.each do |update|
+      tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
+      puts "~ #{update[:tournament].slug}: #{tournament_changes}"
+      update[:events].each do |event|
+        event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
+        next if event_changes.blank?
+        puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
       end
     end
     puts "Deleted: #{deleted.count}"
