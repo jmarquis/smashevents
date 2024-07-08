@@ -22,7 +22,7 @@ namespace :startgg do
         tournament, any_games_changed = Tournament.from_startgg(data)
 
         tournament.tournament_games.each do |tournament_game|
-          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count} players"
+          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count || 0} players"
         end
 
         next unless tournament.interesting?
@@ -85,11 +85,14 @@ namespace :startgg do
         end
 
         puts "Analyzing #{data.name}..."
-        tournament = Tournament.from_startgg(data)
-        puts "#{tournament.melee_player_count} Melee players, #{tournament.ultimate_player_count} Ultimate players."
+        tournament, any_games_changed = Tournament.from_startgg(data)
+
+        tournament.tournament_games.each do |tournament_game|
+          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count || 0} players"
+        end
 
         if tournament.persisted?
-          if tournament.changed?
+          if tournament.changed? || any_games_changed
             tournament.save
             updated << tournament
             msg = 'Updated!'
@@ -117,6 +120,11 @@ namespace :startgg do
     updated.each do |t|
       changes = t.saved_changes.reject { |k| k == 'updated_at' }
       puts "~ #{t.slug}: #{changes}"
+      t.tournament_games.each do |tg|
+        changes = tg.saved_changes.reject { |k| k == 'updated_at' }
+        next if changes.empty?
+        puts "~ #{t.slug} / #{tg.game}: #{changes}"
+      end
     end
     puts "Deleted: #{deleted.count}"
     deleted.each { |t| puts "- #{t}" }

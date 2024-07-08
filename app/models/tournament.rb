@@ -32,7 +32,7 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
-  has_many :tournament_games
+  has_many :tournament_games, dependent: :destroy
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
 
