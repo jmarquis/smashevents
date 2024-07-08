@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_08_172008) do
+ActiveRecord::Schema[7.1].define(version: 2024_07_08_203535) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "tournament_games", force: :cascade do |t|
+  create_table "events", force: :cascade do |t|
     t.bigint "tournament_id", null: false
     t.integer "startgg_id", null: false
     t.string "game", null: false
@@ -22,9 +22,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_08_172008) do
     t.string "featured_players", array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["startgg_id"], name: "index_tournament_games_on_startgg_id", unique: true
-    t.index ["tournament_id", "game"], name: "index_tournament_games_on_tournament_id_and_game", unique: true
-    t.index ["tournament_id"], name: "index_tournament_games_on_tournament_id"
+    t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
+    t.index ["tournament_id", "game"], name: "index_events_on_tournament_id_and_game", unique: true
+    t.index ["tournament_id"], name: "index_events_on_tournament_id"
   end
 
   create_table "tournament_overrides", force: :cascade do |t|

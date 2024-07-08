@@ -32,7 +32,7 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
-  has_many :tournament_games, dependent: :destroy
+  has_many :events, dependent: :destroy
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
 
@@ -55,24 +55,24 @@ class Tournament < ApplicationRecord
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
-        tg = t.tournament_games.find_by(startgg_id: biggest_event.id) || t.tournament_games.new
+        e = t.events.find_by(startgg_id: biggest_event.id) || t.events.new
 
-        tg.startgg_id = biggest_event.id
-        tg.game = game[:slug]
-        tg.player_count = biggest_event.num_entrants
+        e.startgg_id = biggest_event.id
+        e.game = game[:slug]
+        e.player_count = biggest_event.num_entrants
 
-        any_games_changed = any_games_changed || tg.changed?
+        any_events_changed = any_events_changed || e.changed?
       end
     end
 
-    return t, any_games_changed
+    return t, any_events_changed
   end
 
   def interesting?
     override = TournamentOverride.find_by(slug:)
     return override.include unless override&.include.nil?
 
-    tournament_games.any?(&:interesting?)
+    events.any?(&:interesting?)
   end
 
   def interesting_melee?

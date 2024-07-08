@@ -21,8 +21,8 @@ namespace :startgg do
         puts "Analyzing #{data.name}..."
         tournament, any_games_changed = Tournament.from_startgg(data)
 
-        tournament.tournament_games.each do |tournament_game|
-          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count || 0} players"
+        tournament.events.each do |event|
+          puts "#{event.game.upcase}: #{event.player_count || 0} players"
         end
 
         next unless tournament.interesting?
@@ -56,10 +56,10 @@ namespace :startgg do
     updated.each do |t|
       changes = t.saved_changes.reject { |k| k == 'updated_at' }
       puts "~ #{t.slug}: #{changes}"
-      t.tournament_games.each do |tg|
-        changes = tg.saved_changes.reject { |k| k == 'updated_at' }
+      t.events.each do |e|
+        changes = e.saved_changes.reject { |k| k == 'updated_at' }
         next if changes.empty?
-        puts "~ #{t.slug} / #{tg.game}: #{changes}"
+        puts "~ #{t.slug} / #{e.game}: #{changes}"
       end
     end
   end
@@ -87,8 +87,8 @@ namespace :startgg do
         puts "Analyzing #{data.name}..."
         tournament, any_games_changed = Tournament.from_startgg(data)
 
-        tournament.tournament_games.each do |tournament_game|
-          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count || 0} players"
+        tournament.events.each do |event|
+          puts "#{event.game.upcase}: #{event.player_count || 0} players"
         end
 
         if tournament.persisted?
@@ -120,10 +120,10 @@ namespace :startgg do
     updated.each do |t|
       changes = t.saved_changes.reject { |k| k == 'updated_at' }
       puts "~ #{t.slug}: #{changes}"
-      t.tournament_games.each do |tg|
-        changes = tg.saved_changes.reject { |k| k == 'updated_at' }
+      t.events.each do |e|
+        changes = e.saved_changes.reject { |k| k == 'updated_at' }
         next if changes.empty?
-        puts "~ #{t.slug} / #{tg.game}: #{changes}"
+        puts "~ #{t.slug} / #{e.game}: #{changes}"
       end
     end
     puts "Deleted: #{deleted.count}"
@@ -138,15 +138,13 @@ namespace :startgg do
 
     Tournament.upcoming.each do |tournament|
 
+      tournament.events.
       events = with_retries(5) do
-        puts "Fetching tournament #{tournament.slug}..."
+        puts "Fetching event #{tournament.slug}..."
         StartggClient.tournament_events(slug: tournament.slug)
       end
 
-      biggest_events = {
-        Tournament::MELEE_ID => nil,
-        Tournament::ULTIMATE_ID => nil
-      }
+      biggest_events = {}
 
       events.each do |event|
         puts "#{event.num_entrants || 0} entrants in #{event.name} (#{event.videogame.id.to_i == Tournament::MELEE_ID ? 'Melee' : 'Ultimate'})"

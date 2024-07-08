@@ -16,9 +16,9 @@ class ApplicationController < ActionController::Base
     @games = game_list.map { |game| GameConfig::GAMES[game] }
 
     @tournaments = Tournament
-      .includes(:tournament_games)
+      .includes(:events)
       .where('end_at > ?', Date.today - 1.day)
-      .where(tournament_games: { game: game_list })
+      .where(events: { game: game_list })
       .order(start_at: :asc, name: :asc)
 
   end

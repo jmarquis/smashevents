@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: tournament_games
+# Table name: events
 #
 #  id               :bigint           not null, primary key
 #  featured_players :string           is an Array
@@ -13,14 +13,14 @@
 #
 # Indexes
 #
-#  index_tournament_games_on_startgg_id              (startgg_id) UNIQUE
-#  index_tournament_games_on_tournament_id           (tournament_id)
-#  index_tournament_games_on_tournament_id_and_game  (tournament_id,game) UNIQUE
+#  index_events_on_startgg_id              (startgg_id) UNIQUE
+#  index_events_on_tournament_id           (tournament_id)
+#  index_events_on_tournament_id_and_game  (tournament_id,game) UNIQUE
 #
-require "test_helper"
+class Event < ApplicationRecord
+  belongs_to :tournament
 
-class TournamentGameTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  def interesting?
+    player_count.present? && player_count > GameConfig::GAMES[game][:player_count_threshold]
+  end
 end
