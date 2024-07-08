@@ -48,7 +48,24 @@ class Tournament < ApplicationRecord
     t.state = data.addr_state
     t.country = data.country_code
 
-    t
+    any_games_changed = false
+    GameConfig::GAMES.values.each do |game|
+      biggest_event = data.events
+        .filter { |event| event.videogame.id.to_i == game[:startgg_id] }
+        .max { |a, b| a.num_entrants <=> b.num_entrants }
+
+      if biggest_event.present?
+        tg = t.tournament_games.find_by(startgg_id: biggest_event.id) || t.tournament_games.new
+
+        tg.startgg_id = biggest_event.id
+        tg.game = game[:slug]
+        tg.player_count = biggest_event.num_entrants
+
+        any_games_changed = any_games_changed || tg.changed?
+      end
+    end
+
+    return t, any_games_changed
   end
 
   def interesting?

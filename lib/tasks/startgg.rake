@@ -19,27 +19,10 @@ namespace :startgg do
 
       tournaments.each do |data|
         puts "Analyzing #{data.name}..."
-        tournament = Tournament.from_startgg(data)
-
-        any_games_changed = false
-        GameConfig::GAMES.values.each do |game|
-          biggest_event = data.events
-            .filter { |event| event.videogame.id.to_i == game[:startgg_id] }
-            .max { |a, b| a.num_entrants <=> b.num_entrants }
-
-          if biggest_event.present?
-            tg = tournament.tournament_games.find_by(startgg_id: biggest_event.id) || tournament.tournament_games.new
-
-            tg.startgg_id = biggest_event.id
-            tg.game = game[:slug]
-            tg.player_count = biggest_event.num_entrants
-
-            any_games_changed = any_games_changed || tg.changed?
-          end
-        end
+        tournament, any_games_changed = Tournament.from_startgg(data)
 
         tournament.tournament_games.each do |tournament_game|
-          puts "#{tournament_game.game}: #{tournament_game.player_count} players"
+          puts "#{tournament_game.game.upcase}: #{tournament_game.player_count} players"
         end
 
         next unless tournament.interesting?
