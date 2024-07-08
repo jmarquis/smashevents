@@ -3,32 +3,14 @@ namespace :startgg do
   task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
 
   task sync_tournaments: [:environment] do
-    RETRIES_PER_FETCH = 5
     analyzed = 0
     added = []
     updated = []
 
     (1..100).each do |page|
-      tournaments = []
-      retries = 0
-
-      loop do
+      tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
-        tournaments = StartggClient.tournaments(batch_size: 100, page:)
-        break
-      rescue Graphlient::Errors::ExecutionError => e
-        if retries < RETRIES_PER_FETCH
-          puts "Transient error fetching tournaments, will retry: #{e.message}"
-          retries += 1
-          sleep 1
-          next
-        else
-          puts "Retry threshold exceeded, exiting: #{e.message}"
-          raise e
-        end
-      rescue => e
-        puts "Unexpected error fetching tournaments: #{e.message}"
-        raise e
+        StartggClient.tournaments(batch_size: 100, page:)
       end
 
       puts "#{tournaments.count} tournaments found."
@@ -74,7 +56,6 @@ namespace :startgg do
   end
 
   task sync_overrides: [:environment] do
-    RETRIES_PER_FETCH = 5
     analyzed = 0
     added = []
     updated = []
@@ -89,26 +70,9 @@ namespace :startgg do
           deleted << tournament.slug
         end
       else
-        data = nil
-        retries = 0
-
-        loop do
+        data = with_retries(5) do
           puts "Fetching tournament #{override.slug}..."
-          data = StartggClient.tournament(slug: override.slug)
-          break
-        rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError => e
-          if retries < RETRIES_PER_FETCH
-            puts "Transient error fetching tournament, will retry: #{e.message}"
-            retries += 1
-            sleep 1
-            next
-          else
-            puts "Retry threshold exceeded, exiting: #{e.message}"
-            raise e
-          end
-        rescue => e
-          puts "Unexpected error fetching tournament: #{e.message}"
-          raise e
+          StartggClient.tournament(slug: override.slug)
         end
 
         puts "Analyzing #{data.name}..."
