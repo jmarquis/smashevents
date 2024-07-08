@@ -20,10 +20,10 @@
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
 
       <% @games.each do |game| %>
-        <% event = tournament.events.find_by(game: game[:slug]) %>
+        <% event = tournament.events.find_by(game: game.slug) %>
         <% if event.present? && event.player_count.present? && event.player_count > 0 %>
           <div class="game">
-            <p><%= "#{game[:name]}: " if @games.count > 1 %><%= event.player_count.round(-1) %>+ players</p>
+            <p><%= "#{game.name}: " if @games.count > 1 %><%= event.player_count.round(-1) %>+ players</p>
             <ul class="players">
               <% if event.featured_players.present? %>
                 <% event.featured_players.each do |player| %>

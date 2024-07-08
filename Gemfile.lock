@@ -143,6 +143,8 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.2)
+    memery (1.5.0)
+      ruby2_keywords (~> 0.0.2)
     method_source (1.1.0)
     mini_mime (1.1.5)
     minitest (5.24.0)
@@ -233,6 +235,7 @@ GEM
       io-console (~> 0.5)
     rexml (3.3.0)
       strscan
+    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     selenium-webdriver (4.22.0)
       base64 (~> 0.2)
@@ -278,6 +281,7 @@ DEPENDENCIES
   graphlient
   importmap-rails
   jbuilder
+  memery
   pg (~> 1.1)
   propshaft
   pry-rails

@@ -1,9 +1,13 @@
 class Game
-  include Memery
-
   attr_accessor :name, :slug, :startgg_id, :ranking_regex, :player_count_threshold
 
-  const MELEE = new(
+  def initialize(params)
+    params.each do |key, value|
+      self.instance_variable_set("@#{key}".to_sym, value)
+    end
+  end
+
+  MELEE = new(
     name: 'Melee',
     slug: 'melee',
     startgg_id: 1,
@@ -11,7 +15,7 @@ class Game
     player_count_threshold: 100
   )
 
-  const ULTIMATE = new(
+  ULTIMATE = new(
     name: 'Ultimate',
     slug: 'ultimate',
     startgg_id: 1386,
@@ -19,27 +23,25 @@ class Game
     player_count_threshold: 300
   )
 
-  const GAMES = [
+  GAMES = [
     MELEE,
     ULTIMATE
   ]
 
-  memoize def self.by_slug(slug)
-    GAMES.find { |game| game[:slug] == slug }
-  end
+  class << self
+    include Memery
 
-  memoize def self.by_startgg_id(startgg_id)
-    GAMES.find { |game| game[:startgg_id] == startgg_id }
+    memoize def by_slug(slug)
+      GAMES.find { |game| game.slug == slug }
+    end
+
+    memoize def by_startgg_id(startgg_id)
+      GAMES.find { |game| game.startgg_id == startgg_id }
+    end
   end
 
   def self.filter_valid_game_slugs(slugs)
     slugs.filter { |slug| slug.in? GAMES }
-  end
-
-  def initialize
-    params.each do |key, value|
-      self.instance_variable_set("@#{key}".to_sym, value)
-    end
   end
 
   def rankings_key

@@ -19,7 +19,7 @@ namespace :startgg do
 
       tournaments.each do |data|
         puts "Analyzing #{data.name}..."
-        tournament, any_games_changed = Tournament.from_startgg(data)
+        tournament, any_events_changed = Tournament.from_startgg(data)
 
         tournament.events.each do |event|
           puts "#{event.game.upcase}: #{event.player_count || 0} players"
@@ -28,7 +28,7 @@ namespace :startgg do
         next unless tournament.interesting?
 
         if tournament.persisted?
-          if tournament.changed? || any_games_changed
+          if tournament.changed? || any_events_changed
             tournament.save
             updated << tournament
             msg = 'Updated!'
@@ -85,14 +85,14 @@ namespace :startgg do
         end
 
         puts "Analyzing #{data.name}..."
-        tournament, any_games_changed = Tournament.from_startgg(data)
+        tournament, any_events_changed = Tournament.from_startgg(data)
 
         tournament.events.each do |event|
           puts "#{event.game.upcase}: #{event.player_count || 0} players"
         end
 
         if tournament.persisted?
-          if tournament.changed? || any_games_changed
+          if tournament.changed? || any_events_changed
             tournament.save
             updated << tournament
             msg = 'Updated!'

@@ -48,17 +48,17 @@ class Tournament < ApplicationRecord
     t.state = data.addr_state
     t.country = data.country_code
 
-    any_games_changed = false
+    any_events_changed = false
     Game::GAMES.each do |game|
       biggest_event = data.events
-        .filter { |event| event.videogame.id.to_i == game[:startgg_id] }
+        .filter { |event| event.videogame.id.to_i == game.startgg_id }
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
         e = t.events.find_by(startgg_id: biggest_event.id) || t.events.new
 
         e.startgg_id = biggest_event.id
-        e.game = game[:slug]
+        e.game = game.slug
         e.player_count = biggest_event.num_entrants
 
         any_events_changed = any_events_changed || e.changed?
