@@ -22,4 +22,22 @@ class ApplicationController < ActionController::Base
 
   end
 
+  def index2
+
+    if params[:game]
+      @games = GameConfig.filter_valid_games(params[:game].split(','))
+      cookies[:games] = @games.join(',')
+    elsif cookies[:games].present?
+      @games = GameConfig.filter_valid_games(cookies[:games].split(','))
+    else
+      @games = [GameConfig::MELEE[:slug], GameConfig::ULTIMATE[:slug]]
+    end
+
+    @games.map! { |game| GameConfig::GAMES[game] }
+
+    @tournaments = Tournament.includes(:players).where('end_at > ?', Date.today - 1.day).order(start_at: :asc, name: :asc)
+
+
+  end
+
 end
