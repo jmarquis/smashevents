@@ -19,34 +19,22 @@
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
 
-      <% if @melee && tournament.melee_player_count.present? && tournament.melee_player_count != 0 %>
-        <div class="game">
-          <p><% if @ultimate %>SSBM: <% end %><%= tournament.melee_player_count.round(-1) %>+ players</p>
-          <ul class="players">
-            <% if tournament.melee_featured_players.present? %>
-              <% tournament.melee_featured_players.each do |player| %>
-                <li><%= player %></li>
+      <% @games.each do |game| %>
+        <% tournament_game = tournament.tournament_games.find_by(game: game[:slug]) %>
+        <% if tournament_game.present? && tournament_game.player_count.present? && tournament_game.player_count > 0 %>
+          <div class="game">
+            <p><%= "#{game[:name]}: " if @games.count > 1 %><%= tournament_game.player_count.round(-1) %>+ players</p>
+            <ul class="players">
+              <% if tournament_game.featured_players.present? %>
+                <% tournament_game.featured_players.each do |player| %>
+                  <li><%= player %></li>
+                <% end %>
+              <% else %>
+                <li>Featured players coming soon.</li>
               <% end %>
-            <% else %>
-              <li>Featured players coming soon
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <% if @ultimate && tournament.ultimate_player_count.present? && tournament.ultimate_player_count != 0 %>
-        <div class="game">
-          <p><% if @melee %>SSBU: <% end %><%= tournament.ultimate_player_count.round(-1) %>+ players</p>
-          <ul class="players">
-            <% if tournament.ultimate_featured_players.present? %>
-              <% tournament.ultimate_featured_players.each do |player| %>
-                <li><%= player %></li>
-              <% end %>
-            <% else %>
-              <li>Featured players coming soon
-            <% end %>
-          </ul>
-        </div>
+            </ul>
+          </div>
+        <% end %>
       <% end %>
 
     </article>

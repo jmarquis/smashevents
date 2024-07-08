@@ -32,6 +32,8 @@ class Tournament < ApplicationRecord
   MELEE_THRESHOLD = 100
   ULTIMATE_THRESHOLD = 300
 
+  has_many :tournament_games
+
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
 
   def self.from_startgg(data)
@@ -42,12 +44,6 @@ class Tournament < ApplicationRecord
     t.name = data.name
     t.start_at = data.start_at.present? ? Time.at(data.start_at).in_time_zone(data.timezone).to_date : nil
     t.end_at = data.end_at.present? ? Time.at(data.end_at).in_time_zone(data.timezone).to_date : nil
-    t.melee_player_count = data.events.filter { |event| event.videogame.id.to_i == MELEE_ID }.reduce(0) do |max_player_count, event|
-      [max_player_count, event.num_entrants || 0].max
-    end
-    t.ultimate_player_count = data.events.filter { |event| event.videogame.id.to_i == ULTIMATE_ID }.reduce(0) do |max_player_count, event|
-      [max_player_count, event.num_entrants || 0].max
-    end
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code
@@ -59,7 +55,7 @@ class Tournament < ApplicationRecord
     override = TournamentOverride.find_by(slug:)
     return override.include unless override&.include.nil?
 
-    interesting_melee? || interesting_ultimate?
+    tournament_games.any?(&:interesting?)
   end
 
   def interesting_melee?

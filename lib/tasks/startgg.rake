@@ -20,11 +20,32 @@ namespace :startgg do
       tournaments.each do |data|
         puts "Analyzing #{data.name}..."
         tournament = Tournament.from_startgg(data)
-        puts "#{tournament.melee_player_count} Melee players, #{tournament.ultimate_player_count} Ultimate players."
+
+        any_games_changed = false
+        GameConfig::GAMES.values.each do |game|
+          biggest_event = data.events
+            .filter { |event| event.videogame.id.to_i == game[:startgg_id] }
+            .max { |a, b| a.num_entrants <=> b.num_entrants }
+
+          if biggest_event.present?
+            tg = tournament.tournament_games.find_by(startgg_id: biggest_event.id) || tournament.tournament_games.new
+
+            tg.startgg_id = biggest_event.id
+            tg.game = game[:slug]
+            tg.player_count = biggest_event.num_entrants
+
+            any_games_changed = any_games_changed || tg.changed?
+          end
+        end
+
+        tournament.tournament_games.each do |tournament_game|
+          puts "#{tournament_game.game}: #{tournament_game.player_count} players"
+        end
+
         next unless tournament.interesting?
 
         if tournament.persisted?
-          if tournament.changed?
+          if tournament.changed? || any_games_changed
             tournament.save
             updated << tournament
             msg = 'Updated!'
@@ -52,6 +73,11 @@ namespace :startgg do
     updated.each do |t|
       changes = t.saved_changes.reject { |k| k == 'updated_at' }
       puts "~ #{t.slug}: #{changes}"
+      t.tournament_games.each do |tg|
+        changes = tg.saved_changes.reject { |k| k == 'updated_at' }
+        next if changes.empty?
+        puts "~ #{t.slug} / #{tg.game}: #{changes}"
+      end
     end
   end
 
