@@ -21,6 +21,6 @@ class Event < ApplicationRecord
   belongs_to :tournament
 
   def interesting?
-    player_count.present? && player_count > GameConfig::GAMES[game][:player_count_threshold]
+    player_count.present? && player_count > Game.by_slug(game).player_count_threshold
   end
 end

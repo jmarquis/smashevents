@@ -49,7 +49,7 @@ class Tournament < ApplicationRecord
     t.country = data.country_code
 
     any_games_changed = false
-    GameConfig::GAMES.values.each do |game|
+    Game::GAMES.each do |game|
       biggest_event = data.events
         .filter { |event| event.videogame.id.to_i == game[:startgg_id] }
         .max { |a, b| a.num_entrants <=> b.num_entrants }

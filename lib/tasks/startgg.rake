@@ -138,29 +138,15 @@ namespace :startgg do
 
     Tournament.upcoming.each do |tournament|
 
-      tournament.events.
-      events = with_retries(5) do
-        puts "Fetching event #{tournament.slug}..."
-        StartggClient.tournament_events(slug: tournament.slug)
-      end
-
-      biggest_events = {}
-
-      events.each do |event|
-        puts "#{event.num_entrants || 0} entrants in #{event.name} (#{event.videogame.id.to_i == Tournament::MELEE_ID ? 'Melee' : 'Ultimate'})"
-        biggest_events[event.videogame.id.to_i] = event if event.num_entrants.present? && event.num_entrants > (biggest_events[event.videogame.id.to_i]&.num_entrants || 0)
-      end
-
-      present_events = biggest_events.filter{ |game_id, event| event.present? }
-      featured_players = present_events.merge(present_events) do |game_id, event|
-        players = []
+      tournament.events.each do |event|
+        featured_players = []
         entrants = []
 
         # Get all the entrants, 1 chunk at a time
         (1..100).each do |page|
           event_entrants = with_retries(5) do
-            puts "Fetching entrants for #{event.name} (#{page})..."
-            StartggClient.event_entrants(id: event.id, batch_size: 100, page:)
+            puts "Fetching #{event.game} entrants for #{tournament.name} (#{page})..."
+            StartggClient.event_entrants(id: event.startgg_id, batch_size: 100, page:)
           end
 
           puts "Found #{event_entrants.count} entrants."
@@ -176,16 +162,16 @@ namespace :startgg do
         # First see if the event is seeded
         entrants.each do |entrant|
           if entrant.initial_seed_num.present? && entrant.initial_seed_num <= 10
-            players[entrant.initial_seed_num - 1] = entrant.participants[0].player.gamer_tag
+            featured_players[entrant.initial_seed_num - 1] = entrant.participants[0].player.gamer_tag
           end
         end
 
-        if players.any?
-          puts "Top seeds: #{players.join(', ')}"
+        if featured_players.any?
+          puts "Top seeds: #{featured_players.join(', ')}"
         else
           # Otherwise try to use rankings
-          rankings_key = StartggClient::RANKINGS_KEY_MAP[game_id]
-          rankings_regex = StartggClient::RANKINGS_REGEX_MAP[game_id]
+          rankings_key = Game.by_startgg_id(game_id).rankings_key
+          rankings_regex = Game.by_startgg_id(game_id).rankings_regex
           ranked_entrants = entrants.filter do |entrant|
             entrant.participants[0]&.player&.send(rankings_key)&.filter{ |ranking| ranking.title&.match(rankings_regex) }.present?
           end
@@ -193,26 +179,22 @@ namespace :startgg do
           ranked_entrants = ranked_entrants.sort_by { |entrant| entrant.participants[0]&.player&.send(rankings_key)&.filter{ |ranking| ranking.title&.match(rankings_regex) }[0].rank }
 
           ranked_entrants.each do |entrant|
-            players << entrant.participants[0].player.gamer_tag
-            break if players.count == 10
+            featured_players << entrant.participants[0].player.gamer_tag
+            break if featured_players.count == 10
           end
 
-          if players.any?
-            puts "Ranked players: #{players.join(', ')}"
+          if featured_players.any?
+            puts "Ranked players: #{featured_players.join(', ')}"
           end
         end
 
-        if players.empty?
-          puts 'Not enough player data!'
+        if featured_players.empty?
+          puts 'Not enough player data to determine featured players!'
         end
 
-        players
+        event.featured_players = featured_players
+        event.save
       end
-
-      tournament.melee_featured_players = featured_players[Tournament::MELEE_ID]
-      tournament.ultimate_featured_players = featured_players[Tournament::ULTIMATE_ID]
-
-      tournament.save
 
     end
 

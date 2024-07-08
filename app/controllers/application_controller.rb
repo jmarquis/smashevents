@@ -4,16 +4,16 @@ class ApplicationController < ActionController::Base
 
     # TODO: support old params / cookies for melee + ultimate
 
-    game_list = [GameConfig::MELEE[:slug], GameConfig::ULTIMATE[:slug]]
+    game_list = [Game::MELEE.slug, Game::ULTIMATE.slug]
     if params[:games].present?
-      game_list = GameConfig.filter_valid_games(params[:game].split(','))
+      game_list = Game.filter_valid_game_slugs(params[:game].split(','))
       cookies[:games] = game_list.join(',')
     elsif cookies[:games].present?
-      game_list = GameConfig.filter_valid_games(cookies[:games].split(','))
+      game_list = Game.filter_valid_game_slugs(cookies[:games].split(','))
       cookies[:games] = game_list.join(',')
     end
 
-    @games = game_list.map { |game| GameConfig::GAMES[game] }
+    @games = game_list.map { |slug| Game.by_slug(slug) }
 
     @tournaments = Tournament
       .includes(:events)
