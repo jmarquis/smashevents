@@ -28,7 +28,10 @@ class ApplicationController < ActionController::Base
       .includes(:events)
       .where('end_at > ?', Date.today - 1.day)
       .where(events: { game: game_list })
-      .order(start_at: :asc, name: :asc)
+      .order(start_at: :asc, end_at: :asc, name: :asc)
+
+    # Only show tournaments that are interesting based on the selected games
+    @tournaments = @tournaments.to_a.filter { |t| t.interesting?(games: game_list) }
 
   end
 
