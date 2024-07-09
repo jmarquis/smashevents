@@ -53,7 +53,7 @@ class Tournament < ApplicationRecord
 
         # If we previously saved an event that is no longer the biggest one,
         # get rid of it
-        if e.present? && e.startgg_id != biggest_event.id
+        if e.present? && e.startgg_id != biggest_event.id.to_i
           e.destroy
           e = nil
         end

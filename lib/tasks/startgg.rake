@@ -60,7 +60,7 @@ namespace :startgg do
     puts "Updated: #{updated.count}"
     updated.each do |update|
       tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
-      puts "~ #{update[:tournament].slug}: #{tournament_changes}"
+      puts "~ #{update[:tournament].slug}: #{tournament_changes}" if tournament_changes.present?
       update[:events].each do |event|
         event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
         next if event_changes.blank?
