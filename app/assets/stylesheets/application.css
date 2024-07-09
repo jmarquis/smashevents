@@ -45,7 +45,7 @@ nav {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
-  padding: 0 40px;
+  padding: 0 24px;
 }
 
 nav > div + div {
@@ -154,7 +154,7 @@ nav .unselected-games a:hover {
 main {
   margin: 80px auto;
   max-width: 560px;
-  padding: 0 40px;
+  padding: 0 24px;
   text-align: center;
 }
 
@@ -203,7 +203,7 @@ article > .game > .players {
 
 footer {
   margin: 120px 0 80px;
-  padding: 0 40px;
+  padding: 0 24px;
   text-align: center;
   color: #445555;
 }
