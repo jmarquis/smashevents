@@ -18,7 +18,7 @@ module ApplicationHelper
 
   def remove_game_link(game, selected_games)
     new_selected_games = selected_games.reject { |selected_game| selected_game.slug == game.slug }
-    link_to 'X', CGI::unescape(new_selected_games.count == 1 ? root_path(game: new_selected_games.first.slug) : root_path(games: new_selected_games.map(&:slug)))
+    link_to 'X', CGI::unescape(new_selected_games.count == 1 ? root_path(game: new_selected_games.first.slug) : root_path(games: new_selected_games.map(&:slug).join(',')))
   end
 
 end

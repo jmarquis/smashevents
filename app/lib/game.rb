@@ -66,12 +66,12 @@ class Game
       GAMES.find { |game| game.startgg_id == startgg_id }
     end
 
-    def all_games_except(game_slugs)
-      GAMES.reject { |game| game.slug.in? game_slugs }
+    def all_games_except(games)
+      GAMES.reject { |game| game.slug.in? games.map(&:slug) }
     end
 
     def filter_valid_game_slugs(slugs)
-      slugs.filter { |slug| slug.in? GAMES.map(&:slug) }
+      slugs.filter { |slug| slug.in? GAMES.map(&:slug) }.uniq
     end
   end
 
