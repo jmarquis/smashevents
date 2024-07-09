@@ -45,11 +45,8 @@ nav {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+  gap: 16px;
   padding: 0 24px;
-}
-
-nav > div + div {
-  margin-left: 16px;
 }
 
 nav .selected-game {
