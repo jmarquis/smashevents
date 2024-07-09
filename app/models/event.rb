@@ -21,6 +21,7 @@ class Event < ApplicationRecord
   belongs_to :tournament
 
   def interesting?
+    return false unless Game.by_slug(game)&.player_count_threshold.present?
     player_count.present? && player_count > Game.by_slug(game).player_count_threshold
   end
 end

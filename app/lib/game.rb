@@ -23,9 +23,36 @@ class Game
     player_count_threshold: 300
   )
 
+  SMASH64 = new(
+    name: '64',
+    slug: 'smash64',
+    startgg_id: 4,
+    rankings_regex: /^The SSB64 League Rankings/,
+    player_count_threshold: 10
+  )
+
+  RIVALS = new(
+    name: 'Rivals',
+    slug: 'rivals',
+    startgg_id: 24,
+    rankings_regex: /^NA RCS/,
+    player_count_threshold: 30
+  )
+
+  RIVALS2 = new(
+    name: 'Rivals 2',
+    slug: 'rivals2',
+    startgg_id: 53945,
+    rankings_regex: /^NA RCS/,
+    player_count_threshold: 30
+  )
+
   GAMES = [
     MELEE,
-    ULTIMATE
+    ULTIMATE,
+    SMASH64,
+    RIVALS,
+    RIVALS2
   ]
 
   class << self
@@ -41,7 +68,7 @@ class Game
   end
 
   def self.filter_valid_game_slugs(slugs)
-    slugs.filter { |slug| slug.in? GAMES }
+    slugs.filter { |slug| slug.in? GAMES.map(&:slug) }
   end
 
   def rankings_key
