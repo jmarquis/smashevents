@@ -49,16 +49,7 @@ class Tournament < ApplicationRecord
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
-        e = t.events.find_by(game: game.slug)
-
-        # If we previously saved an event that is no longer the biggest one,
-        # get rid of it
-        if e.present? && e.startgg_id != biggest_event.id.to_i
-          e.destroy
-          e = nil
-        end
-
-        e = t.events.new if e.blank?
+        e = t.events.find_by(game: game.slug) || t.events.new
 
         e.startgg_id = biggest_event.id
         e.game = game.slug
