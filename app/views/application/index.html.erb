@@ -1,6 +1,14 @@
 <h1>Smash Events</h1>
 
 <nav>
+  <% @games.each do |game| %>
+    <div class="selected-game"><%= game.name %> <%= remove_game_link(game, @games) if @games.count > 1 %></div>
+  <% end %>
+  <div class="unselected_games">
+    <% Game.all_games_except(@games).each do |game| %>
+      <%= add_game_link(game, @games) %>
+    <% end %>
+  </div>
   <form method="get" action="/">
     <label>
       <div><input type="checkbox" name="melee" value="1" <%= 'checked' if @melee %> onchange="this.form.submit()"><span></span></div>Melee

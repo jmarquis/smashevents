@@ -24,7 +24,7 @@ class Game
   )
 
   SMASH64 = new(
-    name: '64',
+    name: 'Smash 64',
     slug: 'smash64',
     startgg_id: 4,
     rankings_regex: /^The SSB64 League Rankings/,
@@ -65,10 +65,14 @@ class Game
     memoize def by_startgg_id(startgg_id)
       GAMES.find { |game| game.startgg_id == startgg_id }
     end
-  end
 
-  def self.filter_valid_game_slugs(slugs)
-    slugs.filter { |slug| slug.in? GAMES.map(&:slug) }
+    def all_games_except(game_slugs)
+      GAMES.reject { |game| game.slug.in? game_slugs }
+    end
+
+    def filter_valid_game_slugs(slugs)
+      slugs.filter { |slug| slug.in? GAMES.map(&:slug) }
+    end
   end
 
   def rankings_key
