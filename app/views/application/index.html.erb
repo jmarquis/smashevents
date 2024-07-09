@@ -4,15 +4,17 @@
   <% @games.each do |game| %>
     <div class="selected-game"><%= game.name %> <%= remove_game_link(game, @games) if @games.count > 1 %></div>
   <% end %>
-  <div class="menu-container">
-    <input id="menu-toggle" type="checkbox">
-    <label for="menu-toggle" class="menu-toggle">+</label>
-    <ul class="unselected-games">
-      <% Game.all_games_except(@games).each do |game| %>
-        <li><%= add_game_link(game, @games) %></li>
-      <% end %>
-    </ul>
-  </div>
+  <% if @unselected_games.any? %>
+    <div class="menu-container">
+      <input id="menu-toggle" type="checkbox">
+      <label for="menu-toggle" class="menu-toggle">+</label>
+      <ul class="unselected-games">
+        <% @unselected_games.each do |game| %>
+          <li><%= add_game_link(game, @games) %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
 </nav>
 
 <main>

@@ -22,6 +22,7 @@ class ApplicationController < ActionController::Base
     game_list = [Game::MELEE.slug, Game::ULTIMATE.slug] if game_list.blank?
     cookies[:games] = game_list.join(',')
     @games = game_list.map { |slug| Game.by_slug(slug) }
+    @unselected_games = Game.all_games_except(@games)
 
     @tournaments = Tournament
       .includes(:events)
