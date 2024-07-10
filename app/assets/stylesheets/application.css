@@ -24,7 +24,8 @@ body {
   background-attachment: fixed;
 
   /* hack to get gradient to work on mobile */
-  text-shadow: 0px 0px #00000000;
+  text-shadow: 0px 0px transparent;
+  -webkit-box-decoration-break: clone;
 }
 
 a {
