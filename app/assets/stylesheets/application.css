@@ -18,6 +18,7 @@ body {
   letter-spacing: 1.5px;
   line-height: 1.5;
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to bottom, #445555 0%, #C6D2D2 10%, #859D9D 70%, #445555);
   background-attachment: fixed;
@@ -46,9 +47,10 @@ h1 {
   left: 24px;
   pointer-events: none;
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
 nav {
@@ -68,7 +70,7 @@ nav .selected-game {
   cursor: default;
   white-space: nowrap;
   background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
-  background-attachment: fixed;
+  background-attachment: scroll;
 }
 
 nav .selected-game a {

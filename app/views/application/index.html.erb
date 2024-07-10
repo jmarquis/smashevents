@@ -23,7 +23,13 @@
     <article>
       <time><%= date_range(tournament) %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
-      <div><%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
+      <div>
+        <% if tournament.city.present? || tournament.state.present? || tournament.country.present? %>
+          <%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
+        <% else %>
+          Online
+        <% end %>
+      </div>
 
       <% @games.each do |game| %>
         <% event = tournament.events.find_by(game: game.slug) %>
