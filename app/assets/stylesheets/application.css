@@ -22,7 +22,10 @@ body {
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to bottom, #445555 0%, #C6D2D2 10%, #859D9D 70%, #445555);
   background-attachment: fixed;
-  }
+
+  /* hack to get gradient to work on mobile */
+  text-shadow: 0px 0px #00000000;
+}
 
 a {
   text-decoration: underline;
