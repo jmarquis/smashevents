@@ -231,6 +231,7 @@ article > .streams .live {
   border-radius: 4px;
   position: relative;
   top: 1px;
+  pointer-events: none;
 }
 
 footer {
