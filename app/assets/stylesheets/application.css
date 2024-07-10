@@ -7,15 +7,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  background-color: #081212;
+}
+
 body {
   box-sizing: border-box;
   font: 16px forma-djr-mono, sans-serif;
   font-weight: 500;
   letter-spacing: 1.5px;
   line-height: 1.5;
-  background-color: #081212;
-  color: #859D9D;
-}
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to bottom, #445555 0%, #C6D2D2 10%, #859D9D 70%, #445555);
+  background-attachment: fixed;
+  }
 
 a {
   text-decoration: underline;
@@ -39,6 +45,10 @@ h1 {
   position: relative;
   left: 24px;
   pointer-events: none;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
+  background-attachment: fixed;
 }
 
 nav {
@@ -47,16 +57,18 @@ nav {
   justify-content: center;
   gap: 16px;
   padding: 0 24px;
+  -webkit-text-fill-color: currentcolor;
 }
 
 nav .selected-game {
   height: 32px;
-  background-color: #859D9D;
   color: #081212;
   font-weight: bold;
   padding: 3px 12px 0;
   cursor: default;
   white-space: nowrap;
+  background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
+  background-attachment: fixed;
 }
 
 nav .selected-game a {
@@ -75,7 +87,6 @@ nav .menu-container {
 nav .menu-toggle {
   display: block;
   height: 32px;
-  background-color: #859D9D;
   color: #081212;
   font-weight: bold;
   padding: 0px 11px 0 12px;
@@ -83,6 +94,8 @@ nav .menu-toggle {
   color: #445555;
   cursor: pointer;
   letter-spacing: 0;
+  background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
+  background-attachment: fixed;
 }
 
 nav .menu-toggle::after {
@@ -92,7 +105,8 @@ nav .menu-toggle::after {
   right: 0;
   width: 100%;
   height: 16px;
-  background-color: #859D9D;
+  background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
+  background-attachment: fixed;
   visibility: hidden;
 }
 
@@ -112,7 +126,8 @@ nav .unselected-games {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #859D9D;
+  background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
+  background-attachment: fixed;
 }
 
 input[type="checkbox"]:checked ~ .unselected-games {
@@ -157,6 +172,7 @@ main {
 
 h2 {
   color: #EBF1F1;
+  -webkit-text-fill-color: currentcolor;
   font-size: 32px;
   letter-spacing: 4px;
   font-weight: 500;
@@ -165,6 +181,7 @@ h2 {
 }
 
 h2 a {
+  color: #fff;
   text-underline-offset: 4px;
 }
 
@@ -202,6 +219,7 @@ footer {
   margin: 120px 0 80px;
   padding: 0 24px;
   text-align: center;
+  -webkit-text-fill-color: currentcolor;
   color: #445555;
 }
 
