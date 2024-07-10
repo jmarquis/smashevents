@@ -35,7 +35,7 @@
         <% event = tournament.events.find_by(game: game.slug) %>
         <% if event.present? && event.player_count.present? && event.player_count > 0 %>
           <div class="game">
-            <p><%= game.name %>: <%= event.player_count.round(-1) %>+ players</p>
+            <h3><%= game.name %>: <%= event.player_count.round(-1) %>+ players</h3>
             <ul class="players">
               <% if event.featured_players.present? %>
                 <% event.featured_players.each do |player| %>
@@ -47,6 +47,22 @@
             </ul>
           </div>
         <% end %>
+      <% end %>
+
+      <% if Date.today >= tournament.start_at && tournament.stream_data.present? %>
+        <div class="streams">
+          <h3>Streams</h3>
+          <ul class="streams">
+            <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase == 'twitch' }.each do |stream| %>
+              <li>
+                <%= link_to stream[:name], "https://twitch.tv/#{stream[:name]}", target: '_blank' %>
+                <% if stream[:status] == 'live' %>
+                  <span class="live">Live</span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
       <% end %>
 
     </article>

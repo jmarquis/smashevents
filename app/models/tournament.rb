@@ -12,6 +12,7 @@
 #  slug                      :string
 #  start_at                  :date
 #  state                     :string
+#  stream_data               :json
 #  ultimate_featured_players :string           is an Array
 #  ultimate_player_count     :integer
 #  created_at                :datetime         not null
@@ -41,6 +42,14 @@ class Tournament < ApplicationRecord
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code
+
+    t.stream_data = data.streams&.map do |stream|
+      {
+        name: stream.stream_name,
+        source: stream.stream_source,
+        status: stream.stream_status
+      }
+    end
 
     events = []
     Game::GAMES.each do |game|

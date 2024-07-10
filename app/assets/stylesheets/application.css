@@ -169,6 +169,11 @@ h2 a {
   text-underline-offset: 4px;
 }
 
+h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
 time {
   font-weight: bold;
   text-transform: uppercase;
@@ -182,21 +187,50 @@ article > div + div {
   margin-top: 8px;
 }
 
-article > .game {
-  margin-top: 32px;
+article > .game,
+article > .streams {
+  margin-top: 40px;
 }
 
 article > .game > .players {
-  margin: 12px 0 0;
+  margin: 24px 0 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
+  line-height: 1;
+  gap: 16px 32px;
 }
 
-.players > li {
-  margin: 2px 16px;
+article > .streams ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  line-height: 1;
+  gap: 16px 32px;
+}
+
+article > .streams li {
+  display: flex;
+}
+
+article > .streams .live {
+  background-color: #910830;
+  color: #fff;
+  margin-left: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-block;
+  font-size: 12px;
+  line-height: 1;
+  padding: 2px 3px 4px 4px;
+  border-radius: 4px;
+  position: relative;
+  top: 1px;
 }
 
 footer {

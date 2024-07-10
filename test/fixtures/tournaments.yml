@@ -12,6 +12,7 @@
 #  slug                      :string
 #  start_at                  :date
 #  state                     :string
+#  stream_data               :json
 #  ultimate_featured_players :string           is an Array
 #  ultimate_player_count     :integer
 #  created_at                :datetime         not null

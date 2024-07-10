@@ -34,6 +34,11 @@ class StartggClient
                 id
               }
             }
+            streams {
+              streamName
+              streamSource
+              streamStatus
+            }
           }
         }
       }
