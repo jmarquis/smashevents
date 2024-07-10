@@ -36,8 +36,8 @@ class Tournament < ApplicationRecord
     t.startgg_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
-    t.start_at = data.start_at.present? ? Time.at(data.start_at).in_time_zone(data.timezone).to_date : nil
-    t.end_at = data.end_at.present? ? Time.at(data.end_at).in_time_zone(data.timezone).to_date : nil
+    t.start_at = data.start_at.present? ? Time.at(data.start_at).in_time_zone(data.timezone || 'America/New_York').to_date : nil
+    t.end_at = data.end_at.present? ? Time.at(data.end_at - 1).in_time_zone(data.timezone || 'America/New_York').to_date : nil
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code
