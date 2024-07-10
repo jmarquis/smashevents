@@ -50,7 +50,7 @@ h1 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
-  background-attachment: scroll;
+  background-attachment: fixed;
 }
 
 nav {
@@ -70,7 +70,7 @@ nav .selected-game {
   cursor: default;
   white-space: nowrap;
   background-image: linear-gradient(to bottom, #445555 0%, #859D9D 10%);
-  background-attachment: scroll;
+  background-attachment: fixed;
 }
 
 nav .selected-game a {
