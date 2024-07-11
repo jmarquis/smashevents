@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
 
     @tournaments = Tournament
       .includes(:events)
-      .where('end_at > ?', Date.today - 1.day)
+      .where('end_at > ?', Date.today - 2.day)
       .where(events: { game: game_list })
       .order(start_at: :asc, end_at: :asc, name: :asc)
 
