@@ -26,7 +26,8 @@ class ApplicationController < ActionController::Base
 
     @tournaments = Tournament
       .includes(:events)
-      .where('end_at > ?', Date.today - 2.day)
+      # Leave a few hours of leeway for events that run long
+      .where('end_at > ?', Time.now - 6.hours)
       .where(events: { game: game_list })
       .order(start_at: :asc, end_at: :asc, name: :asc)
 

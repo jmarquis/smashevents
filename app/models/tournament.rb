@@ -5,14 +5,15 @@
 #  id                        :bigint           not null, primary key
 #  city                      :string
 #  country                   :string
-#  end_at                    :date
+#  end_at                    :datetime
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string
 #  slug                      :string
-#  start_at                  :date
+#  start_at                  :datetime
 #  state                     :string
 #  stream_data               :json
+#  timezone                  :string
 #  ultimate_featured_players :string           is an Array
 #  ultimate_player_count     :integer
 #  created_at                :datetime         not null
@@ -37,8 +38,9 @@ class Tournament < ApplicationRecord
     t.startgg_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
-    t.start_at = data.start_at.present? ? Time.at(data.start_at).in_time_zone(data.timezone || 'America/New_York').to_date : nil
-    t.end_at = data.end_at.present? ? Time.at(data.end_at - 1).in_time_zone(data.timezone || 'America/New_York').to_date : nil
+    t.start_at = data.start_at.present? ? Time.at(data.start_at) : nil
+    t.end_at = data.end_at.present? ? Time.at(data.end_at - 1) : nil
+    t.timezone = data.timezone
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code

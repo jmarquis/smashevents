@@ -5,14 +5,15 @@
 #  id                        :bigint           not null, primary key
 #  city                      :string
 #  country                   :string
-#  end_at                    :date
+#  end_at                    :datetime
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string
 #  slug                      :string
-#  start_at                  :date
+#  start_at                  :datetime
 #  state                     :string
 #  stream_data               :json
+#  timezone                  :string
 #  ultimate_featured_players :string           is an Array
 #  ultimate_player_count     :integer
 #  created_at                :datetime         not null
