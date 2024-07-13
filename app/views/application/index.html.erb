@@ -49,7 +49,7 @@
         <% end %>
       <% end %>
 
-      <% if Date.today >= tournament.start_at && tournament.stream_data.present? %>
+      <% if Time.now >= tournament.start_at && tournament.stream_data.present? %>
         <div class="streams">
           <h3>Streams</h3>
           <ul class="streams">
