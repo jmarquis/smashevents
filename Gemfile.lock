@@ -109,6 +109,10 @@ GEM
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
       net-http
+    faraday-parse_dates (0.1.1)
+      faraday (~> 2.0)
+    faraday-retry (2.2.1)
+      faraday (~> 2.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     graphlient (0.8.0)
@@ -247,6 +251,14 @@ GEM
     strscan (3.1.0)
     thor (1.3.1)
     timeout (0.4.1)
+    twitch-api (1.0.0)
+      faraday (~> 2.3)
+      faraday-parse_dates (~> 0.1.1)
+      faraday-retry (~> 2.0)
+      twitch_oauth2 (~> 0.5.0)
+    twitch_oauth2 (0.5.0)
+      faraday (~> 2.3)
+      faraday-parse_dates (~> 0.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uri (0.13.0)
@@ -288,6 +300,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 7.1.3, >= 7.1.3.4)
   selenium-webdriver
+  twitch-api
   tzinfo-data
   web-console
 

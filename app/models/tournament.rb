@@ -48,8 +48,7 @@ class Tournament < ApplicationRecord
     t.stream_data = data.streams&.map do |stream|
       {
         name: stream.stream_name,
-        source: stream.stream_source,
-        status: stream.stream_status
+        source: stream.stream_source
       }
     end
 
