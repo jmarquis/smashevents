@@ -1,7 +1,7 @@
 namespace :twitch do
 
   task sync_streams: [:environment] do
-    Tournament.where('start_at <= ?', Time.now + 6.hours).where('end_at >= ?', Time.now - 6.hours).each do |tournament|
+    Tournament.where('start_at <= ?', Time.now + 12.hours).where('end_at >= ?', Time.now - 12.hours).each do |tournament|
       next unless tournament.stream_data.present?
 
       puts "Syncing streams for #{tournament.slug}..."
@@ -15,12 +15,18 @@ namespace :twitch do
 
       next unless streams.present?
 
-      live_streams = TwitchService.live_streams(streams:).map(&:upcase)
+      live_streams = TwitchService.live_streams(streams:)
       tournament.stream_data = tournament.stream_data.map do |stream|
         stream = stream.with_indifferent_access
 
-        if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH
-          stream[:status] = stream[:name].upcase.in?(live_streams) ? Tournament::STREAM_STATUS_LIVE : nil
+        if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams)
+          stream[:status] = Tournament::STREAM_STATUS_LIVE
+          stream[:game] = live_streams[stream[:name].downcase][:game]
+          stream[:title] = live_streams[stream[:name].downcase][:title]
+        else
+          stream.delete(:status)
+          stream.delete(:game)
+          stream.delete(:title)
         end
 
         stream
