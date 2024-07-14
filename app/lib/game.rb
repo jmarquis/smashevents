@@ -28,7 +28,7 @@ class Game
     slug: 'smash64',
     startgg_id: 4,
     rankings_regex: /^The SSB64 League Rankings/,
-    player_count_threshold: 10
+    player_count_threshold: 20
   )
 
   RIVALS = new(
