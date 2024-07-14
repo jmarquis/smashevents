@@ -4,7 +4,7 @@ class TwitchService
     TwitchClient.get_streams(user_login: streams).data.reduce({}) do |streams, stream|
       streams[stream.user_name.downcase] = {
         name: stream.user_name,
-        game: stream.game,
+        game: stream.game_name,
         title: stream.title
       }
       streams
