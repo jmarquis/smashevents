@@ -58,7 +58,7 @@ class Tournament < ApplicationRecord
 
       if t.persisted? && t.stream_data.present?
         existing_data = t.stream_data.map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase }
-        stream_data[:status] = existing_data[:status] if existing_data.present?
+        stream_data[:status] = existing_data[:status] if existing_data.present? && existing_data[:status].present?
       end
 
       stream_data
