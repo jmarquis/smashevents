@@ -32,7 +32,7 @@ module ApplicationHelper
 
     case stream[:source].downcase
     when Tournament::STREAM_SOURCE_TWITCH
-      link_to stream[:name], "https://twitch.tv/#{stream[:name]}", target: '_blank'
+      link_to stream[:name], "https://twitch.tv/#{stream[:name]}", target: '_blank', title: "#{stream[:game]} | #{stream[:title]}"
     when Tournament::STREAM_SOURCE_YOUTUBE
       link_to stream[:name], "https://youtube.com/#{stream[:name]}/live", target: '_blank'
     end
