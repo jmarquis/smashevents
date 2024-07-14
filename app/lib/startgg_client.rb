@@ -2,16 +2,16 @@ class StartggClient
 
   @@client = nil
 
-  def self.tournaments(batch_size: 100, page: 1)
+  def self.tournaments(batch_size: 100, page: 1, after_date: Time.now)
     query = <<~GRAPHQL
-      query($perPage: Int, $page: Int) {
+      query($perPage: Int, $page: Int, $afterDate: Timestamp) {
         tournaments(query: {
           perPage: $perPage
           page: $page
           sortBy: "startAt asc"
           filter: {
-            upcoming: true
-            videogameIds: [#{Game::GAMES.map(&:startgg_id).join(',')}]
+            videogameIds: [#{Game::GAMES.map(&:startgg_id).join(',')}],
+            afterDate: $afterDate
           }
         }) {
           nodes {
@@ -44,7 +44,7 @@ class StartggClient
       }
     GRAPHQL
 
-    client.query(query, perPage: batch_size, page:)&.data&.tournaments&.nodes
+    client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
   end
 
   def self.tournament(slug:)

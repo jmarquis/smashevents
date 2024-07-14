@@ -10,7 +10,7 @@ namespace :startgg do
     (1..100).each do |page|
       tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
-        StartggClient.tournaments(batch_size: 100, page:)
+        StartggClient.tournaments(batch_size: 100, page:, after_date: Time.now - 7.days.to_i)
       end
 
       puts "#{tournaments.count} tournaments found."
