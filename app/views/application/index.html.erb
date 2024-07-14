@@ -53,10 +53,10 @@
         <div class="streams">
           <h3>Streams</h3>
           <ul class="streams">
-            <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase == 'twitch' }.each do |stream| %>
+            <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase.in?(['twitch', 'youtube']) }.each do |stream| %>
               <li>
-                <%= link_to stream[:name], "https://twitch.tv/#{stream[:name]}", target: '_blank' %>
-                <% if stream[:status] == TwitchService::STATUS_LIVE %>
+                <%= stream_link(stream) %>
+                <% if stream[:status]&.downcase == Tournament::STREAM_STATUS_LIVE %>
                   <span class="live">Live</span>
                 <% end %>
               </li>

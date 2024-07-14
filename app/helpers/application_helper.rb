@@ -27,4 +27,15 @@ module ApplicationHelper
     link_to 'X', CGI::unescape(new_selected_games.count == 1 ? root_path(game: new_selected_games.first.slug) : root_path(games: new_selected_games.map(&:slug).join(',')))
   end
 
+  def stream_link(stream)
+    stream = stream.with_indifferent_access
+
+    case stream[:source].downcase
+    when Tournament::STREAM_SOURCE_TWITCH
+      link_to stream[:name], "https://twitch.tv/#{stream[:name]}", target: '_blank'
+    when Tournament::STREAM_SOURCE_YOUTUBE
+      link_to stream[:name], "https://youtube.com/#{stream[:name]}/live", target: '_blank'
+    end
+  end
+
 end

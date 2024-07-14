@@ -28,6 +28,11 @@
 #
 class Tournament < ApplicationRecord
 
+  STREAM_SOURCE_TWITCH = 'twitch'
+  STREAM_SOURCE_YOUTUBE = 'youtube'
+
+  STREAM_STATUS_LIVE = 'live'
+
   has_many :events, dependent: :destroy
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }

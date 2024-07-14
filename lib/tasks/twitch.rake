@@ -8,7 +8,7 @@ namespace :twitch do
 
       streams = tournament.stream_data.reduce([]) do |streams, stream|
         stream = stream.with_indifferent_access
-        next unless stream[:source]&.upcase == 'TWITCH'
+        next unless stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
 
         streams + [stream[:name]]
       end
@@ -19,8 +19,8 @@ namespace :twitch do
       tournament.stream_data = tournament.stream_data.map do |stream|
         stream = stream.with_indifferent_access
 
-        if stream[:source].upcase == 'TWITCH'
-          stream[:status] = stream[:name].upcase.in?(live_streams) ? TwitchService::STATUS_LIVE : nil
+        if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH
+          stream[:status] = stream[:name].upcase.in?(live_streams) ? Tournament::STREAM_STATUS_LIVE : nil
         end
 
         stream
