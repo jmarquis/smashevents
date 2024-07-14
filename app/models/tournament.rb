@@ -51,10 +51,17 @@ class Tournament < ApplicationRecord
     t.country = data.country_code
 
     t.stream_data = data.streams&.map do |stream|
-      {
+      stream_data = {
         name: stream.stream_name,
         source: stream.stream_source
       }
+
+      if t.persisted? && t.stream_data.present?
+        existing_data = t.stream_data.map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase }
+        stream_data[:status] = existing_data[:status] if existing_data.present?
+      end
+
+      stream_data
     end
 
     events = []
