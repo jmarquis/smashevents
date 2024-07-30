@@ -1,5 +1,4 @@
 namespace :startgg do
-
   task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
 
   task sync_tournaments: [:environment] do
@@ -10,7 +9,7 @@ namespace :startgg do
     (1..100).each do |page|
       tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
-        StartggClient.tournaments(batch_size: 100, page:, after_date: Time.now - 7.days.to_i)
+        StartggClient.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days.to_i)
       end
 
       puts "#{tournaments.count} tournaments found."
@@ -50,7 +49,6 @@ namespace :startgg do
       end
 
       sleep 1
-
     end
 
     puts '----------------------------------'
@@ -64,6 +62,7 @@ namespace :startgg do
       update[:events].each do |event|
         event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
         next if event_changes.blank?
+
         puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
       end
     end
@@ -76,7 +75,6 @@ namespace :startgg do
     deleted = []
 
     TournamentOverride.all.each do |override|
-
       if !override.include
         tournament = Tournament.find_by(slug: override.slug)
         if tournament.present?
@@ -118,7 +116,6 @@ namespace :startgg do
         sleep 1
 
       end
-
     end
 
     puts '----------------------------------'
@@ -132,6 +129,7 @@ namespace :startgg do
       update[:events].each do |event|
         event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
         next if event_changes.blank?
+
         puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
       end
     end
@@ -146,7 +144,6 @@ namespace :startgg do
     deleted = []
 
     Tournament.upcoming.each do |tournament|
-
       tournament.events.each do |event|
         featured_players = []
         entrants = []
@@ -190,31 +187,31 @@ namespace :startgg do
           rankings_key = Game.by_slug(event.game).rankings_key
           rankings_regex = Game.by_slug(event.game).rankings_regex
           ranked_entrants = entrants.filter do |entrant|
-            entrant.participants[0]&.player&.send(rankings_key)&.filter{ |ranking| ranking.title&.match(rankings_regex) }.present?
+            entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
+              ranking.title&.match(rankings_regex)
+            end.present?
           end
 
-          ranked_entrants = ranked_entrants.sort_by { |entrant| entrant.participants[0]&.player&.send(rankings_key)&.filter{ |ranking| ranking.title&.match(rankings_regex) }[0].rank }
+          ranked_entrants = ranked_entrants.sort_by do |entrant|
+            entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
+              ranking.title&.match(rankings_regex)
+            end&.[](0)&.rank
+          end
 
           ranked_entrants.each do |entrant|
             featured_players << entrant.participants[0].player.gamer_tag
             break if featured_players.count == 10
           end
 
-          if featured_players.any?
-            puts "Ranked players: #{featured_players.join(', ')}"
-          end
+          puts "Ranked players: #{featured_players.join(', ')}" if featured_players.any?
         end
 
-        if featured_players.empty?
-          puts 'Not enough player data to determine featured players!'
-        end
+        puts 'Not enough player data to determine featured players!' if featured_players.empty?
 
         event.featured_players = featured_players
         event.save
       end
-
     end
-
   end
 
   private
@@ -236,12 +233,11 @@ namespace :startgg do
         puts "Retry threshold exceeded, exiting: #{e.message}"
         raise e
       end
-    rescue => e
+    rescue StandardError => e
       puts "Unexpected error communicating with startgg: #{e.message}"
       raise e
     end
 
     result
   end
-
 end
