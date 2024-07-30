@@ -1,5 +1,4 @@
 class StartggClient
-
   @@client = nil
 
   def self.tournaments(batch_size: 100, page: 1, after_date: Time.now)
@@ -70,6 +69,11 @@ class StartggClient
               id
             }
           }
+          streams {
+            streamName
+            streamSource
+            streamStatus
+          }
         }
       }
     GRAPHQL
@@ -116,5 +120,4 @@ class StartggClient
       }
     )
   end
-
 end
