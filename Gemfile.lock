@@ -137,6 +137,11 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     logger (1.6.0)
+    lograge (0.14.0)
+      actionpack (>= 4)
+      activesupport (>= 4)
+      railties (>= 4)
+      request_store (~> 1.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -237,6 +242,8 @@ GEM
     regexp_parser (2.9.2)
     reline (0.5.9)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     rexml (3.3.0)
       strscan
     ruby2_keywords (0.0.5)
@@ -293,6 +300,7 @@ DEPENDENCIES
   graphlient
   importmap-rails
   jbuilder
+  lograge
   memery
   pg (~> 1.1)
   propshaft
