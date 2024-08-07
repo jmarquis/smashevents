@@ -160,6 +160,13 @@ namespace :startgg do
             )
           end
 
+          # This means the tournament was probably deleted
+          if event_entrants.nil?
+            puts 'Tournament not found. Deleting...'
+            tournament.destroy
+            break
+          end
+
           puts "Found #{event_entrants.count} entrants."
 
           # This means there are no available entrants
