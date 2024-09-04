@@ -20,9 +20,11 @@ namespace :startgg do
         puts "Analyzing #{data.name}..."
         tournament, events = Tournament.from_startgg(data)
 
-        events.each do |event|
-          puts "#{event.game.upcase}: #{event.player_count || 0} players"
-        end
+        next if events.blank?
+
+        puts events.map { |event|
+          "#{event.game.upcase}: #{event.player_count || 0} players"
+        }.join(', ')
 
         next if tournament.exclude?
         next unless events.any?(&:interesting?) || tournament.interesting?
@@ -148,10 +150,11 @@ namespace :startgg do
         featured_players = []
         entrants = []
 
+        puts "Fetching #{event.game.upcase} entrants for #{tournament.name}..."
+
         # Get all the entrants, 1 chunk at a time
         (1..100).each do |page|
           event_entrants = with_retries(5) do
-            puts "Fetching #{event.game} entrants for #{tournament.name} (#{page})..."
             StartggClient.event_entrants(
               id: event.startgg_id,
               game: Game.by_slug(event.game),
@@ -167,8 +170,6 @@ namespace :startgg do
             break
           end
 
-          puts "Found #{event_entrants.count} entrants."
-
           # This means there are no available entrants
           break if event_entrants.count.zero?
 
@@ -179,6 +180,8 @@ namespace :startgg do
 
           sleep 1
         end
+
+        puts "Found #{entrants.count} entrants."
 
         # First see if the event is seeded
         entrants.each do |entrant|
@@ -219,6 +222,8 @@ namespace :startgg do
         event.save
       end
     end
+
+    puts 'Entrant sync complete.'
   end
 
   private
