@@ -23,9 +23,10 @@ namespace :startgg do
         next if tournament.exclude?
         next unless events.any?(&:interesting?) || tournament.interesting?
 
-        puts events.map { |event|
-          "#{tournament.name} #{event.game.upcase}: #{event.player_count || 0} players"
+        event_logs = events.map { |event|
+          "#{event.game.upcase}: #{event.player_count || 0} players"
         }.join(', ')
+        puts "#{tournament.name} | #{event_logs}"
 
         if tournament.persisted?
           if tournament.changed? || events.any?(&:changed?)
