@@ -12,22 +12,20 @@ namespace :startgg do
         StartggClient.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days.to_i)
       end
 
-      puts "#{tournaments.count} tournaments found."
+      puts "#{tournaments.count} tournaments found. Analyzing..."
       analyzed += tournaments.count
       break if tournaments.count.zero?
 
       tournaments.each do |data|
-        puts "Analyzing #{data.name}..."
         tournament, events = Tournament.from_startgg(data)
 
         next if events.blank?
-
-        puts events.map { |event|
-          "#{event.game.upcase}: #{event.player_count || 0} players"
-        }.join(', ')
-
         next if tournament.exclude?
         next unless events.any?(&:interesting?) || tournament.interesting?
+
+        puts events.map { |event|
+          "#{tournament.name} #{event.game.upcase}: #{event.player_count || 0} players"
+        }.join(', ')
 
         if tournament.persisted?
           if tournament.changed? || events.any?(&:changed?)
