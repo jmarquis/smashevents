@@ -70,6 +70,7 @@ namespace :startgg do
 
     added.each do |tournament|
       Discord.notify_tournament_added tournament
+      Twitter.notify_tournament_added tournament
     end
   end
 
@@ -143,6 +144,7 @@ namespace :startgg do
 
     added.each do |tournament|
       Discord.notify_tournament_added tournament
+      Twitter.notify_tournament_added tournament
     end
   end
 
