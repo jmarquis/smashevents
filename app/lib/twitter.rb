@@ -10,6 +10,7 @@ class Twitter
           \n\n
           #{tournament.name.upcase}
           #{tournament.formatted_date_range}
+          #{tournament.formatted_location}
           \n\n
           Featuring #{tournament.events.map { |event| Game.by_slug(event.game).name }.to_sentence}.
           \n\n

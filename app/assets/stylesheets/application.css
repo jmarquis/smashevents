@@ -28,13 +28,35 @@ a:hover {
   text-decoration-color: #fff;
 }
 
+.social {
+  display: flex;
+  justify-content: center;
+  margin: 64px 0 0;
+  gap: 24px;
+}
+
+.social a {
+  color: #859D9D;
+  padding: 8px;
+  display: flex;
+}
+
+.social a:hover {
+  color: #fff;
+}
+
+.social a svg {
+  width: 24px;
+  height: 24px;
+}
+
 h1 {
   text-align: center;
   font: 80px dharma-gothic-m, sans-serif;
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 24px;
-  margin: 96px 0 24px;
+  margin: 24px 0 24px;
   width: calc(100% - 24px);
   position: relative;
   left: 24px;

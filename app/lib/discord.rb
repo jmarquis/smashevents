@@ -10,11 +10,7 @@ class Discord
           embed.title = tournament.name
           embed.description = [
             tournament.formatted_date_range,
-            [
-              tournament.city,
-              tournament.state,
-              tournament.country.in?(['US', 'GB']) ? nil : tournament.country
-            ].compact.join(', '),
+            tournament.formatted_location,
             '',
             *tournament.events.map { |event|
               "#{Game.by_slug(event.game).name}: #{event.player_count || 0} players"

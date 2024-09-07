@@ -1,3 +1,8 @@
+<div class="social">
+  <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag 'twitter.svg' %></a>
+  <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag 'discord.svg' %></a>
+</diV>
+
 <h1>Smash Events</h1>
 
 <nav>
@@ -24,11 +29,7 @@
       <time><%= tournament.formatted_date_range %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div>
-        <% if tournament.city.present? || tournament.state.present? || tournament.country.present? %>
-          <%= tournament.city %>, <%= tournament.state %><%= ", #{tournament.country}" unless tournament.country.in? ['US', 'GB'] %></div>
-        <% else %>
-          Online
-        <% end %>
+        <%= tournament.formatted_location %>
       </div>
 
       <% @games.each do |game| %>

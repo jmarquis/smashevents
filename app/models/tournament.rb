@@ -130,4 +130,9 @@ class Tournament < ApplicationRecord
     end
   end
 
+  def formatted_location
+    return 'Online' if city.blank? && state.blank? && country.blank?
+    [city, state, country.in?(['US', 'GB']) ? nil : tournament.country].compact.join(', ')
+  end
+
 end
