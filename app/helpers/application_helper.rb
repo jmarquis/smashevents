@@ -1,23 +1,5 @@
 module ApplicationHelper
 
-  def date_range(tournament)
-    start_at = tournament.start_at.in_time_zone(tournament.timezone || 'America/New_York')
-
-    # Subtract a second because a lot of people set their tournaments to stop
-    # at midnight, which is technically the next day.
-    end_at = tournament.end_at.in_time_zone(tournament.timezone || 'America/New_York') - 1.second
-
-    if start_at.day == end_at.day
-      start_at.strftime('%b %-d, %Y')
-    elsif start_at.month == end_at.month
-      "#{start_at.strftime('%b %-d')} – #{end_at.strftime('%-d, %Y')}"
-    elsif start_at.year == end_at.year
-      "#{start_at.strftime('%b %-d')} – #{end_at.strftime('%b %-d, %Y')}"
-    else
-      "#{start_at.strftime('%b %-d, %Y')} – #{end_at.strftime('%b %-d, %Y')}"
-    end
-  end
-
   def add_game_link(game, selected_games)
     link_to "+ #{game.name}", CGI::unescape(root_path(games: (selected_games.map(&:slug) + [game.slug]).join(',')))
   end

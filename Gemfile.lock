@@ -103,8 +103,18 @@ GEM
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    discordrb (3.5.0)
+      discordrb-webhooks (~> 3.5.0)
+      ffi (>= 1.9.24)
+      opus-ruby
+      rest-client (>= 2.0.0)
+      websocket-client-simple (>= 0.3.0)
+    discordrb-webhooks (3.5.0)
+      rest-client (>= 2.0.0)
+    domain_name (0.6.20240107)
     drb (2.2.1)
     erubi (1.13.0)
+    event_emitter (0.2.6)
     faraday (2.9.2)
       faraday-net_http (>= 2.0, < 3.2)
     faraday-net_http (3.1.0)
@@ -113,6 +123,13 @@ GEM
       faraday (~> 2.0)
     faraday-retry (2.2.1)
       faraday (~> 2.0)
+    ffi (1.17.0-aarch64-linux-gnu)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm-linux-gnu)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86-linux-gnu)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
     globalid (1.2.1)
       activesupport (>= 6.1)
     graphlient (0.8.0)
@@ -123,6 +140,9 @@ GEM
     graphql-client (0.23.0)
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
+    http-accept (1.7.0)
+    http-cookie (1.0.7)
+      domain_name (~> 0.5)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.0.1)
@@ -155,6 +175,9 @@ GEM
     memery (1.5.0)
       ruby2_keywords (~> 0.0.2)
     method_source (1.1.0)
+    mime-types (3.5.2)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2024.0903)
     mini_mime (1.1.5)
     minitest (5.24.0)
     msgpack (1.7.2)
@@ -169,6 +192,7 @@ GEM
       timeout
     net-smtp (0.5.0)
       net-protocol
+    netrc (0.11.0)
     nio4r (2.7.3)
     nokogiri (1.16.6-aarch64-linux)
       racc (~> 1.4)
@@ -182,6 +206,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.6-x86_64-linux)
       racc (~> 1.4)
+    opus-ruby (1.0.1)
+      ffi
     pg (1.5.6)
     propshaft (0.9.0)
       actionpack (>= 7.0.0)
@@ -244,6 +270,11 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rexml (3.3.0)
       strscan
     ruby2_keywords (0.0.5)
@@ -276,6 +307,9 @@ GEM
       railties (>= 6.0.0)
     webrick (1.8.1)
     websocket (1.2.10)
+    websocket-client-simple (0.8.0)
+      event_emitter
+      websocket
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -297,6 +331,7 @@ DEPENDENCIES
   bootsnap
   capybara
   debug
+  discordrb
   graphlient
   importmap-rails
   jbuilder

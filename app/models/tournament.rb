@@ -112,4 +112,22 @@ class Tournament < ApplicationRecord
     override&.include == false
   end
 
+  def formatted_date_range
+    adjusted_start_at = start_at.in_time_zone(timezone || 'America/New_York')
+
+    # Subtract a second because a lot of people set their tournaments to stop
+    # at midnight, which is technically the next day.
+    adjusted_end_at = end_at.in_time_zone(timezone || 'America/New_York') - 1.second
+
+    if adjusted_start_at.day == adjusted_end_at.day
+      adjusted_start_at.strftime('%b %-d, %Y')
+    elsif adjusted_start_at.month == adjusted_end_at.month
+      "#{adjusted_start_at.strftime('%b %-d')} – #{adjusted_end_at.strftime('%-d, %Y')}"
+    elsif adjusted_start_at.year == adjusted_end_at.year
+      "#{adjusted_start_at.strftime('%b %-d')} – #{adjusted_end_at.strftime('%b %-d, %Y')}"
+    else
+      "#{adjusted_start_at.strftime('%b %-d, %Y')} – #{adjusted_end_at.strftime('%b %-d, %Y')}"
+    end
+  end
+
 end

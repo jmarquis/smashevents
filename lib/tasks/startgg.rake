@@ -42,7 +42,7 @@ namespace :startgg do
           end
         else
           tournament.save
-          added << tournament.slug
+          added << tournament
           msg = 'Imported!'
         end
 
@@ -55,7 +55,7 @@ namespace :startgg do
     puts '----------------------------------'
     puts "Analyzed: #{analyzed}"
     puts "Imported: #{added.count}"
-    added.each { |t| puts "+ #{t}" }
+    added.each { |t| puts "+ #{t.slug}" }
     puts "Updated: #{updated.count}"
     updated.each do |update|
       tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
@@ -66,6 +66,10 @@ namespace :startgg do
 
         puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
       end
+    end
+
+    added.each do |tournament|
+      Discord.notify_tournament_added tournament
     end
   end
 
@@ -109,7 +113,7 @@ namespace :startgg do
           end
         else
           tournament.save
-          added << tournament.slug
+          added << tournament
           msg = 'Imported!'
         end
 
@@ -122,7 +126,7 @@ namespace :startgg do
     puts '----------------------------------'
     puts "Analyzed: #{analyzed}"
     puts "Imported: #{added.count}"
-    added.each { |t| puts "+ #{t}" }
+    added.each { |t| puts "+ #{t.slug}" }
     puts "Updated: #{updated.count}"
     updated.each do |update|
       tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
@@ -136,6 +140,10 @@ namespace :startgg do
     end
     puts "Deleted: #{deleted.count}"
     deleted.each { |t| puts "- #{t}" }
+
+    added.each do |tournament|
+      Discord.notify_tournament_added tournament
+    end
   end
 
   task sync_entrants: [:environment] do

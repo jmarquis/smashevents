@@ -21,7 +21,7 @@
 
   <% @tournaments.each do |tournament| %>
     <article>
-      <time><%= date_range(tournament) %></time>
+      <time><%= tournament.formatted_date_range %></time>
       <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
       <div>
         <% if tournament.city.present? || tournament.state.present? || tournament.country.present? %>
