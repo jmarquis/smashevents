@@ -1,4 +1,4 @@
-class StartggClient
+class Startgg
   @@client = nil
 
   def self.tournaments(batch_size: 100, page: 1, after_date: Time.now)

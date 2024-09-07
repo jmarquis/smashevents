@@ -9,7 +9,7 @@ namespace :startgg do
     (1..100).each do |page|
       tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
-        StartggClient.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days.to_i)
+        Startgg.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days.to_i)
       end
 
       puts "#{tournaments.count} tournaments found. Analyzing..."
@@ -85,7 +85,7 @@ namespace :startgg do
       else
         data = with_retries(5) do
           puts "Fetching tournament #{override.slug}..."
-          StartggClient.tournament(slug: override.slug)
+          Startgg.tournament(slug: override.slug)
         end
 
         puts "Analyzing #{data.name}..."
@@ -154,7 +154,7 @@ namespace :startgg do
         # Get all the entrants, 1 chunk at a time
         (1..100).each do |page|
           event_entrants = with_retries(5) do
-            StartggClient.event_entrants(
+            Startgg.event_entrants(
               id: event.startgg_id,
               game: Game.by_slug(event.game),
               batch_size: 100,
