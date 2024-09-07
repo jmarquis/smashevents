@@ -15,7 +15,7 @@ namespace :twitch do
 
       next unless streams.present?
 
-      live_streams = Twitch.live_streams(streams:)
+      live_streams = Twitchy.live_streams(streams:)
       tournament.stream_data = tournament.stream_data.map do |stream|
         stream = stream.with_indifferent_access
 
