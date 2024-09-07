@@ -6,6 +6,7 @@
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime
+#  hashtag                   :string
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string

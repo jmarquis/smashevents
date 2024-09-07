@@ -19,6 +19,7 @@ class Startgg
               id
               name
               slug
+              hashtag
               startAt
               endAt
               timezone
@@ -55,6 +56,7 @@ class Startgg
             id
             name
             slug
+            hashtag
             startAt
             endAt
             timezone

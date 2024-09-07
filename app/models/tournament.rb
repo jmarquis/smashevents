@@ -6,6 +6,7 @@
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime
+#  hashtag                   :string
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string
@@ -43,6 +44,7 @@ class Tournament < ApplicationRecord
     t.startgg_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
+    t.hashtag = data.hashtag
     t.start_at = data.start_at.present? ? Time.at(data.start_at) : nil
     t.end_at = data.end_at.present? ? Time.at(data.end_at) : nil
     t.timezone = data.timezone

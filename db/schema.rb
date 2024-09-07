@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_11_133613) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_07_174551) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -53,6 +53,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_11_133613) do
     t.datetime "updated_at", null: false
     t.json "stream_data"
     t.string "timezone"
+    t.string "hashtag"
     t.index ["name"], name: "index_tournaments_on_name"
     t.index ["start_at"], name: "index_tournaments_on_start_at"
     t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true
