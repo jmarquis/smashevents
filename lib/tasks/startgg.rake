@@ -21,7 +21,7 @@ namespace :startgg do
 
         next if events.blank?
         next if tournament.exclude?
-        next unless events.any?(&:interesting?) || tournament.interesting?
+        next unless events.any?(&:interesting?) || tournament.should_ingest?
 
         event_logs = events.map { |event|
           "#{event.game.upcase}: #{event.player_count || 0} players"

@@ -79,7 +79,21 @@ class Tournament < ApplicationRecord
     return t, events
   end
 
-  def interesting?(games: Game::GAMES.map(&:slug))
+  def should_ingest?
+    override = TournamentOverride.find_by(slug:)
+    return override.include unless override&.include.nil?
+
+    Game::GAMES.each do |game|
+      event = events.find_by(game: game.slug)
+      return true if event.present? && event.interesting?
+    end
+
+    false
+  end
+
+  def should_display?(games: Game::GAMES.map(&:slug))
+    return false if events.find_by(game: games).blank?
+
     override = TournamentOverride.find_by(slug:)
     return override.include unless override&.include.nil?
 
