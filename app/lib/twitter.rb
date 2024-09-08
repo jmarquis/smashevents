@@ -21,6 +21,22 @@ class Twitter
       }))
     end
 
+    def weekend_briefing(game, events)
+      tournament_blurbs = events.map do |event|
+        blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
+        blurb += " featuring #{[*event.featured_players, 'more!'].to_sentence}" if event.featured_players.present?
+        blurb
+      end
+
+      client.post('tweets', JSON.generate({
+        text: <<~TEXT
+          THIS WEEKEND IN #{game.name.upcase}
+          \n\n
+          #{tournament_blurbs.join("\n\n")}
+        TEXT
+      }))
+    end
+
     def client
       return @client if @client
 

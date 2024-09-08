@@ -28,6 +28,7 @@
 #  index_tournaments_on_startgg_id  (startgg_id) UNIQUE
 #
 class Tournament < ApplicationRecord
+  include Memery
 
   STREAM_SOURCE_TWITCH = 'twitch'
   STREAM_SOURCE_YOUTUBE = 'youtube'
@@ -112,13 +113,17 @@ class Tournament < ApplicationRecord
     override&.include == false
   end
 
-  def formatted_date_range
-    adjusted_start_at = start_at.in_time_zone(timezone || 'America/New_York')
+  memoize def adjusted_start_at
+    start_at.in_time_zone(timezone || 'America/New_York')
+  end
 
+  memoize def adjusted_end_at
     # Subtract a second because a lot of people set their tournaments to stop
     # at midnight, which is technically the next day.
-    adjusted_end_at = end_at.in_time_zone(timezone || 'America/New_York') - 1.second
+    end_at.in_time_zone(timezone || 'America/New_York') - 1.second
+  end
 
+  def formatted_date_range
     if adjusted_start_at.day == adjusted_end_at.day
       adjusted_start_at.strftime('%b %-d, %Y')
     elsif adjusted_start_at.month == adjusted_end_at.month
@@ -127,6 +132,15 @@ class Tournament < ApplicationRecord
       "#{adjusted_start_at.strftime('%b %-d')} – #{adjusted_end_at.strftime('%b %-d, %Y')}"
     else
       "#{adjusted_start_at.strftime('%b %-d, %Y')} – #{adjusted_end_at.strftime('%b %-d, %Y')}"
+    end
+  end
+
+  # Fri - Sun  or  Saturday
+  def formatted_day_range
+    if adjusted_start_at.day == adjusted_end_at.day
+      adjusted_start_at.strftime('%A')
+    else
+      "#{adjusted_start_at.strftime('%a')} – #{adjusted_end_at.strftime('%a')}"
     end
   end
 
