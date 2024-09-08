@@ -12,6 +12,8 @@ namespace :notifications do
       .flatten
       .group_by(&:game)
       .each do |game_slug, events|
+        puts "Sending weekend briefing for #{game_slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}"
+
         Twitter.weekend_briefing(
           game: Game.by_slug(game_slug),
           events: events.sort_by(&:player_count).reverse
