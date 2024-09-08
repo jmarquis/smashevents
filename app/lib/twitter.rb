@@ -12,7 +12,7 @@ class Twitter
           #{tournament.formatted_date_range}
           #{tournament.formatted_location}
           \n\n
-          Featuring #{tournament.events.map { |event| Game.by_slug(event.game).name }.to_sentence}.
+          Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
           \n\n
           ##{tournament.hashtag}
           \n\n
@@ -37,6 +37,24 @@ class Twitter
           THIS WEEKEND IN #{game.name.upcase}
           \n\n
           #{tournament_blurbs.join("\n\n")}
+        TEXT
+      }))
+    end
+    
+    def happening_today(tournament)
+      streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
+        "https://twitch.tv/#{stream['name']}"
+      end
+
+      client.post('tweets', JSON.generate({
+        text: <<~TEXT
+          HAPPENING TODAY: #{tournament.name.upcase}
+          \n\n
+          Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
+          \n\n
+          Streams:
+          #{streams.join("\n")}
+          https://start.gg/#{tournament.slug}
         TEXT
       }))
     end
