@@ -22,11 +22,13 @@ namespace :notifications do
   end
 
   task happening_today: [:environment] do
+    effective_time = Time.now
+
     Tournament
       .includes(:events)
-      .where('end_at > ?', Time.now)
-      .where('start_at < ?', Time.now + 2.days)
-      .filter { |t| t.start_at.in_time_zone(t.timezone || 'America/New_York').day == Time.now.in_time_zone(t.timezone || 'America/New_York').day }
+      .where('end_at > ?', effective_time)
+      .where('start_at < ?', effective_time + 2.days)
+      .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') && (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
       .each do |tournament|
         puts "Sending happening today tweet for #{tournament.slug}..."
         Twitter.happening_today(tournament)

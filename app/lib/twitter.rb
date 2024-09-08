@@ -51,14 +51,18 @@ class Twitter
         end
       end.compact
 
+      stream_text = streams.blank? ? nil : <<~TEXT
+        \n\n
+        Streams:
+        #{streams.join("\n")}
+      TEXT
+
       client.post('tweets', JSON.generate({
         text: <<~TEXT
-          HAPPENING TODAY: #{tournament.name.upcase}
+          HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
           \n\n
           Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
-          \n\n
-          Streams:
-          #{streams.join("\n")}
+          #{stream_text}
           https://start.gg/#{tournament.slug}
         TEXT
       }))
