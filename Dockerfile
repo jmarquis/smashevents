@@ -3,16 +3,16 @@ FROM ruby:3.3.3-alpine
 ARG RAILS_ENV=development
 
 RUN apk add --update --no-cache \
-      curl \
-      build-base \
-      less \
-      postgresql-dev \
-      postgresql-client \
-      imagemagick \
-      git \
-      tzdata \
-      gcompat \
-      inotify-tools
+  curl \
+  build-base \
+  less \
+  postgresql-dev \
+  postgresql-client \
+  imagemagick \
+  git \
+  tzdata \
+  gcompat \
+  inotify-tools
 
 RUN mkdir -p /opt/rails
 WORKDIR /opt/rails
@@ -24,6 +24,7 @@ EXPOSE 3036
 
 ENV RAILS_SERVE_STATIC_FILES=1
 ENV RAILS_LOG_TO_STDOUT=1
+ENV DISCORDRB_NONACL=1
 
 VOLUME /opt/rails
 
