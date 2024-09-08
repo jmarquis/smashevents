@@ -43,8 +43,13 @@ class Twitter
     
     def happening_today(tournament)
       streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
-        "https://twitch.tv/#{stream['name']}"
-      end
+        case stream['source']
+        when Tournament::STREAM_SOURCE_TWITCH
+          "https://twitch.tv/#{stream['name']}"
+        when Tournament::STREAM_SOURCE_YOUTUBE
+          "https://youtube.com/#{stream['name']}/live"
+        end
+      end.compact
 
       client.post('tweets', JSON.generate({
         text: <<~TEXT
