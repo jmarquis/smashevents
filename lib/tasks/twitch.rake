@@ -20,6 +20,8 @@ namespace :twitch do
         stream = stream.with_indifferent_access
 
         if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams)
+          Discord.notify_stream_live(tournament:, stream:) if stream[:status] != Tournament::STREAM_STATUS_LIVE
+
           stream[:status] = Tournament::STREAM_STATUS_LIVE
           stream[:game] = live_streams[stream[:name].downcase][:game]
           stream[:title] = live_streams[stream[:name].downcase][:title]

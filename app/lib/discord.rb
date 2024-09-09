@@ -1,6 +1,11 @@
 class Discord
   @clients = {}
 
+  DEFAULT_FOOTER = Discordrb::Webhooks::EmbedFooter.new(
+    text: 'smashevents.gg',
+    icon_url: 'https://smashevents.gg/favicon.png'
+  )
+
   class << self
 
     def notify_tournament_added(tournament)
@@ -18,7 +23,7 @@ class Discord
                 "#{Game.by_slug(event.game).name}: #{event.player_count || 0} players"
               }.join("\n")}
             TEXT
-            embed.timestamp = tournament.start_at
+            embed.footer = DEFAULT_FOOTER
           end
         end
       end
@@ -42,6 +47,8 @@ class Discord
                 Featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}
               TEXT
             end
+
+            embed.footer = DEFAULT_FOOTER
           end
         end
       end
@@ -75,7 +82,26 @@ class Discord
               #{tournament.formatted_location}
               #{stream_text}
             TEXT
+            embed.footer = DEFAULT_FOOTER
           end
+        end
+      end
+    end
+
+    def notify_stream_live(tournament:, stream:)
+      game = Game.by_twitch_name(stream[:game])
+      return unless game.present?
+
+      client(game.slug).execute do |builder|
+        builder.content = "**#{tournament.name}** stream just went live!"
+        builder.add_embed do |embed|
+          embed.title = stream[:name]
+          embed.url = "https://twitch.tv/#{stream[:name]}"
+          embed.description = <<~TEXT
+            #{stream[:title]}
+            #{stream[:game]}
+          TEXT
+          embed.footer = DEFAULT_FOOTER
         end
       end
     end
