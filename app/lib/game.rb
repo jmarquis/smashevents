@@ -59,7 +59,7 @@ class Game
     include Memery
 
     memoize def by_slug(slug)
-      GAMES.find { |game| game.slug == slug }
+      GAMES.find { |game| game.slug == slug.to_s }
     end
 
     memoize def by_startgg_id(startgg_id)

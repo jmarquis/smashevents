@@ -43,7 +43,7 @@ class Twitter
     
     def happening_today(tournament)
       streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
-        case stream['source']
+        case stream['source'].downcase
         when Tournament::STREAM_SOURCE_TWITCH
           "https://twitch.tv/#{stream['name']}"
         when Tournament::STREAM_SOURCE_YOUTUBE
