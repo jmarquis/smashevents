@@ -34,9 +34,9 @@
 
       <% @games.each do |game| %>
         <% event = tournament.events.find_by(game: game.slug) %>
-        <% if event.present? && event.player_count.present? && event.player_count > 0 %>
+        <% if event.present? %>
           <div class="game">
-            <h3><%= game.name %>: <%= event.player_count.round(-1) %>+ players</h3>
+            <h3><%= game.name %><% if event.player_count.present? && event.player_count > 0 %>: <%= event.player_count.round(-1) %>+ players<% end %></h3>
             <ul class="players">
               <% if event.featured_players.present? %>
                 <% event.featured_players.each do |player| %>
