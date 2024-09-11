@@ -98,7 +98,7 @@ class Tournament < ApplicationRecord
     return false if events.find_by(game: games).blank?
 
     override = TournamentOverride.find_by(slug:)
-    return override.include unless override&.include.nil?
+    return override.include unless override&.include.blank?
 
     games.each do |game|
       event = events.find_by(game: game)

@@ -33,6 +33,8 @@ class Discord
       client(game.slug).execute do |builder|
         builder.content = "**This weekend in #{game.name}**"
         events.each do |event|
+          next unless event.interesting?
+
           builder.add_embed do |embed|
             embed.title = "#{event.tournament.name} (#{event.tournament.formatted_day_range})"
             embed.url = "https://start.gg/#{event.tournament.slug}"
@@ -70,9 +72,9 @@ class Discord
         #{streams.join("\n")}
       TEXT
 
-      binding.pry
-
       tournament.events.group_by(&:game).each do |game_slug, events|
+        next unless events.first.interesting?
+
         client(game_slug).execute do |builder|
           builder.content = '**Happening today!**'
           builder.add_embed do |embed|
