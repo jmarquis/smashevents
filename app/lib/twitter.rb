@@ -31,6 +31,8 @@ class Twitter
           blurb += " featuring #{event.player_count} players!"
         end
 
+        blurb += " ##{tournament.hashtag}" if tournament.hashtag.present?
+
         blurb
       end
 
@@ -65,6 +67,8 @@ class Twitter
           \n\n
           Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
           #{stream_text}
+          \n\n
+          #{tournament.hashtag}
           https://start.gg/#{tournament.slug}
         TEXT
       }))
