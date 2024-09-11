@@ -10,6 +10,7 @@ namespace :notifications do
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
+      .filter { |event| event.interesting? }
       .group_by(&:game)
       .each do |game_slug, events|
         puts "Sending weekend briefing notifications for #{game_slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
