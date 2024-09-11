@@ -27,6 +27,8 @@ class Twitter
 
         if event.featured_players.present?
           blurb += " featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
+        else
+          blurb += " featuring #{event.player_count} players!"
         end
 
         blurb

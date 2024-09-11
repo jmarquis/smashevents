@@ -48,6 +48,10 @@ class Discord
 
                 Featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}
               TEXT
+            else
+              embed.description += <<~TEXT
+                #{event.player_count} players
+              TEXT
             end
 
             embed.footer = DEFAULT_FOOTER
