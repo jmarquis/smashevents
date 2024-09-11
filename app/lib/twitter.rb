@@ -31,7 +31,7 @@ class Twitter
           blurb += " featuring #{event.player_count} players!"
         end
 
-        blurb += " ##{tournament.hashtag}" if tournament.hashtag.present?
+        blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
 
         blurb
       end
