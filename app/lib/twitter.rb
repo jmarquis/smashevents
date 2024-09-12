@@ -61,11 +61,20 @@ class Twitter
         #{streams.join("\n")}
       TEXT
 
+      event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
+        game = Game.by_slug(event.game)
+        if event.featured_players.present?
+          "#{game.name.upcase}: featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
+        else
+          "#{game.name.upcase}: featuring #{event.player_count} players!"
+        end
+      end
+
       client.post('tweets', JSON.generate({
         text: <<~TEXT
           HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
           \n\n
-          Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
+          #{event_blurbs.join("\n\n")}
           #{stream_text}
           \n\n
           #{tournament.hashtag}

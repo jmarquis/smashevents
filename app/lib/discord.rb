@@ -76,6 +76,15 @@ class Discord
         #{streams.join("\n")}
       TEXT
 
+      event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
+        game = Game.by_slug(event.game)
+        if event.featured_players.present?
+          "#{game.name.upcase}: featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
+        else
+          "#{game.name.upcase}: featuring #{event.player_count} players!"
+        end
+      end
+
       tournament.events.group_by(&:game).each do |game_slug, events|
         next unless events.first.interesting? || (tournament.override.present? && tournament.override.include)
 
@@ -86,6 +95,8 @@ class Discord
             embed.url = "https://start.gg/#{tournament.slug}"
             embed.description = <<~TEXT
               #{tournament.formatted_location}
+
+              #{event_blurbs.join("\n\n")}
               #{stream_text}
             TEXT
             embed.footer = DEFAULT_FOOTER
