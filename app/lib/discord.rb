@@ -18,7 +18,7 @@ class Discord
             embed.description = <<~TEXT
               #{tournament.formatted_date_range}
               #{tournament.formatted_location}
-              
+
               #{tournament.events.map { |event|
                 "#{Game.by_slug(event.game).name}: #{event.player_count || 0} players"
               }.join("\n")}
@@ -77,7 +77,7 @@ class Discord
       TEXT
 
       tournament.events.group_by(&:game).each do |game_slug, events|
-        next unless events.first.interesting?
+        next unless events.first.interesting? || (tournament.override.present? && tournament.override.include)
 
         client(game_slug).execute do |builder|
           builder.content = '**Happening today!**'
@@ -95,6 +95,7 @@ class Discord
     end
 
     def notify_stream_live(tournament:, stream:)
+      stream = stream.with_indifferent_access
       game = Game.by_twitch_name(stream[:game])
       return unless game.present?
 

@@ -149,4 +149,8 @@ class Tournament < ApplicationRecord
     [city, state, country.in?(['US', 'GB']) ? nil : country].compact.join(', ')
   end
 
+  def override
+    TournamentOverride.find_by(slug:)
+  end
+
 end
