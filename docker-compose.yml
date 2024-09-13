@@ -21,9 +21,13 @@ services:
     depends_on:
       - db
       - redis
+      - memcached
 
   redis:
     image: redis:alpine
+
+  memcached:
+    image: memcached:1.6-alpine
 
 volumes:
   bundle_cache:

@@ -18,7 +18,7 @@ module ApplicationHelper
         target: '_blank',
         title: stream[:status] == Tournament::STREAM_STATUS_LIVE ? "#{stream[:game]} | #{stream[:title]}" : nil
     when Tournament::STREAM_SOURCE_YOUTUBE
-      link_to stream[:name], "https://youtube.com/#{stream[:name]}/live", target: '_blank'
+      link_to stream[:name], "#{Youtube.channel_url(stream[:name])}/live", target: '_blank'
     end
   end
 

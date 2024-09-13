@@ -99,10 +99,12 @@ GEM
     concurrent-ruby (1.3.3)
     connection_pool (2.4.1)
     crass (1.0.6)
+    dalli (3.2.8)
     date (3.3.4)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    declarative (0.0.20)
     discordrb (3.5.0)
       discordrb-webhooks (~> 3.5.0)
       ffi (>= 1.9.24)
@@ -126,6 +128,25 @@ GEM
     ffi (1.17.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    google-apis-core (0.15.1)
+      addressable (~> 2.5, >= 2.5.1)
+      googleauth (~> 1.9)
+      httpclient (>= 2.8.3, < 3.a)
+      mini_mime (~> 1.0)
+      mutex_m
+      representable (~> 3.0)
+      retriable (>= 2.0, < 4.a)
+    google-apis-youtube_v3 (0.43.0)
+      google-apis-core (>= 0.15.0, < 2.a)
+    google-cloud-env (2.2.0)
+      faraday (>= 1.0, < 3.a)
+    googleauth (1.11.0)
+      faraday (>= 1.0, < 3.a)
+      google-cloud-env (~> 2.1)
+      jwt (>= 1.4, < 3.0)
+      multi_json (~> 1.11)
+      os (>= 0.9, < 2.0)
+      signet (>= 0.16, < 2.a)
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
@@ -137,6 +158,7 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.7)
       domain_name (~> 0.5)
+    httpclient (2.8.3)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.0.1)
@@ -153,6 +175,8 @@ GEM
     jbuilder (2.12.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    jwt (2.8.2)
+      base64
     logger (1.6.0)
     lograge (0.14.0)
       actionpack (>= 4)
@@ -178,6 +202,7 @@ GEM
     mini_mime (1.1.5)
     minitest (5.24.0)
     msgpack (1.7.2)
+    multi_json (1.15.0)
     mutex_m (0.2.0)
     net-http (0.4.1)
       uri
@@ -205,6 +230,7 @@ GEM
       racc (~> 1.4)
     opus-ruby (1.0.1)
       ffi
+    os (1.1.4)
     pg (1.5.6)
     propshaft (0.9.0)
       actionpack (>= 7.0.0)
@@ -265,6 +291,10 @@ GEM
     regexp_parser (2.9.2)
     reline (0.5.9)
       io-console (~> 0.5)
+    representable (3.2.0)
+      declarative (< 0.1.0)
+      trailblazer-option (>= 0.1.1, < 0.2.0)
+      uber (< 0.2.0)
     request_store (1.7.0)
       rack (>= 1.4)
     rest-client (2.1.0)
@@ -272,6 +302,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    retriable (3.1.2)
     rexml (3.3.0)
       strscan
     ruby2_keywords (0.0.5)
@@ -282,10 +313,16 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    signet (0.19.0)
+      addressable (~> 2.8)
+      faraday (>= 0.17.5, < 3.a)
+      jwt (>= 1.5, < 3.0)
+      multi_json (~> 1.10)
     stringio (3.1.1)
     strscan (3.1.0)
     thor (1.3.1)
     timeout (0.4.1)
+    trailblazer-option (0.1.2)
     twitch-api (1.0.0)
       faraday (~> 2.3)
       faraday-parse_dates (~> 0.1.1)
@@ -296,6 +333,7 @@ GEM
       faraday-parse_dates (~> 0.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uber (0.1.0)
     uri (0.13.0)
     web-console (4.2.1)
       actionview (>= 6.0.0)
@@ -328,9 +366,11 @@ DEPENDENCIES
   annotate
   bootsnap
   capybara
+  dalli (~> 3.2)
   debug
   discordrb
   ffi
+  google-apis-youtube_v3 (~> 0.43.0)
   graphlient
   importmap-rails
   inline_svg (~> 1.10)

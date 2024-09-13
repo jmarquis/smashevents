@@ -78,3 +78,7 @@ group :test do
 end
 
 gem "inline_svg", "~> 1.10"
+
+gem "google-apis-youtube_v3", "~> 0.43.0"
+
+gem "dalli", "~> 3.2"
