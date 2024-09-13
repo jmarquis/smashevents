@@ -77,7 +77,7 @@ class Twitter
           #{event_blurbs.join("\n\n")}
           #{stream_text}
           \n\n
-          #{tournament.hashtag}
+          ##{tournament.hashtag}
           https://start.gg/#{tournament.slug}
         TEXT
       }))
