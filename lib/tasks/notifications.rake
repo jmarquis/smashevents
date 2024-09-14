@@ -1,7 +1,7 @@
 namespace :notifications do
 
   task weekend_briefing: [:environment] do
-    return unless Time.now.strftime('%a') == 'Wed'
+    next unless Time.now.strftime('%a') == 'Wed' || Rails.env.development?
 
     Tournament
       .includes(:events)

@@ -3,7 +3,7 @@
 # Table name: tournaments
 #
 #  id                        :bigint           not null, primary key
-#  banner_url                :string
+#  banner_image_url          :string
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime
@@ -11,6 +11,7 @@
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string
+#  profile_image_url         :string
 #  slug                      :string
 #  start_at                  :datetime
 #  state                     :string

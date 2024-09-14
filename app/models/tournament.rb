@@ -3,7 +3,7 @@
 # Table name: tournaments
 #
 #  id                        :bigint           not null, primary key
-#  banner_url                :string
+#  banner_image_url          :string
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime
@@ -11,6 +11,7 @@
 #  melee_featured_players    :string           is an Array
 #  melee_player_count        :integer
 #  name                      :string
+#  profile_image_url         :string
 #  slug                      :string
 #  start_at                  :datetime
 #  state                     :string
@@ -53,8 +54,13 @@ class Tournament < ApplicationRecord
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code
-    t.banner_url = data.images.blank? ? nil : data.images
+    t.banner_image_url = data.images.blank? ? nil : data.images
       .filter { |image| image.type == 'banner' }
+      .map { |image| image.url.gsub(/\?.*/, '') }
+      .first
+
+    t.profile_image_url = data.images.blank? ? nil : data.images
+      .filter { |image| image.type == 'profile' }
       .map { |image| image.url.gsub(/\?.*/, '') }
       .first
 
@@ -158,17 +164,17 @@ class Tournament < ApplicationRecord
     TournamentOverride.find_by(slug:)
   end
 
-  def banner_extension
-    return nil if banner_url.blank?
+  def banner_image_extension
+    return nil if banner_image_url.blank?
 
-    banner_url.match(/\.([^.]*)$/)[1]
+    banner_image_url.match(/\.([^.]*)$/)[1]
   end
 
-  def banner_file
-    return nil if banner_url.blank?
+  def banner_image_file
+    return nil if banner_image_url.blank?
 
-    path = "./tmp/#{SecureRandom.hex}.#{banner_extension}"
-    IO.copy_stream(URI.open(banner_url), path)
+    path = "./tmp/#{SecureRandom.hex}.#{banner_image_extension}"
+    IO.copy_stream(URI.open(banner_image_url), path)
 
     path
   end

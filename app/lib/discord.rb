@@ -38,10 +38,14 @@ class Discord
           builder.add_embed do |embed|
             embed.title = "#{event.tournament.name} (#{event.tournament.formatted_day_range})"
             embed.url = "https://start.gg/#{event.tournament.slug}"
+
             embed.description = <<~TEXT
               #{event.tournament.formatted_date_range}
               #{event.tournament.formatted_location}
             TEXT
+
+            embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
             if event.featured_players.present?
               embed.description += <<~TEXT
