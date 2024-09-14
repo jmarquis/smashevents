@@ -13,8 +13,7 @@ class Twitter
           #{tournament.formatted_location}
           \n\n
           Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
-          \n\n
-          ##{tournament.hashtag}
+          #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
           \n\n
           https://start.gg/#{tournament.slug}
         TEXT
@@ -76,8 +75,8 @@ class Twitter
           \n\n
           #{event_blurbs.join("\n\n")}
           #{stream_text}
+          #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
           \n\n
-          ##{tournament.hashtag}
           https://start.gg/#{tournament.slug}
         TEXT
       }))
