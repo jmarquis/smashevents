@@ -27,6 +27,10 @@ class Startgg
               city
               addrState
               countryCode
+              images {
+                type
+                url
+              }
               events(filter: {
                 videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
               }) {
@@ -64,6 +68,10 @@ class Startgg
             city
             addrState
             countryCode
+            images {
+              type
+              url
+            }
             events(filter: {
               videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
             }) {

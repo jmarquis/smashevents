@@ -3,6 +3,7 @@
 # Table name: tournaments
 #
 #  id                        :bigint           not null, primary key
+#  banner_url                :string
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime

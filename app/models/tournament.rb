@@ -3,6 +3,7 @@
 # Table name: tournaments
 #
 #  id                        :bigint           not null, primary key
+#  banner_url                :string
 #  city                      :string
 #  country                   :string
 #  end_at                    :datetime
@@ -52,6 +53,10 @@ class Tournament < ApplicationRecord
     t.city = data.city
     t.state = data.addr_state
     t.country = data.country_code
+    t.banner_url = data.images.blank? ? nil : data.images
+      .filter { |image| image.type == 'banner' }
+      .map { |image| image.url.gsub(/\?.*/, '') }
+      .first
 
     t.stream_data = data.streams&.map do |stream|
       stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase } || {}
@@ -151,6 +156,21 @@ class Tournament < ApplicationRecord
 
   def override
     TournamentOverride.find_by(slug:)
+  end
+
+  def banner_extension
+    return nil if banner_url.blank?
+
+    banner_url.match(/\.([^.]*)$/)[1]
+  end
+
+  def banner_file
+    return nil if banner_url.blank?
+
+    path = "./tmp/#{SecureRandom.hex}.#{banner_extension}"
+    IO.copy_stream(URI.open(banner_url), path)
+
+    path
   end
 
 end
