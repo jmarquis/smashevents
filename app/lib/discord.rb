@@ -129,10 +129,15 @@ class Discord
         builder.add_embed do |embed|
           embed.title = stream[:name]
           embed.url = "https://twitch.tv/#{stream[:name]}"
+
           embed.description = <<~TEXT
             #{stream[:title]}
             #{stream[:game]}
           TEXT
+
+          embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
+          embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
+
           embed.footer = DEFAULT_FOOTER
         end
       end
