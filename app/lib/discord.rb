@@ -15,6 +15,7 @@ class Discord
           builder.add_embed do |embed|
             embed.title = tournament.name
             embed.url = "https://start.gg/#{tournament.slug}"
+
             embed.description = <<~TEXT
               #{tournament.formatted_date_range}
               #{tournament.formatted_location}
@@ -23,6 +24,10 @@ class Discord
                 "#{Game.by_slug(event.game).name}: #{event.player_count || 0} players"
               }.join("\n")}
             TEXT
+
+            embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
+            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
+
             embed.footer = DEFAULT_FOOTER
           end
         end
@@ -97,12 +102,17 @@ class Discord
           builder.add_embed do |embed|
             embed.title = tournament.name
             embed.url = "https://start.gg/#{tournament.slug}"
+
             embed.description = <<~TEXT
               #{tournament.formatted_location}
 
               #{event_blurbs.join("\n\n")}
               #{stream_text}
             TEXT
+
+            embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
+            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
+
             embed.footer = DEFAULT_FOOTER
           end
         end
