@@ -8,7 +8,7 @@ class Discord
 
   class << self
 
-    def notify_tournament_added(tournament)
+    def tournament_added(tournament)
       tournament.events.group_by(&:game).each do |game_slug, events|
         client(game_slug).execute do |builder|
           builder.content = 'New tournament added!'
@@ -119,7 +119,7 @@ class Discord
       end
     end
 
-    def notify_stream_live(tournament:, stream:)
+    def stream_live(tournament:, stream:)
       stream = stream.with_indifferent_access
       game = Game.by_twitch_name(stream[:game])
       return unless game.present?

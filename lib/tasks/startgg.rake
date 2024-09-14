@@ -69,8 +69,8 @@ namespace :startgg do
     end
 
     added.each do |tournament|
-      Discord.notify_tournament_added tournament
-      Twitter.notify_tournament_added tournament
+      Discord.tournament_added tournament
+      Twitter.tournament_added tournament
     end
   end
 
@@ -143,8 +143,8 @@ namespace :startgg do
     deleted.each { |t| puts "- #{t}" }
 
     added.each do |tournament|
-      Discord.notify_tournament_added tournament
-      Twitter.notify_tournament_added tournament
+      Discord.tournament_added tournament
+      Twitter.tournament_added tournament
     end
   end
 

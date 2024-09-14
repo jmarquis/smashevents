@@ -3,21 +3,23 @@ class Twitter
 
   class << self
 
-    def notify_tournament_added(tournament)
-      client.post('tweets', JSON.generate({
-        text: <<~TEXT
-          New tournament added to smashevents.gg!
-          \n\n
-          #{tournament.name.upcase}
-          #{tournament.formatted_date_range}
-          #{tournament.formatted_location}
-          \n\n
-          Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
-          #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
-          \n\n
-          https://start.gg/#{tournament.slug}
-        TEXT
-      }))
+    def tournament_added(tournament)
+      text = <<~TEXT
+        New tournament added to smashevents.gg!
+        \n\n
+        #{tournament.name.upcase}
+        #{tournament.formatted_date_range}
+        #{tournament.formatted_location}
+        \n\n
+        Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
+        #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
+        \n\n
+        https://start.gg/#{tournament.slug}
+      TEXT
+
+      text = text.slice(0, 260) if Rails.env.development?
+
+      client.post('tweets', JSON.generate({ text: }))
     end
 
     def weekend_briefing(game:, events:)
@@ -35,13 +37,15 @@ class Twitter
         blurb
       end
 
-      client.post('tweets', JSON.generate({
-        text: <<~TEXT
-          THIS WEEKEND IN #{game.name.upcase}
-          \n\n
-          #{tournament_blurbs.join("\n\n")}
-        TEXT
-      }))
+      text = <<~TEXT
+        THIS WEEKEND IN #{game.name.upcase}
+        \n\n
+        #{tournament_blurbs.join("\n\n")}
+      TEXT
+
+      text = text.slice(0, 260) if Rails.env.development?
+
+      client.post('tweets', JSON.generate({ text: }))
     end
     
     def happening_today(tournament)
@@ -69,16 +73,21 @@ class Twitter
         end
       end
 
+      text = <<~TEXT
+        HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
+        \n\n
+        #{event_blurbs.join("\n\n")}
+        #{stream_text}
+        #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
+        \n\n
+        https://start.gg/#{tournament.slug}
+      TEXT
+
+      text = text.slice(0, 260) if Rails.env.development?
+
       client.post('tweets', JSON.generate({
-        text: <<~TEXT
-          HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
-          \n\n
-          #{event_blurbs.join("\n\n")}
-          #{stream_text}
-          #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
-          \n\n
-          https://start.gg/#{tournament.slug}
-        TEXT
+        text:,
+        media: nil
       }))
     end
 
