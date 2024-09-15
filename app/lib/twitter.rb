@@ -32,6 +32,7 @@ class Twitter
           blurb += " featuring #{event.player_count} players!"
         end
 
+        blurb += "\nhttps://start.gg/#{event.tournament.slug}"
         blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
 
         blurb
@@ -45,7 +46,14 @@ class Twitter
 
       text = text.slice(0, 260) if Rails.env.development?
 
-      client.post('tweets', JSON.generate({ text: }))
+      media_ids = events.slice(0, 3).map do |event|
+        event.tournament.banner_image_file.present? ? upload_image(event.tournament.banner_image_file)['media_id_string'] : nil
+      end.compact
+
+      client.post('tweets', JSON.generate({
+        text:,
+        media: media_ids.blank? ? nil : { media_ids: }
+      }.compact))
     end
     
     def happening_today(tournament)
@@ -67,28 +75,28 @@ class Twitter
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
         game = Game.by_slug(event.game)
         if event.featured_players.present?
-          "#{game.name.upcase}: featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
+          "#{game.name.upcase} featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
         else
-          "#{game.name.upcase}: featuring #{event.player_count} players!"
+          "#{game.name.upcase} featuring #{event.player_count} players!"
         end
       end
 
       text = <<~TEXT
         HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
+        https://start.gg/#{tournament.slug}#{tournament.hashtag.present? ? " ##{tournament.hashtag}" : nil}
         \n\n
         #{event_blurbs.join("\n\n")}
         #{stream_text}
-        #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
-        \n\n
-        https://start.gg/#{tournament.slug}
       TEXT
 
       text = text.slice(0, 260) if Rails.env.development?
 
+      media_ids = tournament.banner_image_file.blank? ? nil : [upload_image(tournament.banner_image_file)['media_id_string']]
+
       client.post('tweets', JSON.generate({
         text:,
-        media: nil
-      }))
+        media: media_ids.blank? ? nil : { media_ids: }
+      }.compact))
     end
 
     def client
@@ -100,6 +108,10 @@ class Twitter
         access_token: Rails.application.credentials.dig(:twitter, :access_token),
         access_token_secret: Rails.application.credentials.dig(:twitter, :access_token_secret)
       )
+    end
+
+    def upload_image(file_path)
+      X::MediaUploader.upload(client:, file_path:, media_category: 'tweet_image')
     end
 
   end
