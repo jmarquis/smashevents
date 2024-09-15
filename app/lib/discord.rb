@@ -11,7 +11,7 @@ class Discord
     def tournament_added(tournament)
       tournament.events.group_by(&:game).each do |game_slug, events|
         client(game_slug).execute do |builder|
-          builder.content = 'New tournament added!'
+          builder.content = '## NEW TOURNAMENT ADDED'
           builder.add_embed do |embed|
             embed.title = tournament.name
             embed.url = "https://start.gg/#{tournament.slug}"
@@ -36,7 +36,7 @@ class Discord
 
     def weekend_briefing(game:, events:)
       client(game.slug).execute do |builder|
-        builder.content = "**This weekend in #{game.name}**"
+        builder.content = "## THIS WEEKEND IN #{game.name.upcase}"
         events.each do |event|
           next unless event.interesting?
 
@@ -98,7 +98,7 @@ class Discord
         next unless events.first.interesting? || (tournament.override.present? && tournament.override.include)
 
         client(game_slug).execute do |builder|
-          builder.content = '**Happening today!**'
+          builder.content = '## HAPPENING TODAY'
           builder.add_embed do |embed|
             embed.title = tournament.name
             embed.url = "https://start.gg/#{tournament.slug}"
@@ -125,7 +125,7 @@ class Discord
       return unless game.present?
 
       client(game.slug).execute do |builder|
-        builder.content = "**#{tournament.name}** stream just went live!"
+        builder.content = "### #{tournament.name.upcase}** STREAM IS LIVE"
         builder.add_embed do |embed|
           embed.title = stream[:name]
           embed.url = "https://twitch.tv/#{stream[:name]}"
