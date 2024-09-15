@@ -1,5 +1,5 @@
 class Game
-  attr_accessor :name, :slug, :twitch_name, :startgg_id, :rankings_regex, :player_count_threshold
+  attr_accessor :name, :slug, :twitch_name, :startgg_id, :rankings_regex, :ingestion_threshold, :display_threshold
 
   def initialize(params)
     params.each do |key, value|
@@ -13,7 +13,8 @@ class Game
     twitch_name: 'Super Smash Bros. Melee',
     startgg_id: 1,
     rankings_regex: /^SSBMRank/,
-    player_count_threshold: 100
+    ingestion_threshold: 100,
+    display_threshold: 50
   )
 
   ULTIMATE = new(
@@ -22,7 +23,8 @@ class Game
     twitch_name: 'Super Smash Bros. Ultimate',
     startgg_id: 1386,
     rankings_regex: /^UltRank/,
-    player_count_threshold: 300
+    ingestion_threshold: 300,
+    display_threshold: 200
   )
 
   SMASH64 = new(
@@ -31,7 +33,8 @@ class Game
     twitch_name: 'Super Smash Bros.',
     startgg_id: 4,
     rankings_regex: /^The SSB64 League Rankings/,
-    player_count_threshold: 20
+    ingestion_threshold: 20,
+    display_threshold: 15
   )
 
   RIVALS = new(
@@ -40,7 +43,8 @@ class Game
     twitch_name: 'Rivals of Aether',
     startgg_id: 24,
     rankings_regex: /^NA RCS/,
-    player_count_threshold: 30
+    ingestion_threshold: 30,
+    display_threshold: 20
   )
 
   RIVALS2 = new(
@@ -49,7 +53,8 @@ class Game
     twitch_name: 'Rivals 2',
     startgg_id: 53945,
     rankings_regex: /^NA RCS/,
-    player_count_threshold: 30
+    ingestion_threshold: 30,
+    display_threshold: 20
   )
 
   GAMES = [

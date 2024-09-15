@@ -99,7 +99,7 @@ class Tournament < ApplicationRecord
 
     Game::GAMES.each do |game|
       event = events.find_by(game: game.slug)
-      return true if event.present? && event.interesting?
+      return true if event.present? && event.should_ingest?
     end
 
     false
@@ -113,7 +113,7 @@ class Tournament < ApplicationRecord
 
     games.each do |game|
       event = events.find_by(game: game)
-      return true if event.present? && event.interesting?
+      return true if event.present? && event.should_display?
     end
 
     false

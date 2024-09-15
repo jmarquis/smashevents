@@ -10,6 +10,8 @@ class Discord
 
     def tournament_added(tournament)
       tournament.events.group_by(&:game).each do |game_slug, events|
+        next unless events.first.should_display?
+
         client(game_slug).execute do |builder|
           builder.content = '## NEW TOURNAMENT ADDED'
           builder.add_embed do |embed|
@@ -38,7 +40,7 @@ class Discord
       client(game.slug).execute do |builder|
         builder.content = "## THIS WEEKEND IN #{game.name.upcase}"
         events.each do |event|
-          next unless event.interesting?
+          next unless event.should_display?
 
           builder.add_embed do |embed|
             embed.title = "#{event.tournament.name} (#{event.tournament.formatted_day_range})"
@@ -95,7 +97,7 @@ class Discord
       end
 
       tournament.events.group_by(&:game).each do |game_slug, events|
-        next unless events.first.interesting? || (tournament.override.present? && tournament.override.include)
+        next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
         client(game_slug).execute do |builder|
           builder.content = '## HAPPENING TODAY'
