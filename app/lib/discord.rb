@@ -87,17 +87,14 @@ class Discord
         #{streams.join("\n")}
       TEXT
 
-      event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
-        game = Game.by_slug(event.game)
-        if event.featured_players.present?
-          "#{game.name.upcase} featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
-        else
-          "#{game.name.upcase} featuring #{event.player_count} players!"
-        end
-      end
-
       tournament.events.group_by(&:game).each do |game_slug, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
+
+        player_blurb = if events.first.featured_players.present?
+          "Featuring #{[*events.first.featured_players, "#{(events.first.player_count - events.first.featured_players.count)} more!"].to_sentence}"
+        else
+          "Featuring #{events.first.player_count} players!"
+        end
 
         client(game_slug).execute do |builder|
           builder.content = '## HAPPENING TODAY'
@@ -108,7 +105,7 @@ class Discord
             embed.description = <<~TEXT
               #{tournament.formatted_location}
 
-              #{event_blurbs.join("\n\n")}
+              #{player_blurb}
               #{stream_text}
             TEXT
 

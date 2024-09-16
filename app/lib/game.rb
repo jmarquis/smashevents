@@ -24,7 +24,7 @@ class Game
     startgg_id: 1386,
     rankings_regex: /^UltRank/,
     ingestion_threshold: 300,
-    display_threshold: 200
+    display_threshold: 100
   )
 
   SMASH64 = new(
