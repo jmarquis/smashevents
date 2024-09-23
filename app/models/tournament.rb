@@ -76,13 +76,13 @@ class Tournament < ApplicationRecord
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
-        e = t.events.find_by(game: game.slug) || t.events.new
+        event = t.events.find_by(game: game.slug) || t.events.new
 
-        e.startgg_id = biggest_event.id
-        e.game = game.slug
-        e.player_count = biggest_event.num_entrants
+        event.startgg_id = biggest_event.id
+        event.game = game.slug
+        event.player_count = biggest_event.num_entrants
 
-        events << e
+        events << event
       end
     end
 
