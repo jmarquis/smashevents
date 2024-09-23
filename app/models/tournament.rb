@@ -2,26 +2,22 @@
 #
 # Table name: tournaments
 #
-#  id                        :bigint           not null, primary key
-#  banner_image_url          :string
-#  city                      :string
-#  country                   :string
-#  end_at                    :datetime
-#  hashtag                   :string
-#  melee_featured_players    :string           is an Array
-#  melee_player_count        :integer
-#  name                      :string
-#  profile_image_url         :string
-#  slug                      :string
-#  start_at                  :datetime
-#  state                     :string
-#  stream_data               :json
-#  timezone                  :string
-#  ultimate_featured_players :string           is an Array
-#  ultimate_player_count     :integer
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  startgg_id                :integer
+#  id                :bigint           not null, primary key
+#  banner_image_url  :string
+#  city              :string
+#  country           :string
+#  end_at            :datetime
+#  hashtag           :string
+#  name              :string
+#  profile_image_url :string
+#  slug              :string
+#  start_at          :datetime
+#  state             :string
+#  stream_data       :json
+#  timezone          :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  startgg_id        :integer
 #
 # Indexes
 #
