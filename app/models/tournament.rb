@@ -179,4 +179,8 @@ class Tournament < ApplicationRecord
     path
   end
 
+  def past?
+    end_at.present? && Time.now > end_at
+  end
+
 end

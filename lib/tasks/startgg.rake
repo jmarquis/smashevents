@@ -87,41 +87,46 @@ namespace :startgg do
           tournament.destroy
           deleted << tournament.slug
         end
-      else
-        data = with_retries(5) do
-          puts "Fetching tournament #{override.slug}..."
-          Startgg.tournament(slug: override.slug)
-        end
 
-        puts "Analyzing #{data.name}..."
-        tournament, events = Tournament.from_startgg(data)
-
-        events.each do |event|
-          puts "#{event.game.upcase}: #{event.player_count || 0} players"
-        end
-
-        if tournament.persisted?
-          if tournament.changed? || events.any?(&:changed?)
-            tournament.save
-            events.each(&:save)
-            updated << {
-              tournament:,
-              events:
-            }
-            msg = 'Updated!'
-          else
-            msg = 'No updates found.'
-          end
-        else
-          tournament.save
-          added << tournament
-          msg = 'Imported!'
-        end
-
-        puts msg
-        sleep 1
-
+        next
       end
+
+      tournament = Tournament.find_by(slug: override.slug)
+      next if tournament.present? && tournament.past?
+
+      data = with_retries(5) do
+        puts "Fetching tournament #{override.slug}..."
+        Startgg.tournament(slug: override.slug)
+      end
+
+      puts "Analyzing #{data.name}..."
+      tournament, events = Tournament.from_startgg(data)
+
+      events.each do |event|
+        puts "#{event.game.upcase}: #{event.player_count || 0} players"
+      end
+
+      if tournament.persisted?
+        if tournament.changed? || events.any?(&:changed?)
+          tournament.save
+          events.each(&:save)
+          updated << {
+            tournament:,
+            events:
+          }
+          msg = 'Updated!'
+        else
+          msg = 'No updates found.'
+        end
+      else
+        tournament.save
+        added << tournament
+        msg = 'Imported!'
+      end
+
+      puts msg
+      sleep 1
+
     end
 
     puts '----------------------------------'
