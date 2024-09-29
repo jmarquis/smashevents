@@ -13,8 +13,8 @@ class Game
     twitch_name: 'Super Smash Bros. Melee',
     startgg_id: 1,
     rankings_regex: /^SSBMRank/,
-    ingestion_threshold: 100,
-    display_threshold: 50
+    ingestion_threshold: 8,
+    display_threshold: 100
   )
 
   ULTIMATE = new(
@@ -23,8 +23,8 @@ class Game
     twitch_name: 'Super Smash Bros. Ultimate',
     startgg_id: 1386,
     rankings_regex: /^UltRank/,
-    ingestion_threshold: 300,
-    display_threshold: 100
+    ingestion_threshold: 8,
+    display_threshold: 200
   )
 
   SMASH64 = new(
@@ -33,8 +33,8 @@ class Game
     twitch_name: 'Super Smash Bros.',
     startgg_id: 4,
     rankings_regex: /^The SSB64 League Rankings/,
-    ingestion_threshold: 20,
-    display_threshold: 15
+    ingestion_threshold: 8,
+    display_threshold: 30
   )
 
   RIVALS = new(
@@ -43,8 +43,8 @@ class Game
     twitch_name: 'Rivals of Aether',
     startgg_id: 24,
     rankings_regex: /^NA RCS/,
-    ingestion_threshold: 30,
-    display_threshold: 20
+    ingestion_threshold: 8,
+    display_threshold: 40
   )
 
   RIVALS2 = new(
@@ -53,8 +53,8 @@ class Game
     twitch_name: 'Rivals 2',
     startgg_id: 53945,
     rankings_regex: /^NA RCS/,
-    ingestion_threshold: 30,
-    display_threshold: 20
+    ingestion_threshold: 8,
+    display_threshold: 40
   )
 
   GAMES = [

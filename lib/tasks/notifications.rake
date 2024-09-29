@@ -1,5 +1,53 @@
 namespace :notifications do
 
+  task new_events: [:environment] do
+
+    # We only do this notification once per tournament for Twitter, and just
+    # list all the games regardless of player count as soon as one event has
+    # crossed the display threshold.
+    Tournament
+      .includes(:events)
+      .where('start_at > ?', Time.now)
+      .order(start_at: :asc, name: :asc)
+      .filter { |tournament| tournament.should_display? }
+      .filter { |tournament| tournament.events.map(&:notified_added_at).compact.empty? }
+      .each do |tournament|
+        puts "Sending tournament added Twitter notification about #{tournament.name}"
+        Twitter.tournament_added(tournament)
+
+        # Don't make Twitter mad
+        sleep 1
+      end
+
+    # For Discord we want to notify per event and group by game since there are
+    # separate channels for each game.
+    Tournament
+      .includes(:events)
+      .where('start_at > ?', Time.now)
+      .order(start_at: :asc, name: :asc)
+      .map(&:events)
+      .flatten
+      .filter { |event| event.should_display? }
+      .filter { |event| event.notified_added_at.blank? }
+      .group_by(&:game)
+      .each do |game_slug, events|
+        events.each do |event|
+          puts "Sending event added Discord notification about #{event.tournament.name} / #{event.game}"
+          Discord.event_added(game_slug, event)
+
+          # Mark this notification as complete here since we do it per
+          # event/game. Twitter notifications will ignore any tournament with an
+          # event marked as notified.
+          event.notified_added_at = Time.now
+          event.save
+
+          # Don't make Discord mad
+          sleep 1
+        end
+      end
+
+  end
+
   task weekend_briefing: [:environment] do
     next unless Time.now.strftime('%a') == 'Wed' || Rails.env.development?
 

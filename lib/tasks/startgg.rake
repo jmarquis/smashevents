@@ -2,18 +2,18 @@ namespace :startgg do
   task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
 
   task sync_tournaments: [:environment] do
-    analyzed = 0
-    added = []
-    updated = []
+    num_analyzed = 0
+    num_imported = 0
+    num_updated = 0
 
     (1..100).each do |page|
       tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days.to_i)
+        Startgg.tournaments(batch_size: 50, page:, after_date: Time.now - 7.days)
       end
 
       puts "#{tournaments.count} tournaments found. Analyzing..."
-      analyzed += tournaments.count
+      num_analyzed += tournaments.count
       break if tournaments.count.zero?
 
       tournaments.each do |data|
@@ -23,69 +23,44 @@ namespace :startgg do
         next if tournament.exclude?
         next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
-        event_logs = events.map { |event|
-          "#{event.game.upcase}: #{event.player_count || 0} players"
-        }.join(', ')
-        puts "#{tournament.name} | #{event_logs}"
-
         if tournament.persisted?
           if tournament.changed? || events.any?(&:changed?)
             tournament.save
             events.each(&:save)
-            updated << {
-              tournament:,
-              events:
-            }
-            msg = 'Updated!'
-          else
-            msg = 'No updates found.'
+
+            updated_log(tournament, events)
+            num_updated += 1
           end
         else
           tournament.save
-          added << tournament
-          msg = 'Imported!'
-        end
 
-        puts msg
+          event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
+          puts "+ #{tournament.slug}: #{event_blurbs.join(',')}"
+        end
       end
 
       sleep 1
     end
 
     puts '----------------------------------'
-    puts "Analyzed: #{analyzed}"
-    puts "Imported: #{added.count}"
-    added.each { |t| puts "+ #{t.slug}" }
-    puts "Updated: #{updated.count}"
-    updated.each do |update|
-      tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
-      puts "~ #{update[:tournament].slug}: #{tournament_changes}" if tournament_changes.present?
-      update[:events].each do |event|
-        event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
-        next if event_changes.blank?
-
-        puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
-      end
-    end
-
-    added.each do |tournament|
-      Discord.tournament_added tournament
-      Twitter.tournament_added tournament
-    end
+    puts "Analyzed: #{num_analyzed}"
+    puts "Imported: #{num_imported}"
+    puts "Updated: #{num_updated}"
   end
 
   task sync_overrides: [:environment] do
-    analyzed = 0
-    added = []
-    updated = []
-    deleted = []
+    num_analyzed = 0
+    num_imported = 0
+    num_updated = 0
+    num_deleted = 0
 
     TournamentOverride.all.each do |override|
       if !override.include
         tournament = Tournament.find_by(slug: override.slug)
         if tournament.present?
+          puts "- #{tournament.slug}"
           tournament.destroy
-          deleted << tournament.slug
+          num_deleted += 1
         end
 
         next
@@ -94,77 +69,46 @@ namespace :startgg do
       tournament = Tournament.find_by(slug: override.slug)
       next if tournament.present? && tournament.past?
 
+      num_analyzed += 1
+
       data = with_retries(5) do
         puts "Fetching tournament #{override.slug}..."
         Startgg.tournament(slug: override.slug)
       end
 
-      puts "Analyzing #{data.name}..."
       tournament, events = Tournament.from_startgg(data)
-
-      events.each do |event|
-        puts "#{event.game.upcase}: #{event.player_count || 0} players"
-      end
 
       if tournament.persisted?
         if tournament.changed? || events.any?(&:changed?)
           tournament.save
-          events.each(&:save)
-          updated << {
-            tournament:,
-            events:
-          }
-          msg = 'Updated!'
-        else
-          msg = 'No updates found.'
+          updated_log(tournament, events)
+          num_updated += 1
         end
       else
         tournament.save
-        added << tournament
-        msg = 'Imported!'
+
+        event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
+        puts "+ #{tournament.slug}: #{event_blurbs.join(',')}"
+        num_imported += 1
       end
 
-      puts msg
       sleep 1
-
     end
 
     puts '----------------------------------'
-    puts "Analyzed: #{analyzed}"
-    puts "Imported: #{added.count}"
-    added.each { |t| puts "+ #{t.slug}" }
-    puts "Updated: #{updated.count}"
-    updated.each do |update|
-      tournament_changes = update[:tournament].saved_changes.reject { |k| k == 'updated_at' }
-      puts "~ #{update[:tournament].slug}: #{tournament_changes}"
-      update[:events].each do |event|
-        event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
-        next if event_changes.blank?
-
-        puts "~ #{update[:tournament].slug} / #{event.game}: #{event_changes}"
-      end
-    end
-    puts "Deleted: #{deleted.count}"
-    deleted.each { |t| puts "- #{t}" }
-
-    added.each do |tournament|
-      Discord.tournament_added tournament
-      Twitter.tournament_added tournament
-    end
+    puts "Analyzed: #{num_analyzed}"
+    puts "Imported: #{num_imported}"
+    puts "Updated: #{num_updated}"
+    puts "Deleted: #{num_deleted}"
   end
 
   task sync_entrants: [:environment] do
-    analyzed = 0
-    added = []
-    updated = []
-    deleted = []
+    num_events = 0
 
     Tournament.upcoming.each do |tournament|
       tournament.events.each do |event|
         featured_players = []
         entrants = []
-
-        puts "Fetching #{event.game.upcase} entrants for #{tournament.name}..."
 
         # Get all the entrants, 1 chunk at a time
         (1..100).each do |page|
@@ -177,25 +121,26 @@ namespace :startgg do
             )
           end
 
-          # This means the tournament was probably deleted
+          # Respect startgg's rate limits...
+          sleep 1
+
+          # This means the tournament was probably deleted.
           if event_entrants.nil?
             puts 'Tournament not found. Deleting...'
             tournament.destroy
             break
           end
 
-          # This means there are no available entrants
+          # This means there are no available entrants.
           break if event_entrants.count.zero?
 
           entrants = [*entrants, *event_entrants]
 
-          # If we don't have a full batch, this is the last page
+          # If we don't have a full batch, this is the last page.
           break if event_entrants.count != 100
-
-          sleep 1
         end
 
-        puts "Found #{entrants.count} entrants."
+        break if tournament.destroyed?
 
         # First see if the event is seeded
         entrants.each do |entrant|
@@ -204,36 +149,36 @@ namespace :startgg do
           end
         end
 
-        if featured_players.any?
-          puts "Top seeds: #{featured_players.join(', ')}"
-        else
-          # Otherwise try to use rankings
-          rankings_key = Game.by_slug(event.game).rankings_key
-          rankings_regex = Game.by_slug(event.game).rankings_regex
-          ranked_entrants = entrants.filter do |entrant|
-            entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
-              ranking.title&.match(rankings_regex)
-            end.present?
-          end
+        # Otherwise try to use rankings
+        rankings_key = Game.by_slug(event.game).rankings_key
+        rankings_regex = Game.by_slug(event.game).rankings_regex
+        ranked_entrants = entrants.filter do |entrant|
+          entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
+            ranking.title&.match(rankings_regex)
+          end.present?
+        end
 
-          ranked_entrants = ranked_entrants.sort_by do |entrant|
-            entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
-              ranking.title&.match(rankings_regex)
-            end&.[](0)&.rank
-          end
+        ranked_entrants = ranked_entrants.sort_by do |entrant|
+          entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
+            ranking.title&.match(rankings_regex)
+          end&.[](0)&.rank
+        end
 
+        if featured_players.empty?
           ranked_entrants.each do |entrant|
             featured_players << entrant.participants[0].player.gamer_tag
             break if featured_players.count == 10
           end
-
-          puts "Ranked players: #{featured_players.join(', ')}" if featured_players.any?
         end
 
-        puts 'Not enough player data to determine featured players!' if featured_players.empty?
-
         event.featured_players = featured_players
+        event.ranked_player_count = ranked_entrants.count
         event.save
+
+        num_events += 1
+        if num_events % 50 == 0
+          puts "Scanned #{num_events} events so far..."
+        end
       end
     end
 
@@ -265,5 +210,16 @@ namespace :startgg do
     end
 
     result
+  end
+
+  def updated_log(tournament, events)
+    tournament_changes = tournament.saved_changes.reject { |k| k == 'updated_at' }
+    puts "~ #{tournament.slug}: #{tournament_changes}"
+    events.each do |event|
+      event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
+      next if event_changes.blank?
+
+      puts "  ~ #{event.game.upcase}: #{event_changes}"
+    end
   end
 end

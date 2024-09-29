@@ -8,30 +8,31 @@ class Discord
 
   class << self
 
-    def tournament_added(tournament)
-      tournament.events.group_by(&:game).each do |game_slug, events|
-        next unless events.first.should_display?
+    def event_added(game_slug, event)
+      client(game_slug).execute do |builder|
+        builder.content = '## NEW EVENT ADDED'
+        builder.add_embed do |embed|
+          embed.title = event.tournament.name
+          embed.url = "https://start.gg/#{event.tournament.slug}"
 
-        client(game_slug).execute do |builder|
-          builder.content = '## NEW TOURNAMENT ADDED'
-          builder.add_embed do |embed|
-            embed.title = tournament.name
-            embed.url = "https://start.gg/#{tournament.slug}"
+          # List all events for the tournament just to give some context.
+          embed.description = <<~TEXT
+            #{event.tournament.formatted_date_range}
+            #{event.tournament.formatted_location}
 
-            embed.description = <<~TEXT
-              #{tournament.formatted_date_range}
-              #{tournament.formatted_location}
+            #{event.tournament.events.sort_by(&:player_count).reverse.map { |event|
+              if event.player_count.present? && event.player_count > 0
+                "#{Game.by_slug(event.game).name}: #{event.player_count} players"
+              else
+                "#{Game.by_slug(event.game).name}: (player count TBD)"
+              end
+            }.join("\n")}
+          TEXT
 
-              #{tournament.events.map { |event|
-                "#{Game.by_slug(event.game).name}: #{event.player_count || 0} players"
-              }.join("\n")}
-            TEXT
+          embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+          embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
-            embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
-            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
-
-            embed.footer = DEFAULT_FOOTER
-          end
+          embed.footer = DEFAULT_FOOTER
         end
       end
     end
@@ -57,7 +58,7 @@ class Discord
             if event.featured_players.present?
               embed.description += <<~TEXT
 
-                Featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}
+                Featuring #{event.players_sentence}
               TEXT
             else
               embed.description += <<~TEXT
@@ -90,12 +91,6 @@ class Discord
       tournament.events.group_by(&:game).each do |game_slug, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
-        player_blurb = if events.first.featured_players.present?
-          "Featuring #{[*events.first.featured_players, "#{(events.first.player_count - events.first.featured_players.count)} more!"].to_sentence}"
-        else
-          "Featuring #{events.first.player_count} players!"
-        end
-
         client(game_slug).execute do |builder|
           builder.content = '## HAPPENING TODAY'
           builder.add_embed do |embed|
@@ -105,7 +100,7 @@ class Discord
             embed.description = <<~TEXT
               #{tournament.formatted_location}
 
-              #{player_blurb}
+              Featuring #{events.first.players_sentence}
               #{stream_text}
             TEXT
 

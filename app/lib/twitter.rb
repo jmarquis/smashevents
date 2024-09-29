@@ -17,26 +17,23 @@ class Twitter
         https://start.gg/#{tournament.slug}
       TEXT
 
-      text = text.slice(0, 260) if Rails.env.development?
-
-      client.post('tweets', JSON.generate({ text: }))
+      tweet(text)
     end
 
     def weekend_briefing(game:, events:)
       tournament_blurbs = events.map do |event|
-        blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
+        next unless event.should_display?
 
-        if event.featured_players.present?
-          blurb += " featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
-        else
-          blurb += " featuring #{event.player_count} players!"
-        end
+        blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
+        blurb += " featuring #{event.players_sentence}"
 
         blurb += "\nhttps://start.gg/#{event.tournament.slug}"
         blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
 
         blurb
-      end
+      end.compact
+
+      return if tournament_blurbs.empty?
 
       text = <<~TEXT
         THIS WEEKEND IN #{game.name.upcase}
@@ -44,19 +41,14 @@ class Twitter
         #{tournament_blurbs.join("\n\n")}
       TEXT
 
-      text = text.slice(0, 260) if Rails.env.development?
+      banner_images = events.slice(0, 3).map(&:tournament).map(&:banner_image_file)
 
-      media_ids = events.slice(0, 3).map do |event|
-        event.tournament.banner_image_file.present? ? upload_image(event.tournament.banner_image_file)['media_id_string'] : nil
-      end.compact
-
-      client.post('tweets', JSON.generate({
-        text:,
-        media: media_ids.blank? ? nil : { media_ids: }
-      }.compact))
+      tweet(text, banner_images)
     end
     
     def happening_today(tournament)
+      return unless tournament.events.map(&:should_display?).any?
+
       streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
         case stream['source'].downcase
         when Tournament::STREAM_SOURCE_TWITCH
@@ -72,13 +64,11 @@ class Twitter
         #{streams.join("\n")}
       TEXT
 
+      # Don't filter by should_display?, might as well just show all the events
+      # on the day of.
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
         game = Game.by_slug(event.game)
-        if event.featured_players.present?
-          "#{game.name.upcase} featuring #{[*event.featured_players, "#{(event.player_count - event.featured_players.count)} more!"].to_sentence}"
-        else
-          "#{game.name.upcase} featuring #{event.player_count} players!"
-        end
+        "#{game.name.upcase} featuring #{event.players_sentence}"
       end
 
       text = <<~TEXT
@@ -89,9 +79,15 @@ class Twitter
         #{stream_text}
       TEXT
 
+      tweet(text, [tournament.banner_image_file])
+    end
+
+    def tweet(text, images: [])
       text = text.slice(0, 260) if Rails.env.development?
 
-      media_ids = tournament.banner_image_file.blank? ? nil : [upload_image(tournament.banner_image_file)['media_id_string']]
+      media_ids = images.map do |image|
+        image.present? ? upload_image(image)['media_id_string'] : nil
+      end.compact
 
       client.post('tweets', JSON.generate({
         text:,
