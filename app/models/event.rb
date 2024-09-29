@@ -44,7 +44,7 @@ class Event < ApplicationRecord
 
   # Meant to be used like: "Featuring #{event.players_sentence}"
   def players_sentence
-    if event.featured_players.present?
+    if featured_players.present?
       remaining_player_count = player_count - featured_players.count
       
       if remaining_player_count >= 10
@@ -53,7 +53,7 @@ class Event < ApplicationRecord
         "#{[*featured_players, 'more!'].to_sentence}"
       end
     else
-      "#{event.player_count} players!"
+      "#{player_count} players!"
     end
   end
 end
