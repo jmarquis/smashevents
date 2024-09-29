@@ -71,7 +71,7 @@ class Tournament < ApplicationRecord
 
     events = []
     Game::GAMES.each do |game|
-      biggest_event = data.events
+      biggest_event = (data.events || [])
         .filter { |event| event.videogame.id.to_i == game.startgg_id }
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
@@ -90,7 +90,6 @@ class Tournament < ApplicationRecord
   end
 
   def should_ingest?
-    override = TournamentOverride.find_by(slug:)
     return override.include unless override&.include.nil?
 
     Game::GAMES.each do |game|
@@ -104,7 +103,6 @@ class Tournament < ApplicationRecord
   def should_display?(games: Game::GAMES.map(&:slug))
     return false if events.find_by(game: games).blank?
 
-    override = TournamentOverride.find_by(slug:)
     return override.include unless override&.include.blank?
 
     games.each do |game|

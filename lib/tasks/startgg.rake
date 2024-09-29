@@ -253,7 +253,7 @@ namespace :startgg do
       if retries < num_retries
         puts "Transient error communicating with startgg, will retry: #{e.message}"
         retries += 1
-        sleep 1
+        sleep 5 * retries
         next
       else
         puts "Retry threshold exceeded, exiting: #{e.message}"

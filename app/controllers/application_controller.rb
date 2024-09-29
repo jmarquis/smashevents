@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
       .order(start_at: :asc, end_at: :asc, name: :asc)
 
     # Only show tournaments that are interesting based on the selected games
-    @tournaments = @tournaments.to_a.filter { |t| t.should_display?(games: game_list) }
+    @tournaments = @tournaments.filter { |t| t.should_display?(games: game_list) }
 
   end
 
