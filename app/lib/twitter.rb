@@ -43,7 +43,7 @@ class Twitter
 
       banner_images = events.slice(0, 3).map(&:tournament).map(&:banner_image_file)
 
-      tweet(text, banner_images)
+      tweet(text, images: banner_images)
     end
     
     def happening_today(tournament)
@@ -79,7 +79,7 @@ class Twitter
         #{stream_text}
       TEXT
 
-      tweet(text, [tournament.banner_image_file])
+      tweet(text, images: [tournament.banner_image_file])
     end
 
     def tweet(text, images: [])
