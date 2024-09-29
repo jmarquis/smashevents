@@ -24,7 +24,7 @@ class Event < ApplicationRecord
 
   def should_ingest?
     return false unless Game.by_slug(game)&.ingestion_threshold.present?
-    player_count.present? && player_count > Game.by_slug(game).ingestion_threshold
+    player_count.present? && player_count >= Game.by_slug(game).ingestion_threshold
   end
 
   def should_display?
