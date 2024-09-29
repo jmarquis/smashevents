@@ -35,7 +35,7 @@ namespace :startgg do
           tournament.save
 
           event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
-          puts "+ #{tournament.slug}: #{event_blurbs.join(',')}"
+          puts "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
         end
       end
 
@@ -104,6 +104,8 @@ namespace :startgg do
 
   task sync_entrants: [:environment] do
     num_events = 0
+
+    puts 'Fetching event entrants...'
 
     Tournament.upcoming.each do |tournament|
       tournament.events.each do |event|
