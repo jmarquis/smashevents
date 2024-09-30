@@ -9,7 +9,7 @@ class Discord
   class << self
 
     def event_added(game_slug, event)
-      client(game_slug).execute do |builder|
+      post(game_slug) do |builder|
         builder.content = '## NEW EVENT ADDED'
         builder.add_embed do |embed|
           embed.title = event.tournament.name
@@ -38,7 +38,7 @@ class Discord
     end
 
     def weekend_briefing(game:, events:)
-      client(game.slug).execute do |builder|
+      post(game.slug) do |builder|
         builder.content = "## THIS WEEKEND IN #{game.name.upcase}"
         events.each do |event|
           next unless event.should_display?
@@ -91,7 +91,7 @@ class Discord
       tournament.events.group_by(&:game).each do |game_slug, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
-        client(game_slug).execute do |builder|
+        post(game_slug) do |builder|
           builder.content = '## HAPPENING TODAY'
           builder.add_embed do |embed|
             embed.title = tournament.name
@@ -118,7 +118,7 @@ class Discord
       game = Game.by_twitch_name(stream[:game])
       return unless game.present?
 
-      client(game.slug).execute do |builder|
+      post(game.slug) do |builder|
         builder.content = "### #{tournament.name.upcase}** STREAM IS LIVE"
         builder.add_embed do |embed|
           embed.title = stream[:name]
@@ -133,6 +133,14 @@ class Discord
           embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
 
           embed.footer = DEFAULT_FOOTER
+        end
+      end
+    end
+
+    def post(game_slug)
+      StatsD.measure('discord.post') do
+        client(game_slug).execute do |builder|
+          yield builder
         end
       end
     end

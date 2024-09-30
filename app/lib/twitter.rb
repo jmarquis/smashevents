@@ -89,10 +89,12 @@ class Twitter
         image.present? ? upload_image(image)['media_id_string'] : nil
       end.compact
 
-      client.post('tweets', JSON.generate({
-        text:,
-        media: media_ids.blank? ? nil : { media_ids: }
-      }.compact))
+      StatsD.measure('twitter.tweet') do
+        client.post('tweets', JSON.generate({
+          text:,
+          media: media_ids.blank? ? nil : { media_ids: }
+        }.compact))
+      end
     end
 
     def client
@@ -107,7 +109,9 @@ class Twitter
     end
 
     def upload_image(file_path)
-      X::MediaUploader.upload(client:, file_path:, media_category: 'tweet_image')
+      StatsD.measure('twitter.upload_image') do
+        X::MediaUploader.upload(client:, file_path:, media_category: 'tweet_image')
+      end
     end
 
   end
