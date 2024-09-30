@@ -28,12 +28,14 @@ namespace :startgg do
             tournament.save
             events.each(&:save)
 
+            StatsD.increment('startgg.tournament_updated')
             updated_log(tournament, events)
             num_updated += 1
           end
         else
           tournament.save
 
+          StatsD.increment('startgg.tournament_added')
           event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
           puts "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
         end
@@ -81,12 +83,15 @@ namespace :startgg do
       if tournament.persisted?
         if tournament.changed? || events.any?(&:changed?)
           tournament.save
+
+          StatsD.increment('startgg.tournament_updated')
           updated_log(tournament, events)
           num_updated += 1
         end
       else
         tournament.save
 
+        StatsD.increment('startgg.tournament_added')
         event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
         puts "+ #{tournament.slug}: #{event_blurbs.join(',')}"
         num_imported += 1
@@ -197,6 +202,8 @@ namespace :startgg do
       result = yield
       break
     rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError => e
+      StatsD.increment('startgg.request_error')
+
       if retries < num_retries
         puts "Transient error communicating with startgg, will retry: #{e.message}"
         retries += 1
