@@ -4,13 +4,15 @@ class Twitchy
   class << self
 
     def live_streams(streams:)
-      client.get_streams(user_login: streams).data.reduce({}) do |streams, stream|
-        streams[stream.user_name.downcase] = {
-          name: stream.user_name,
-          game: stream.game_name,
-          title: stream.title
-        }
-        streams
+      StatsD.measure('twitch.get_streams') do
+        client.get_streams(user_login: streams).data.reduce({}) do |streams, stream|
+          streams[stream.user_name.downcase] = {
+            name: stream.user_name,
+            game: stream.game_name,
+            title: stream.title
+          }
+          streams
+        end
       end
     end
 

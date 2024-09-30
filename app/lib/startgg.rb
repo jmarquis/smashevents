@@ -50,7 +50,9 @@ class Startgg
         }
       GRAPHQL
 
-      client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
+      StatsD.measure('startgg.tournaments') do
+        client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
+      end
     end
 
     def tournament(slug:)
@@ -90,7 +92,9 @@ class Startgg
         }
       GRAPHQL
 
-      client.query(query, slug:)&.data&.tournament
+      StatsD.measure('startgg.tournament') do
+        client.query(query, slug:)&.data&.tournament
+      end
     end
 
     def event_entrants(id:, game:, batch_size:, page:)
@@ -115,7 +119,9 @@ class Startgg
         }
       GRAPHQL
 
-      client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
+      StatsD.measure('startgg.event_entrants') do
+        client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
+      end
     end
 
     def client
