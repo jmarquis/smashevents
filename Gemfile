@@ -82,3 +82,5 @@ gem "inline_svg", "~> 1.10"
 gem "google-apis-youtube_v3", "~> 0.43.0"
 
 gem "dalli", "~> 3.2"
+
+gem "statsd-instrument", "~> 3.9"
