@@ -61,6 +61,8 @@ namespace :startgg do
         tournament = Tournament.find_by(slug: override.slug)
         if tournament.present?
           puts "- #{tournament.slug}"
+
+          Statsd.increment('startgg.tournament_deleted')
           tournament.destroy
           num_deleted += 1
         end
@@ -134,6 +136,7 @@ namespace :startgg do
           # This means the tournament was probably deleted.
           if event_entrants.nil?
             puts 'Tournament not found. Deleting...'
+            Statsd.increment('startgg.tournament_deleted')
             tournament.destroy
             break
           end
