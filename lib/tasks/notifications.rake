@@ -53,7 +53,7 @@ namespace :notifications do
 
     Tournament
       .includes(:events)
-      .where('end_at > ?', Time.now)
+      .where('end_at > ?', Time.now + 1.day)
       .where('start_at < ?', Time.now + 5.days)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
