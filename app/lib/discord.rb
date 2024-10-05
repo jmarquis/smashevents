@@ -83,7 +83,7 @@ class Discord
       end.compact
 
       stream_text = streams.blank? ? nil : <<~TEXT
-        
+
         Streams:
         #{streams.join("\n")}
       TEXT
@@ -119,7 +119,7 @@ class Discord
       return unless game.present?
 
       post(game.slug) do |builder|
-        builder.content = "### #{tournament.name.upcase}** STREAM IS LIVE"
+        builder.content = "### #{tournament.name.upcase} STREAM IS LIVE"
         builder.add_embed do |embed|
           embed.title = stream[:name]
           embed.url = "https://twitch.tv/#{stream[:name]}"
