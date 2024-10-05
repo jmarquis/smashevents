@@ -3,6 +3,7 @@ namespace :twitch do
   task sync_streams: [:environment] do
     Tournament.where('start_at <= ?', Time.now + 12.hours).where('end_at >= ?', Time.now - 12.hours).each do |tournament|
       next unless tournament.stream_data.present?
+      next unless tournament.should_display?
 
       puts "Syncing streams for #{tournament.slug}..."
 
@@ -15,27 +16,31 @@ namespace :twitch do
 
       next unless streams.present?
 
-      live_streams = Twitchy.live_streams(streams:)
-      tournament.stream_data = tournament.stream_data.map do |stream|
-        stream = stream.with_indifferent_access
+      begin
+        live_streams = Twitchy.live_streams(streams:)
+        tournament.stream_data = tournament.stream_data.map do |stream|
+          stream = stream.with_indifferent_access
 
-        if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams)
-          Discord.stream_live(tournament:, stream:) if stream[:status] != Tournament::STREAM_STATUS_LIVE
+          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams)
+            Discord.stream_live(tournament:, stream:) if stream[:status] != Tournament::STREAM_STATUS_LIVE
 
-          stream[:status] = Tournament::STREAM_STATUS_LIVE
-          stream[:game] = live_streams[stream[:name].downcase][:game]
-          stream[:title] = live_streams[stream[:name].downcase][:title]
-        else
-          stream.delete(:status)
-          stream.delete(:game)
-          stream.delete(:title)
+            stream[:status] = Tournament::STREAM_STATUS_LIVE
+            stream[:game] = live_streams[stream[:name].downcase][:game]
+            stream[:title] = live_streams[stream[:name].downcase][:title]
+          else
+            stream.delete(:status)
+            stream.delete(:game)
+            stream.delete(:title)
+          end
+
+          stream
         end
 
-        stream
+        puts "#{tournament.slug}: #{tournament.changes}"
+        tournament.save
+      rescue Twitch::APIError => e
+        puts "Error syncing stream: #{e.message}"
       end
-
-      puts "#{tournament.slug}: #{tournament.changes}"
-      tournament.save
     end
   end
 

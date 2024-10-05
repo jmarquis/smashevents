@@ -46,7 +46,7 @@ class Event < ApplicationRecord
   def players_sentence
     if featured_players.present?
       remaining_player_count = player_count - featured_players.count
-      
+
       if remaining_player_count >= 10
         "#{[*featured_players, "#{(player_count - featured_players.count)} more!"].to_sentence}"
       else
