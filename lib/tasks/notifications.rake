@@ -2,6 +2,8 @@ namespace :notifications do
 
   task new_events: [:environment] do
 
+    puts 'Scanning for new event notifications that need to be sent...'
+
     # We only do this notification once per tournament for Twitter, and just
     # list all the games regardless of player count as soon as one event has
     # crossed the display threshold.
