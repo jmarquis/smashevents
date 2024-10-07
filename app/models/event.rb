@@ -29,6 +29,7 @@ class Event < ApplicationRecord
 
   def should_display?
     return false unless Game.by_slug(game)&.display_threshold.present?
+    return true if tournament.override.present? && tournament.override.include
     return false unless player_count.present?
 
     # If the event is stacked with ranked players, always display it. This
