@@ -13,7 +13,12 @@ namespace :notifications do
       .filter { |tournament| tournament.events.map(&:notified_added_at).compact.empty? }
       .each do |tournament|
         puts "Sending tournament added Twitter notification about #{tournament.name}"
-        Twitter.tournament_added(tournament)
+
+        begin
+          Twitter.tournament_added(tournament)
+        rescue X::Error => e
+          puts e.message
+        end
 
         # Don't make Twitter mad
         sleep 1
@@ -36,8 +41,8 @@ namespace :notifications do
           Discord.event_added(game_slug, event)
 
           # Mark this notification as complete here since we do it per
-          # event/game. Twitter notifications will ignore any tournament with an
-          # event marked as notified.
+          # event/game. Twitter notifications will ignore any tournament with
+          # any event marked as notified.
           event.notified_added_at = Time.now
           event.save
 
