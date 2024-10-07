@@ -6,6 +6,8 @@ namespace :startgg do
     num_imported = 0
     num_updated = 0
 
+    puts 'Starting tournament sync...'
+
     (1..100).each do |page|
       tournaments = with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
@@ -55,6 +57,8 @@ namespace :startgg do
     num_imported = 0
     num_updated = 0
     num_deleted = 0
+
+    puts 'Starting override sync...'
 
     TournamentOverride.all.each do |override|
       if !override.include
@@ -112,7 +116,7 @@ namespace :startgg do
   task sync_entrants: [:environment] do
     num_events = 0
 
-    puts 'Fetching event entrants...'
+    puts 'Starting entrant sync...'
 
     Tournament.upcoming.each do |tournament|
       tournament.events.each do |event|

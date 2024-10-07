@@ -1,6 +1,8 @@
 namespace :twitch do
 
   task sync_streams: [:environment] do
+    puts 'Starting Twitch stream sync...'
+
     Tournament.where('start_at <= ?', Time.now + 12.hours).where('end_at >= ?', Time.now - 12.hours).each do |tournament|
       next unless tournament.stream_data.present?
       next unless tournament.should_display?
