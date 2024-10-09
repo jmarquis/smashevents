@@ -16,15 +16,17 @@ class ApplicationController < ActionController::Base
     @games = game_list.map { |slug| Game.by_slug(slug) }
     @unselected_games = Game.all_games_except(@games)
 
-    @tournaments = Tournament
-      .includes(:events)
-      # Leave a few hours of leeway for events that run long
-      .where('end_at > ?', Time.now - 6.hours)
-      .where(events: { game: game_list })
-      .order(start_at: :asc, end_at: :asc, name: :asc)
+    @tournaments = Rails.cache.fetch("tournaments_#{game_list.join('-')}", expires_in: Rails.env.development? ? 5.seconds : 5.minutes) do
+      tournaments = Tournament
+        .includes(:events)
+        # Leave a few hours of leeway for events that run long
+        .where('end_at > ?', Time.now - 6.hours)
+        .where(events: { game: game_list })
+        .order(start_at: :asc, end_at: :asc, name: :asc)
 
-    # Only show tournaments that are interesting based on the selected games
-    @tournaments = @tournaments.filter { |t| t.should_display?(games: game_list) }
+      # Only show tournaments that are interesting based on the selected games
+      tournaments.filter { |t| t.should_display?(games: game_list) }
+    end
 
   end
 
