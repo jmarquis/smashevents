@@ -25,7 +25,7 @@ class Twitter
         next unless event.should_display?
 
         blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
-        blurb += " featuring #{event.players_sentence}"
+        blurb += " featuring #{event.players_sentence(twitter: true)}"
 
         blurb += "\nhttps://start.gg/#{event.tournament.slug}"
         blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
@@ -45,7 +45,7 @@ class Twitter
 
       tweet(text, images: banner_images)
     end
-    
+
     def happening_today(tournament)
       return unless tournament.events.map(&:should_display?).any?
 
@@ -68,7 +68,7 @@ class Twitter
       # on the day of.
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
         game = Game.by_slug(event.game)
-        "#{game.name.upcase} featuring #{event.players_sentence}"
+        "#{game.name.upcase} featuring #{event.players_sentence(twitter: true)}"
       end
 
       text = <<~TEXT
@@ -94,6 +94,9 @@ class Twitter
           text:,
           media: media_ids.blank? ? nil : { media_ids: }
         }.compact))
+      rescue X::Error => e
+        puts "ERROR POSTING TO TWITTER: #{e.message}"
+        raise e
       end
     end
 

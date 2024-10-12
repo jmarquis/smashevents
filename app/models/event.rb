@@ -44,14 +44,23 @@ class Event < ApplicationRecord
   end
 
   # Meant to be used like: "Featuring #{event.players_sentence}"
-  def players_sentence
+  def players_sentence(twitter: false)
     if featured_players.present?
       remaining_player_count = player_count - featured_players.count
 
+      players = featured_players.map do |player_data|
+        player = Player.from_json(player_data)
+        if twitter && player.twitter_username.present?
+          "#{player.tag} (@#{player.twitter_username})"
+        else
+          player.tag
+        end
+      end
+
       if remaining_player_count >= 10
-        "#{[*featured_players, "#{(player_count - featured_players.count)} more!"].to_sentence}"
+        "#{[*players, "#{(player_count - featured_players.count)} more!"].to_sentence}"
       else
-        "#{[*featured_players, 'more!'].to_sentence}"
+        "#{[*players, 'more!'].to_sentence}"
       end
     else
       "#{player_count} players!"

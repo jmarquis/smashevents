@@ -111,6 +111,11 @@ class Startgg
                       rank
                       title
                     }
+                    user {
+                      authorizations(types: [TWITTER]) {
+                        externalUsername
+                      }
+                    }
                   }
                 }
               }

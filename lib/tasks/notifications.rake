@@ -18,11 +18,10 @@ namespace :notifications do
 
         begin
           Twitter.tournament_added(tournament)
-        rescue X::Error => e
-          puts e.message
+        rescue X::Error
         end
 
-        # Don't make Twitter mad
+        # Avoid rate limits
         sleep 1
       end
 
@@ -48,7 +47,7 @@ namespace :notifications do
           event.notified_added_at = Time.now
           event.save
 
-          # Don't make Discord mad
+          # Avoid rate limits
           sleep 1
         end
       end
@@ -79,6 +78,9 @@ namespace :notifications do
           game: Game.by_slug(game_slug),
           events: events.sort_by(&:player_count).reverse
         )
+
+        # Avoid rate limits
+        sleep 1
       end
   end
 
@@ -95,6 +97,9 @@ namespace :notifications do
         puts "Sending happening today notifications for #{tournament.slug}..."
         Twitter.happening_today(tournament)
         Discord.happening_today(tournament)
+
+        # Avoid rate limits
+        sleep 1
       end
   end
 

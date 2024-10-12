@@ -159,7 +159,7 @@ namespace :startgg do
         # First see if the event is seeded
         entrants.each do |entrant|
           if entrant.initial_seed_num.present? && entrant.initial_seed_num <= 10
-            featured_players[entrant.initial_seed_num - 1] = entrant.participants[0].player.gamer_tag
+            featured_players[entrant.initial_seed_num - 1] = Player.from_startgg(entrant.participants[0].player).serialize
           end
         end
 
@@ -180,7 +180,8 @@ namespace :startgg do
 
         if featured_players.empty?
           ranked_entrants.each do |entrant|
-            featured_players << entrant.participants[0].player.gamer_tag
+            featured_players << Player.from_startgg(entrant.participants[0].player).serialize
+
             break if featured_players.count == 10
           end
         end

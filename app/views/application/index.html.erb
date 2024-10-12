@@ -1,7 +1,7 @@
 <div class="social">
   <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag 'twitter.svg' %></a>
   <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag 'discord.svg' %></a>
-</diV>
+</div>
 
 <h1>Smash Events</h1>
 
@@ -39,8 +39,13 @@
             <h3><%= game.name %><% if event.player_count.present? && event.player_count > 0 %>: <%= event.player_count.round(-1) %>+ players<% end %></h3>
             <ul class="players">
               <% if event.featured_players.present? %>
-                <% event.featured_players.each do |player| %>
-                  <li><%= player %></li>
+                <% event.featured_players.each do |player_data| %>
+                  <% player = Player.from_json(player_data) %>
+                  <% if player.twitter_username.present? %>
+                    <li><%= link_to player.tag, player.twitter_url, target: '_blank' %></li>
+                  <% else %>
+                    <li><%= player.tag %></li>
+                  <% end %>
                 <% end %>
               <% else %>
                 <li>Featured players coming soon</li>
