@@ -1,10 +1,21 @@
 class Player
+  TWITTER_USERNAME_FALLBACKS = {
+    'chem' => 'Chemjamin',
+    'fiction' => 'FictionIRL',
+    'junebug' => 'arJunebug',
+    'mang0' => 'C9Mang0',
+    'mvlvchi' => '_mvlvchi_',
+    'wizzrobe' => 'Wizzrobe',
+  }
+
   attr_accessor :tag, :twitter_username
 
   def initialize(params)
     params.each do |key, value|
       self.instance_variable_set("@#{key}".to_sym, value)
     end
+
+    self.twitter_username = TWITTER_USERNAME_FALLBACKS[tag.downcase] if twitter_username.blank?
   end
 
   def serialize
