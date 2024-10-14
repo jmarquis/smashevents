@@ -72,7 +72,7 @@ class Twitter
       end
 
       text = <<~TEXT
-        HAPPENING TODAY (#{Time.now.strftime('%A')}):
+        HAPPENING TODAY (#{Time.now.strftime('%A')})
         #{tournament.name.upcase}
         https://start.gg/#{tournament.slug}#{tournament.hashtag.present? ? " ##{tournament.hashtag}" : nil}
         \n\n
