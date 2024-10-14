@@ -23,7 +23,6 @@ class Startgg
               startAt
               endAt
               timezone
-              numAttendees
               city
               addrState
               countryCode
@@ -35,6 +34,7 @@ class Startgg
                 videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
               }) {
                 id
+                startAt
                 numEntrants
                 videogame {
                   id
@@ -66,7 +66,6 @@ class Startgg
             startAt
             endAt
             timezone
-            numAttendees
             city
             addrState
             countryCode
@@ -78,6 +77,7 @@ class Startgg
               videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
             }) {
               id
+              startAt
               numEntrants
               videogame {
                 id

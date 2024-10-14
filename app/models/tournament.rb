@@ -73,12 +73,19 @@ class Tournament < ApplicationRecord
     Game::GAMES.each do |game|
       biggest_event = (data.events || [])
         .filter { |event| event.videogame.id.to_i == game.startgg_id }
+        # Some TOs make a single tournament for a weekly for some reason, and
+        # just move the tournament's start_at and end_at every week. So make
+        # sure we don't consider old events part of the current tournament.
+        .filter { |event| Time.at(event.start_at) >= t.start_at }
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
+        # Look up by game because we only care about one event per game per
+        # tournament.
         event = t.events.find_by(game: game.slug) || t.events.new
 
         event.startgg_id = biggest_event.id
+        event.start_at = biggest_event.start_at
         event.game = game.slug
         event.player_count = biggest_event.num_entrants
 

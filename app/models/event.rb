@@ -8,6 +8,7 @@
 #  notified_added_at   :datetime
 #  player_count        :integer
 #  ranked_player_count :integer
+#  start_at            :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  startgg_id          :integer          not null
