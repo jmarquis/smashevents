@@ -85,7 +85,7 @@ class Tournament < ApplicationRecord
         event = t.events.find_by(game: game.slug) || t.events.new
 
         event.startgg_id = biggest_event.id
-        event.start_at = biggest_event.start_at
+        event.start_at = Time.at(biggest_event.start_at)
         event.game = game.slug
         event.player_count = biggest_event.num_entrants
 
@@ -182,6 +182,10 @@ class Tournament < ApplicationRecord
 
   def past?
     end_at.present? && Time.now > end_at
+  end
+
+  def startgg_data
+    Startgg.tournament(slug:)
   end
 
 end
