@@ -184,6 +184,7 @@ h2 {
   font-weight: 500;
   margin: 8px 0 12px;
   line-height: 1.25;
+  word-wrap: break-word;
 }
 
 h2 a {
