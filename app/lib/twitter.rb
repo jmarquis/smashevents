@@ -72,7 +72,8 @@ class Twitter
       end
 
       text = <<~TEXT
-        HAPPENING TODAY (#{Time.now.strftime('%A')}): #{tournament.name.upcase}
+        HAPPENING TODAY (#{Time.now.strftime('%A')}):
+        #{tournament.name.upcase}
         https://start.gg/#{tournament.slug}#{tournament.hashtag.present? ? " ##{tournament.hashtag}" : nil}
         \n\n
         #{event_blurbs.join("\n\n")}
