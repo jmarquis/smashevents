@@ -88,7 +88,11 @@ class Discord
         #{streams.join("\n")}
       TEXT
 
-      tournament.events.group_by(&:game).each do |game_slug, events|
+      events = tournament.events
+        .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') >= Time.now.in_time_zone(tournament.timezone || 'America/New_York') - 6.hours }
+        .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
+
+      events.group_by(&:game).each do |game_slug, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
         post(game_slug) do |builder|
