@@ -91,7 +91,8 @@ namespace :notifications do
       .includes(:events)
       .where('end_at > ?', effective_time)
       .where('start_at < ?', effective_time + 2.days)
-      .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') && (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
+      .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
+      .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| t.should_display? }
       .each do |tournament|
         puts "Sending happening today notifications for #{tournament.slug}..."
