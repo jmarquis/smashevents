@@ -54,7 +54,7 @@ class Game
     startgg_id: 53945,
     rankings_regex: /^NA RCS/,
     ingestion_threshold: 8,
-    display_threshold: 40
+    display_threshold: 60
   )
 
   GAMES = [
