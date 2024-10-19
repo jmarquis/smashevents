@@ -14,6 +14,7 @@
     <%= stylesheet_link_tag "normalize" %>
     <%= stylesheet_link_tag "application" %>
     <%= javascript_importmap_tags %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
   </head>
 
   <body>
