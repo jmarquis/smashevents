@@ -139,7 +139,7 @@ namespace :startgg do
 
           # This means the tournament was probably deleted.
           if event_entrants.nil?
-            puts 'Tournament not found. Deleting...'
+            puts "Tournament #{tournament.slug} not found. Deleting..."
             StatsD.increment('startgg.tournament_deleted')
             tournament.destroy
             break

@@ -4,6 +4,18 @@ class Twitter
   class << self
 
     def tournament_added(tournament)
+      event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
+        if event.player_count.present? && event.player_count > 0
+          blurb = "#{Game.by_slug(event.game).name.upcase}: #{event.player_count} players"
+
+          if event.featured_players.present?
+            blurb + " featuring #{event.players_sentence(twitter: true, show_count: false)}\n"
+          end
+        else
+          "#{Game.by_slug(event.game).name}: (player count TBD)"
+        end
+      end
+
       text = <<~TEXT
         New tournament added to smashevents.gg!
         \n\n
@@ -11,7 +23,7 @@ class Twitter
         #{tournament.formatted_date_range}
         #{tournament.formatted_location}
         \n\n
-        Featuring #{tournament.events.sort_by(&:player_count).reverse.map { |event| Game.by_slug(event.game).name }.to_sentence}!
+        #{event_blurbs.join("\n")}
         #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
         \n\n
         https://start.gg/#{tournament.slug}

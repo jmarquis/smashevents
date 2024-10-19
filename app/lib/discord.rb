@@ -8,8 +8,8 @@ class Discord
 
   class << self
 
-    def event_added(game_slug, event)
-      post(game_slug) do |builder|
+    def event_added(event)
+      post(event.game) do |builder|
         builder.content = '## NEW EVENT ADDED'
         builder.add_embed do |embed|
           embed.title = event.tournament.name
@@ -22,7 +22,11 @@ class Discord
 
             #{event.tournament.events.sort_by(&:player_count).reverse.map { |event|
               if event.player_count.present? && event.player_count > 0
-                "#{Game.by_slug(event.game).name}: #{event.player_count} players"
+                blurb = "#{Game.by_slug(event.game).name}: #{event.player_count} players"
+
+                if event.featured_players.present?
+                  blurb += " featuring #{event.players_sentence(show_count: false)}\n"
+                end
               else
                 "#{Game.by_slug(event.game).name}: (player count TBD)"
               end

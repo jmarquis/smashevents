@@ -25,8 +25,8 @@ namespace :notifications do
         sleep 1
       end
 
-    # For Discord we want to notify per event and group by game since there are
-    # separate channels for each game.
+    # For Discord we want to notify per event since there are separate channels
+    # for each game.
     Tournament
       .includes(:events)
       .where('start_at > ?', Time.now)
@@ -35,21 +35,17 @@ namespace :notifications do
       .flatten
       .filter { |event| event.should_display? }
       .filter { |event| event.notified_added_at.blank? }
-      .group_by(&:game)
-      .each do |game_slug, events|
-        events.each do |event|
-          puts "Sending event added Discord notification about #{event.tournament.name} / #{event.game}"
-          Discord.event_added(game_slug, event)
+      .each do |event|
+        Discord.event_added(event)
 
-          # Mark this notification as complete here since we do it per
-          # event/game. Twitter notifications will ignore any tournament with
-          # any event marked as notified.
-          event.notified_added_at = Time.now
-          event.save
+        # Mark this notification as complete here since we do it per
+        # event/game. Twitter notifications will ignore any tournament with
+        # any event marked as notified.
+        event.notified_added_at = Time.now
+        event.save
 
-          # Avoid rate limits
-          sleep 1
-        end
+        # Avoid rate limits
+        sleep 1
       end
 
   end
