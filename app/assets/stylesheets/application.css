@@ -197,9 +197,18 @@ h3 {
   font-weight: bold;
 }
 
+h3.game-heading {
+  margin-bottom: 4px;
+}
+
 time {
   font-weight: bold;
   text-transform: uppercase;
+}
+
+time.event-time {
+  font-size: 14px;
+  font-weight: normal;
 }
 
 article + article {
