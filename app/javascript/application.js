@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const startTimes = document.querySelectorAll(".event-time")
   startTimes.forEach(startTime => {
     const time = moment.unix(startTime.getAttribute("datetime")).tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
-    startTime.innerHTML = `Starting ${time.format("dddd")} @ ${time.format("h:mm a z")}`
+    startTime.innerHTML = `${time.format("dddd")} @ ${time.format("h:mm a z")}`
   })
 
 });
