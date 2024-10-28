@@ -41,8 +41,9 @@
               <%= event.start_at.in_time_zone(tournament.timezone || 'America/New_York').strftime('%A @ %l:%M %p') %> (local time)
             </time>
             <ul class="players">
-              <% if event.featured_players.present? %>
-                <% event.featured_players.each do |player| %>
+              <% featured_players = Rails.cache.fetch("featured_players_#{event.id}", expires_in: Rails.env.development? ? 5.seconds : 6.hours) { event.featured_players } %>
+              <% if featured_players.present? %>
+                <% featured_players.each do |player| %>
                   <% if player.twitter_username.present? %>
                     <li><%= link_to player.tag, player.twitter_url, target: '_blank' %></li>
                   <% else %>
