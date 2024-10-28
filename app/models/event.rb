@@ -22,6 +22,8 @@
 #
 class Event < ApplicationRecord
   belongs_to :tournament
+  has_many :entrants
+  has_many :players, through: :entrants
 
   def should_ingest?
     return false unless Game.by_slug(game)&.ingestion_threshold.present?

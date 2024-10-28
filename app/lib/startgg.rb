@@ -103,15 +103,18 @@ class Startgg
           event(id: $id) {
             entrants(query: { page: $page, perPage: $perPage }) {
               nodes {
+                id
                 initialSeedNum
                 participants {
                   player {
+                    id
                     gamerTag
                     #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
                       rank
                       title
                     }
                     user {
+                      id
                       authorizations(types: [TWITTER]) {
                         externalUsername
                       }

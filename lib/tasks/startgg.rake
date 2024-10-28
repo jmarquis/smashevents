@@ -156,31 +156,27 @@ namespace :startgg do
 
         break if tournament.destroyed?
 
+        # Populate entrants
+        entrants = entrants.map { |entrant| Entrant.from_startgg(event, entrant) }
+        entrants.each(&:save)
+
         # First see if the event is seeded
         entrants.each do |entrant|
-          if entrant.initial_seed_num.present? && entrant.initial_seed_num <= 10
-            featured_players[entrant.initial_seed_num - 1] = Player.from_startgg(entrant.participants[0].player).serialize
+          if entrant.seed.present? && entrant.seed <= 10
+            featured_players[entrant.seed - 1] = entrant.player.serialize
           end
         end
 
         # Otherwise try to use rankings
-        rankings_key = Game.by_slug(event.game).rankings_key
-        rankings_regex = Game.by_slug(event.game).rankings_regex
-        ranked_entrants = entrants.filter do |entrant|
-          entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
-            ranking.title&.match(rankings_regex)
-          end.present?
-        end
-
-        ranked_entrants = ranked_entrants.sort_by do |entrant|
-          entrant.participants[0]&.player&.send(rankings_key)&.filter do |ranking|
-            ranking.title&.match(rankings_regex)
-          end&.[](0)&.rank
-        end
+        ranked_entrants = entrants
+          .filter { |entrant| entrant.rank.present? }
+          .sort_by do |entrant|
+            entrant.rank
+          end
 
         if featured_players.empty?
           ranked_entrants.each do |entrant|
-            featured_players << Player.from_startgg(entrant.participants[0].player).serialize
+            featured_players << entrant.player.serialize
 
             break if featured_players.count == 10
           end
