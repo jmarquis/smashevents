@@ -69,4 +69,16 @@ class Event < ApplicationRecord
       "#{player_count} players!"
     end
   end
+
+  def seeded?
+    entrants.any? { |entrant| entrant.seed.present? }
+  end
+
+  def featured_players
+    if seeded?
+      entrants.where('seed is not null').order(seed: :asc).limit(10).map(&:player)
+    elsif ranked_player_count > 0
+      entrants.where('rank is not null').order(rank: :asc).limit(10).map(&:player)
+    end
+  end
 end

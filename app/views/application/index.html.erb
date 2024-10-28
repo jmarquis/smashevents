@@ -42,8 +42,7 @@
             </time>
             <ul class="players">
               <% if event.featured_players.present? %>
-                <% event.featured_players.each do |player_data| %>
-                  <% player = Player.from_json(player_data) %>
+                <% event.featured_players.each do |player| %>
                   <% if player.twitter_username.present? %>
                     <li><%= link_to player.tag, player.twitter_url, target: '_blank' %></li>
                   <% else %>
