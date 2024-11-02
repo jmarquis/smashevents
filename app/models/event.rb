@@ -5,6 +5,7 @@
 #  id                  :bigint           not null, primary key
 #  featured_players    :string           is an Array
 #  game                :string           not null
+#  is_seeded           :boolean
 #  notified_added_at   :datetime
 #  player_count        :integer
 #  ranked_player_count :integer

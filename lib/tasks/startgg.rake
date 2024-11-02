@@ -120,7 +120,6 @@ namespace :startgg do
 
     Tournament.upcoming.each do |tournament|
       tournament.events.each do |event|
-        featured_players = []
         entrants = []
 
         # Get all the entrants, 1 chunk at a time
@@ -158,32 +157,14 @@ namespace :startgg do
 
         # Populate entrants
         entrants = entrants.map { |entrant| Entrant.from_startgg(event, entrant) }
-        entrants.each(&:save)
+        entrants.filter { |entrant| !entrant.persisted? || entrant.changed? }.each(&:save)
 
-        # First see if the event is seeded
-        entrants.each do |entrant|
-          if entrant.seed.present? && entrant.seed <= 10
-            featured_players[entrant.seed - 1] = entrant.player.serialize
-          end
-        end
+        # Denormalize whether the event is seeded
+        event.is_seeded = entrants.any? { |entrant| entrant.seed.present? }
 
-        # Otherwise try to use rankings
-        ranked_entrants = entrants
-          .filter { |entrant| entrant.rank.present? }
-          .sort_by do |entrant|
-            entrant.rank
-          end
+        # Denormalize ranked entrant count
+        event.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
 
-        if featured_players.empty?
-          ranked_entrants.each do |entrant|
-            featured_players << entrant.player.serialize
-
-            break if featured_players.count == 10
-          end
-        end
-
-        event.featured_players = featured_players
-        event.ranked_player_count = ranked_entrants.count
         event.save
 
         num_events += 1
