@@ -12,7 +12,10 @@ RUN apk add --update --no-cache \
   git \
   tzdata \
   gcompat \
-  inotify-tools
+  inotify-tools \
+  jemalloc
+
+ENV LD_PRELOAD=libjemalloc.so.2
 
 RUN mkdir -p /opt/rails
 WORKDIR /opt/rails

@@ -16,7 +16,10 @@ RUN apk add --update --no-cache \
   inotify-tools \
   openssh \
   iproute2 \
-  jq
+  jq \
+  jemalloc
+
+ENV LD_PRELOAD=libjemalloc.so.2
 
 ADD heroku-exec.sh /app/.profile.d/heroku-exec.sh
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
