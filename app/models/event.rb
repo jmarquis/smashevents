@@ -70,13 +70,9 @@ class Event < ApplicationRecord
     end
   end
 
-  def seeded?
-    entrants.any? { |entrant| entrant.seed.present? }
-  end
-
   def featured_players
     Rails.cache.fetch("featured_players_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
-      if seeded?
+      if is_seeded
         entrants.where('seed is not null').order(seed: :asc).limit(10).map(&:player)
       elsif ranked_player_count > 0
         entrants.where('rank is not null').order(rank: :asc).limit(10).map(&:player)
