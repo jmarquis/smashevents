@@ -51,7 +51,7 @@ class Event < ApplicationRecord
     if featured_players.present?
       remaining_player_count = player_count - featured_players.count
 
-      players = featured_players.map do |player_data|
+      players = featured_players.map do |player|
         if twitter && player.twitter_username.present?
           "#{player.tag} (@#{player.twitter_username})"
         else
