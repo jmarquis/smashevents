@@ -30,8 +30,8 @@ class Entrant < ApplicationRecord
     e.startgg_entrant_id = data.id
     e.seed = data.initial_seed_num
 
-    rankings_key = Game.by_slug(event.game).rankings_key
-    rankings_regex = Game.by_slug(event.game).rankings_regex
+    rankings_key = event.game.rankings_key
+    rankings_regex = event.game.rankings_regex
     e.rank = data.participants[0]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
 
     e.player = Player.from_startgg(data.participants[0].player)

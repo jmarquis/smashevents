@@ -11,7 +11,7 @@ class Startgg
             page: $page
             sortBy: "startAt asc"
             filter: {
-              videogameIds: [#{Game::GAMES.map(&:startgg_id).join(',')}],
+              videogameIds: [#{Game.pluck(:startgg_id).join(',')}],
               afterDate: $afterDate
             }
           }) {
@@ -31,7 +31,7 @@ class Startgg
                 url
               }
               events(filter: {
-                videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
+                videogameId: [#{Game.pluck(:startgg_id).join(',')}]
               }) {
                 id
                 startAt
@@ -74,7 +74,7 @@ class Startgg
               url
             }
             events(filter: {
-              videogameId: [#{Game::GAMES.map(&:startgg_id).join(',')}]
+              videogameId: [#{Game.pluck(:startgg_id).join(',')}]
             }) {
               id
               startAt

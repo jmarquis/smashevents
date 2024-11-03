@@ -33,7 +33,7 @@
       </div>
 
       <% @games.each do |game| %>
-        <% event = tournament.events.find_by(game: game.slug) %>
+        <% event = tournament.events.filter { |event| event.game_slug == game.slug }.first %>
         <% if event.present? %>
           <div class="game">
             <h3 class="game-heading"><%= game.name %><% if event.player_count.present? && event.player_count > 0 %>: <%= event.player_count.round(-1) %>+ players<% end %></h3>
@@ -41,9 +41,8 @@
               <%= event.start_at.in_time_zone(tournament.timezone || 'America/New_York').strftime('%A @ %l:%M %p') %> (local time)
             </time>
             <ul class="players">
-              <% featured_players = Rails.cache.fetch("featured_players_#{event.id}", expires_in: Rails.env.development? ? 5.seconds : 6.hours) { event.featured_players } %>
-              <% if featured_players.present? %>
-                <% featured_players.each do |player| %>
+              <% if event.featured_players.present? %>
+                <% event.featured_players.each do |player| %>
                   <% if player.twitter_username.present? %>
                     <li><%= link_to player.tag, player.twitter_url, target: '_blank' %></li>
                   <% else %>

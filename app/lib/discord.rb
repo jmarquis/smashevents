@@ -9,7 +9,7 @@ class Discord
   class << self
 
     def event_added(event)
-      post(event.game) do |builder|
+      post(event.game_slug) do |builder|
         builder.content = '## NEW EVENT ADDED'
         builder.add_embed do |embed|
           embed.title = event.tournament.name
@@ -22,13 +22,13 @@ class Discord
 
             #{event.tournament.events.sort_by(&:player_count).reverse.map { |event|
               if event.player_count.present? && event.player_count > 0
-                blurb = "#{Game.by_slug(event.game).name}: #{event.player_count} players"
+                blurb = "#{event.game.name}: #{event.player_count} players"
 
                 if event.featured_players.present?
                   blurb += " featuring #{event.players_sentence(show_count: false)}\n"
                 end
               else
-                "#{Game.by_slug(event.game).name}: (player count TBD)"
+                "#{event.game.name}: (player count TBD)"
               end
             }.join("\n")}
           TEXT
@@ -96,10 +96,10 @@ class Discord
         .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') >= Time.now.in_time_zone(tournament.timezone || 'America/New_York') - 6.hours }
         .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
 
-      events.group_by(&:game).each do |game_slug, events|
+      events.group_by(&:game).each do |game, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
-        post(game_slug) do |builder|
+        post(game.slug) do |builder|
           builder.content = '## HAPPENING TODAY'
           builder.add_embed do |embed|
             embed.title = tournament.name
@@ -123,7 +123,7 @@ class Discord
 
     def stream_live(tournament:, stream:)
       stream = stream.with_indifferent_access
-      game = Game.by_twitch_name(stream[:game])
+      game = Game.find_by(twitch_name: stream[:game])
       return unless game.present?
 
       post(game.slug) do |builder|

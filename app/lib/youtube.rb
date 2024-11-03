@@ -4,7 +4,7 @@ class Youtube
   class << self
 
     def channel_url(channel_name)
-      Rails.cache.fetch("youtube_channel_url_#{channel_name}", expires_in: Rails.env.development? ? 5.seconds : 6.hours) do 
+      Rails.cache.fetch("youtube_channel_url_#{channel_name}", expires_in: Rails.env.development? ? 5.seconds : 7.days) do
         puts "Fetching YouTube channel info for #{channel_name}..."
 
         response = StatsD.measure('youtube.list_searches') do

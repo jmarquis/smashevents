@@ -38,7 +38,7 @@ namespace :startgg do
           tournament.save
 
           StatsD.increment('startgg.tournament_added')
-          event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
+          event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
           puts "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
         end
       end
@@ -98,7 +98,7 @@ namespace :startgg do
         tournament.save
 
         StatsD.increment('startgg.tournament_added')
-        event_blurbs = tournament.events.map { |event| "#{event.game}: #{event.player_count}" }
+        event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
         puts "+ #{tournament.slug}: #{event_blurbs.join(',')}"
         num_imported += 1
       end
@@ -127,7 +127,7 @@ namespace :startgg do
           event_entrants = with_retries(5) do
             Startgg.event_entrants(
               id: event.startgg_id,
-              game: Game.by_slug(event.game),
+              game: event.game,
               batch_size: 100,
               page:
             )
@@ -213,7 +213,7 @@ namespace :startgg do
       event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
       next if event_changes.blank?
 
-      puts "  ~ #{event.game.upcase}: #{event_changes}"
+      puts "  ~ #{event.game.slug.upcase}: #{event_changes}"
     end
   end
 end

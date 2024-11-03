@@ -4,7 +4,7 @@
 #
 #  id                  :bigint           not null, primary key
 #  featured_players    :string           is an Array
-#  game                :string           not null
+#  game_slug           :string           not null
 #  is_seeded           :boolean
 #  notified_added_at   :datetime
 #  player_count        :integer
@@ -17,22 +17,23 @@
 #
 # Indexes
 #
-#  index_events_on_startgg_id              (startgg_id) UNIQUE
-#  index_events_on_tournament_id           (tournament_id)
-#  index_events_on_tournament_id_and_game  (tournament_id,game) UNIQUE
+#  index_events_on_startgg_id                   (startgg_id) UNIQUE
+#  index_events_on_tournament_id                (tournament_id)
+#  index_events_on_tournament_id_and_game_slug  (tournament_id,game_slug) UNIQUE
 #
 class Event < ApplicationRecord
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
+  belongs_to :game, foreign_key: :game_slug, primary_key: :slug
 
   def should_ingest?
-    return false unless Game.by_slug(game)&.ingestion_threshold.present?
-    player_count.present? && player_count >= Game.by_slug(game).ingestion_threshold
+    return false unless game&.ingestion_threshold.present?
+    player_count.present? && player_count >= game.ingestion_threshold
   end
 
   def should_display?
-    return false unless Game.by_slug(game)&.display_threshold.present?
+    return false unless game&.display_threshold.present?
     return true if tournament.override.present? && tournament.override.include
     return false unless player_count.present?
 
@@ -44,7 +45,7 @@ class Event < ApplicationRecord
     end
 
     score = player_count + ((ranked_player_count || 0) * 10)
-    score > Game.by_slug(game).display_threshold
+    score > game.display_threshold
   end
 
   # Meant to be used like: "Featuring #{event.players_sentence}"
@@ -73,9 +74,9 @@ class Event < ApplicationRecord
   def featured_players
     Rails.cache.fetch("featured_players_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
       if is_seeded
-        entrants.where('seed is not null').order(seed: :asc).limit(10).map(&:player)
+        entrants.includes(:player).where('seed is not null').order(seed: :asc).limit(10).map(&:player)
       elsif ranked_player_count > 0
-        entrants.where('rank is not null').order(rank: :asc).limit(10).map(&:player)
+        entrants.includes(:player).where('rank is not null').order(rank: :asc).limit(10).map(&:player)
       end
     end
   end

@@ -34,6 +34,7 @@ class Tournament < ApplicationRecord
   STREAM_STATUS_LIVE = 'live'
 
   has_many :events, dependent: :destroy
+  has_one :override, class_name: 'TournamentOverride', foreign_key: :slug, primary_key: :slug
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
 
@@ -70,7 +71,7 @@ class Tournament < ApplicationRecord
     end
 
     events = []
-    Game::GAMES.each do |game|
+    Game.all.each do |game|
       biggest_event = (data.events || [])
         .filter { |event| event.videogame.id.to_i == game.startgg_id }
         # Some TOs make a single tournament for a weekly for some reason, and
@@ -82,11 +83,11 @@ class Tournament < ApplicationRecord
       if biggest_event.present?
         # Look up by game because we only care about one event per game per
         # tournament.
-        event = t.events.find_by(game: game.slug) || t.events.new
+        event = t.events.find_by(game:) || t.events.new
 
         event.startgg_id = biggest_event.id
         event.start_at = Time.at(biggest_event.start_at)
-        event.game = game.slug
+        event.game = game
         event.player_count = biggest_event.num_entrants
 
         events << event
@@ -99,21 +100,21 @@ class Tournament < ApplicationRecord
   def should_ingest?
     return override.include unless override&.include.nil?
 
-    Game::GAMES.each do |game|
-      event = events.find_by(game: game.slug)
+    Game.all.each do |game|
+      event = events.find_by(game:)
       return true if event.present? && event.should_ingest?
     end
 
     false
   end
 
-  def should_display?(games: Game::GAMES.map(&:slug))
-    return false if events.find_by(game: games).blank?
+  def should_display?(game_slugs: Game.pluck(:slug))
+    return false if events.find_by(game_slug: game_slugs).blank?
 
     return override.include unless override&.include.blank?
 
-    games.each do |game|
-      event = events.find_by(game: game)
+    game_slugs.each do |game_slug|
+      event = events.find_by(game_slug:)
       return true if event.present? && event.should_display?
     end
 
@@ -159,10 +160,6 @@ class Tournament < ApplicationRecord
   def formatted_location
     return 'Online' if city.blank? && state.blank? && country.blank?
     [city, state, country.in?(['US', 'GB']) ? nil : country].compact.join(', ')
-  end
-
-  def override
-    TournamentOverride.find_by(slug:)
   end
 
   def banner_image_extension

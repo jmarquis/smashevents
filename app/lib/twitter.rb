@@ -6,13 +6,13 @@ class Twitter
     def tournament_added(tournament)
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
         if event.player_count.present? && event.player_count > 0
-          blurb = "#{Game.by_slug(event.game).name.upcase}: #{event.player_count} players"
+          blurb = "#{event.game.name.upcase}: #{event.player_count} players"
 
           if event.featured_players.present?
             blurb + " featuring #{event.players_sentence(twitter: true, show_count: false)}\n"
           end
         else
-          "#{Game.by_slug(event.game).name}: (player count TBD)"
+          "#{event.game.name}: (player count TBD)"
         end
       end
 
@@ -79,8 +79,7 @@ class Twitter
       # Don't filter by should_display?, might as well just show all the events
       # on the day of.
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
-        game = Game.by_slug(event.game)
-        "#{game.name.upcase} featuring #{event.players_sentence(twitter: true)}"
+        "#{event.game.name.upcase} featuring #{event.players_sentence(twitter: true)}"
       end
 
       text = <<~TEXT

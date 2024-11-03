@@ -36,6 +36,8 @@ namespace :notifications do
       .filter { |event| event.should_display? }
       .filter { |event| event.notified_added_at.blank? }
       .each do |event|
+        puts "Sending tournament added Discord notification about #{tournament.name}"
+
         Discord.event_added(event)
 
         # Mark this notification as complete here since we do it per
@@ -62,16 +64,16 @@ namespace :notifications do
       .flatten
       .filter { |event| event.should_display? }
       .group_by(&:game)
-      .each do |game_slug, events|
-        puts "Sending weekend briefing notifications for #{game_slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
+      .each do |game, events|
+        puts "Sending weekend briefing notifications for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
 
         Twitter.weekend_briefing(
-          game: Game.by_slug(game_slug),
+          game:,
           events: events.sort_by(&:player_count).reverse
         )
 
         Discord.weekend_briefing(
-          game: Game.by_slug(game_slug),
+          game:,
           events: events.sort_by(&:player_count).reverse
         )
 
@@ -92,7 +94,12 @@ namespace :notifications do
       .filter { |t| t.should_display? }
       .each do |tournament|
         puts "Sending happening today notifications for #{tournament.slug}..."
-        Twitter.happening_today(tournament)
+
+        begin
+          Twitter.happening_today(tournament)
+        rescue X::Error
+        end
+
         Discord.happening_today(tournament)
 
         # Avoid rate limits

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_02_172359) do
+ActiveRecord::Schema[7.1].define(version: 2024_11_02_233306) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,7 +32,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_02_172359) do
   create_table "events", force: :cascade do |t|
     t.bigint "tournament_id", null: false
     t.integer "startgg_id", null: false
-    t.string "game", null: false
+    t.string "game_slug", null: false
     t.integer "player_count"
     t.string "featured_players", array: true
     t.datetime "created_at", null: false
@@ -42,8 +42,23 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_02_172359) do
     t.datetime "start_at"
     t.boolean "is_seeded"
     t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
-    t.index ["tournament_id", "game"], name: "index_events_on_tournament_id_and_game", unique: true
+    t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"
+  end
+
+  create_table "games", force: :cascade do |t|
+    t.string "slug"
+    t.string "name"
+    t.string "twitch_name"
+    t.integer "startgg_id"
+    t.string "rankings_regex"
+    t.integer "ingestion_threshold"
+    t.integer "display_threshold"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_games_on_slug"
+    t.index ["startgg_id"], name: "index_games_on_startgg_id"
+    t.index ["twitch_name"], name: "index_games_on_twitch_name"
   end
 
   create_table "players", force: :cascade do |t|
