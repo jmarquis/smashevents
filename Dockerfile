@@ -1,4 +1,4 @@
-FROM ruby:3.3.3-alpine
+FROM ruby:3.3.5-alpine
 
 ARG RAILS_ENV=development
 

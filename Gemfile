@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 
-ruby "3.3.3"
+ruby "3.3.5"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.3", ">= 7.1.3.4"
+gem "rails", "~> 7.2.2"
 
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
@@ -51,6 +51,8 @@ gem 'discordrb'
 gem 'ffi', force_ruby_platform: true
 
 gem 'x'
+
+gem 'ostruct'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
