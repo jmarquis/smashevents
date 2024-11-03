@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_02_233306) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_03_211232) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "entrants", force: :cascade do |t|
     t.bigint "player_id", null: false
@@ -102,5 +102,4 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_02_233306) do
     t.index ["start_at"], name: "index_tournaments_on_start_at"
     t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true
   end
-
 end
