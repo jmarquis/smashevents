@@ -36,7 +36,7 @@ namespace :notifications do
       .filter { |event| event.should_display? }
       .filter { |event| event.notified_added_at.blank? }
       .each do |event|
-        puts "Sending tournament added Discord notification about #{tournament.name}"
+        puts "Sending tournament added Discord notification about #{event.tournament.name}"
 
         Discord.event_added(event)
 
