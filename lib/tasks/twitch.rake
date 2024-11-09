@@ -11,9 +11,9 @@ namespace :twitch do
 
       streams = tournament.stream_data.reduce([]) do |streams, stream|
         stream = stream.with_indifferent_access
-        next unless stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
+        streams = streams + [stream[:name]] if stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
 
-        streams + [stream[:name]]
+        streams
       end
 
       next unless streams.present?
