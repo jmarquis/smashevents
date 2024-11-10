@@ -186,7 +186,10 @@ namespace :startgg do
     loop do
       result = yield
       break
-    rescue Graphlient::Errors::ExecutionError, Graphlient::Errors::FaradayServerError, Graphlient::Errors::TimeoutError => e
+    rescue Graphlient::Errors::ExecutionError,
+      Graphlient::Errors::FaradayServerError,
+      Graphlient::Errors::ConnectionFailedError,
+      Graphlient::Errors::TimeoutError => e
       StatsD.increment('startgg.request_error')
 
       if retries < num_retries
