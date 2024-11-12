@@ -158,7 +158,12 @@ namespace :startgg do
         # Populate entrants
         entrants = entrants.map do |entrant|
           entrant = Entrant.from_startgg(event, entrant)
-          entrant.save! unless entrant.persisted? && !entrant.changed?
+
+          if !entrant.persisted? || entrant.changed?
+            entrant.save!
+            StatsD.increment('startgg.entrant_added')
+          end
+
           entrant
         end
 
