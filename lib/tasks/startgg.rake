@@ -156,8 +156,11 @@ namespace :startgg do
         break if tournament.destroyed?
 
         # Populate entrants
-        entrants = entrants.map { |entrant| Entrant.from_startgg(event, entrant) }
-        entrants.filter { |entrant| !entrant.persisted? || entrant.changed? }.each(&:save)
+        entrants = entrants.map do |entrant|
+          entrant = Entrant.from_startgg(event, entrant)
+          entrant.save! unless entrant.persisted? && !entrant.changed?
+          entrant
+        end
 
         # Denormalize whether the event is seeded
         event.is_seeded = entrants.any? { |entrant| entrant.seed.present? }
