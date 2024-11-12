@@ -159,7 +159,10 @@ namespace :startgg do
         entrants = entrants.map do |entrant|
           entrant = Entrant.from_startgg(event, entrant)
 
-          if !entrant.persisted? || entrant.changed?
+          if !entrant.persisted?
+            entrant.save!
+            StatsD.increment('startgg.entrant_updated')
+          elsif entrant.changed?
             entrant.save!
             StatsD.increment('startgg.entrant_added')
           end
