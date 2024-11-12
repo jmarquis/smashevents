@@ -168,6 +168,7 @@ namespace :startgg do
         # Denormalize ranked entrant count
         event.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
 
+        event.synced_at = Time.now
         event.save
 
         num_events += 1
