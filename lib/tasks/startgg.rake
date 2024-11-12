@@ -189,7 +189,8 @@ namespace :startgg do
     rescue Graphlient::Errors::ExecutionError,
       Graphlient::Errors::FaradayServerError,
       Graphlient::Errors::ConnectionFailedError,
-      Graphlient::Errors::TimeoutError => e
+      Graphlient::Errors::TimeoutError,
+      Faraday::ParsingError => e
       StatsD.increment('startgg.request_error')
 
       if retries < num_retries
