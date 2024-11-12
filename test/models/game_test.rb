@@ -2,16 +2,16 @@
 #
 # Table name: games
 #
-#  id                  :bigint           not null, primary key
-#  display_threshold   :integer
-#  ingestion_threshold :integer
-#  name                :string
-#  rankings_regex      :string
+#  id                  :integer          not null, primary key
 #  slug                :string
+#  name                :string
 #  twitch_name         :string
+#  startgg_id          :integer
+#  rankings_regex      :string
+#  ingestion_threshold :integer
+#  display_threshold   :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  startgg_id          :integer
 #
 # Indexes
 #
@@ -19,6 +19,7 @@
 #  index_games_on_startgg_id   (startgg_id)
 #  index_games_on_twitch_name  (twitch_name)
 #
+
 require "test_helper"
 
 class GameTest < ActiveSupport::TestCase

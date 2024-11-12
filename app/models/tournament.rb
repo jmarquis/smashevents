@@ -2,22 +2,22 @@
 #
 # Table name: tournaments
 #
-#  id                :bigint           not null, primary key
-#  banner_image_url  :string
-#  city              :string
-#  country           :string
-#  end_at            :datetime
-#  hashtag           :string
-#  name              :string
-#  profile_image_url :string
+#  id                :integer          not null, primary key
+#  startgg_id        :integer
 #  slug              :string
+#  name              :string
 #  start_at          :datetime
+#  end_at            :datetime
+#  city              :string
 #  state             :string
-#  stream_data       :json
-#  timezone          :string
+#  country           :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  startgg_id        :integer
+#  stream_data       :json
+#  timezone          :string
+#  hashtag           :string
+#  banner_image_url  :string
+#  profile_image_url :string
 #
 # Indexes
 #
@@ -25,6 +25,7 @@
 #  index_tournaments_on_start_at    (start_at)
 #  index_tournaments_on_startgg_id  (startgg_id) UNIQUE
 #
+
 class Tournament < ApplicationRecord
   include Memery
 

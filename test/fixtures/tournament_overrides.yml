@@ -2,9 +2,9 @@
 #
 # Table name: tournament_overrides
 #
-#  id         :bigint           not null, primary key
-#  include    :boolean
+#  id         :integer          not null, primary key
 #  slug       :string
+#  include    :boolean
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

@@ -2,18 +2,19 @@
 #
 # Table name: events
 #
-#  id                  :bigint           not null, primary key
-#  featured_players    :string           is an Array
+#  id                  :integer          not null, primary key
+#  tournament_id       :integer          not null
+#  startgg_id          :integer          not null
 #  game_slug           :string           not null
-#  is_seeded           :boolean
-#  notified_added_at   :datetime
 #  player_count        :integer
-#  ranked_player_count :integer
-#  start_at            :datetime
+#  featured_players    :string           is an Array
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  startgg_id          :integer          not null
-#  tournament_id       :bigint           not null
+#  ranked_player_count :integer
+#  notified_added_at   :datetime
+#  start_at            :datetime
+#  is_seeded           :boolean
+#  synced_at           :datetime
 #
 # Indexes
 #
@@ -21,11 +22,14 @@
 #  index_events_on_tournament_id                (tournament_id)
 #  index_events_on_tournament_id_and_game_slug  (tournament_id,game_slug) UNIQUE
 #
+
 class Event < ApplicationRecord
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
   belongs_to :game, foreign_key: :game_slug, primary_key: :slug
+
+  scope :should_sync, -> { where("coalesce(synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
 
   def should_ingest?
     return false unless game&.ingestion_threshold.present?

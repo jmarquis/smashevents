@@ -119,7 +119,7 @@ namespace :startgg do
     puts 'Starting entrant sync...'
 
     Tournament.upcoming.each do |tournament|
-      tournament.events.each do |event|
+      tournament.events.should_sync.each do |event|
         entrants = []
 
         # Get all the entrants, 1 chunk at a time

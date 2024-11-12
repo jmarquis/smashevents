@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_03_211232) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_12_022005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -41,6 +41,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_03_211232) do
     t.datetime "notified_added_at"
     t.datetime "start_at"
     t.boolean "is_seeded"
+    t.datetime "synced_at"
     t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
     t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"
