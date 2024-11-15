@@ -164,7 +164,7 @@ namespace :startgg do
             StatsD.increment('startgg.entrant_added')
           elsif entrant.changed?
             entrant.save!
-            entrant.saved_changes.reject { |field| field == 'updated_at' }.each do |field|
+            entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
               StatsD.increment("startgg.entrant_update.#{field}")
             end
             StatsD.increment('startgg.entrant_updated')
