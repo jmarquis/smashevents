@@ -26,6 +26,7 @@ class Player < ApplicationRecord
     'mang0' => 'C9Mang0',
     'mvlvchi' => '_mvlvchi_',
     'wizzrobe' => 'Wizzrobe',
+    'plup' => 'Plup_Club',
   }
 
   has_many :entrants

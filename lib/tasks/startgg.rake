@@ -177,7 +177,7 @@ namespace :startgg do
         event.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
 
         event.synced_at = Time.now
-        event.save
+        event.save!
 
         num_events += 1
         if num_events % 50 == 0
