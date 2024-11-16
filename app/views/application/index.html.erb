@@ -1,13 +1,14 @@
 <div class="social">
-  <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag 'twitter.svg' %></a>
-  <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag 'discord.svg' %></a>
+  <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag "twitter.svg" %></a>
+  <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag "discord.svg" %></a>
 </div>
 
 <h1>Smash Events</h1>
 
 <nav>
   <% @games.each do |game| %>
-    <div class="selected-game"><%= game.name %> <%= remove_game_link(game, @games) if @games.count > 1 %></div>
+    <div class="selected-game"><%= game.name %>
+      <%= remove_game_link(game, @games) if @games.count > 1 %></div>
   <% end %>
   <% if @unselected_games.any? %>
     <div class="menu-container">
@@ -36,15 +37,24 @@
         <% event = tournament.events.filter { |event| event.game_slug == game.slug }.first %>
         <% if event.present? %>
           <div class="game">
-            <h3 class="game-heading"><%= game.name %><% if event.player_count.present? && event.player_count > 0 %>: <%= event.player_count.round(-1) %>+ players<% end %></h3>
+            <h3 class="game-heading">
+              <a href="<%= event.startgg_url %>" target="_blank">
+                <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
+                  <%= event.player_count.round(-1) %>+ players<% end %>
+              </a>
+            </h3>
             <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
-              <%= event.start_at.in_time_zone(tournament.timezone || 'America/New_York').strftime('%A @ %l:%M %p') %> (local time)
+              <%= event
+                .start_at
+                .in_time_zone(tournament.timezone || "America/New_York")
+                .strftime("%A @ %l:%M %p") %>
+              (local time)
             </time>
             <ul class="players">
               <% if event.featured_players.present? %>
                 <% event.featured_players.each do |player| %>
                   <% if player.twitter_username.present? %>
-                    <li><%= link_to player.tag, player.twitter_url, target: '_blank' %></li>
+                    <li><%= link_to player.tag, player.twitter_url, target: "_blank" %></li>
                   <% else %>
                     <li><%= player.tag %></li>
                   <% end %>
@@ -79,8 +89,11 @@
 </main>
 
 <footer>
-  <p>Made with ♥ by <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
-  <p>Powered by <a href="https://start.gg" target="_blank">start.gg</a>.</p>
+  <p>Made with ♥ by
+    <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
+  <p>Powered by
+    <a href="https://start.gg" target="_blank">start.gg</a>.</p>
   <p>Got feedback? Is a tournament missing?<br><a href="https://discord.gg/x7E38ygc42" target="_blank">Let me know on Discord</a>!</p>
-  <p>This website is <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
+  <p>This website is
+    <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
 </footer>

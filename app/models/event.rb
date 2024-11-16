@@ -85,4 +85,8 @@ class Event < ApplicationRecord
       end
     end
   end
+
+  def startgg_url
+    "https://start.gg/#{slug}"
+  end
 end
