@@ -34,6 +34,7 @@ class Startgg
                 videogameId: [#{Game.pluck(:startgg_id).join(',')}]
               }) {
                 id
+                slug
                 startAt
                 numEntrants
                 videogame {
@@ -77,6 +78,7 @@ class Startgg
               videogameId: [#{Game.pluck(:startgg_id).join(',')}]
             }) {
               id
+              slug
               startAt
               numEntrants
               videogame {

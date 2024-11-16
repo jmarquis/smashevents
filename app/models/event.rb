@@ -15,6 +15,7 @@
 #  start_at            :datetime
 #  is_seeded           :boolean
 #  synced_at           :datetime
+#  slug                :string
 #
 # Indexes
 #
