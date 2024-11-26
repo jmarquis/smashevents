@@ -205,7 +205,8 @@ namespace :startgg do
       Graphlient::Errors::FaradayServerError,
       Graphlient::Errors::ConnectionFailedError,
       Graphlient::Errors::TimeoutError,
-      Faraday::ParsingError => e
+      Faraday::ParsingError,
+      OpenSSL::SSL::SSLError => e
       StatsD.increment('startgg.request_error')
 
       if retries < num_retries
