@@ -39,7 +39,7 @@ class Tournament < ApplicationRecord
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
 
-  def self.from_startgg(data)
+  def self.from_startgg_tournament(data)
     t = find_by(startgg_id: data.id) || new
 
     t.startgg_id = data.id

@@ -24,8 +24,8 @@ class Discord
               if event.player_count.present? && event.player_count > 0
                 blurb = "#{event.game.name}: #{event.player_count} players"
 
-                if event.featured_players.present?
-                  blurb += " featuring #{event.players_sentence(show_count: false)}\n"
+                if event.featured_entrants.present?
+                  blurb += " featuring #{event.entrants_sentence(show_count: false)}\n"
                 end
               else
                 "#{event.game.name}: (player count TBD)"
@@ -59,10 +59,10 @@ class Discord
             embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
             embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
-            if event.featured_players.present?
+            if event.featured_entrants.present?
               embed.description += <<~TEXT
 
-                Featuring #{event.players_sentence}
+                Featuring #{event.entrants_sentence}
               TEXT
             else
               embed.description += <<~TEXT

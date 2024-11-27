@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_16_170102) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_26_014623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,9 +22,11 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_16_170102) do
     t.integer "startgg_entrant_id"
     t.integer "seed"
     t.integer "rank"
+    t.bigint "player2_id"
     t.index ["event_id", "rank"], name: "index_entrants_on_event_id_and_rank"
     t.index ["event_id", "seed"], name: "index_entrants_on_event_id_and_seed"
     t.index ["event_id"], name: "index_entrants_on_event_id"
+    t.index ["player2_id"], name: "index_entrants_on_player2_id"
     t.index ["player_id"], name: "index_entrants_on_player_id"
     t.index ["startgg_entrant_id"], name: "index_entrants_on_startgg_entrant_id", unique: true
   end

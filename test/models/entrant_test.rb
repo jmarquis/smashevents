@@ -10,12 +10,14 @@
 #  startgg_entrant_id :integer
 #  seed               :integer
 #  rank               :integer
+#  player2_id         :integer
 #
 # Indexes
 #
 #  index_entrants_on_event_id            (event_id)
 #  index_entrants_on_event_id_and_rank   (event_id,rank)
 #  index_entrants_on_event_id_and_seed   (event_id,seed)
+#  index_entrants_on_player2_id          (player2_id)
 #  index_entrants_on_player_id           (player_id)
 #  index_entrants_on_startgg_entrant_id  (startgg_entrant_id) UNIQUE
 #

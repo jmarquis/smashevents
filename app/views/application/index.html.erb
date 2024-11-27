@@ -51,13 +51,23 @@
               (local time)
             </time>
             <ul class="players">
-              <% if event.featured_players.present? %>
-                <% event.featured_players.each do |player| %>
-                  <% if player.twitter_username.present? %>
-                    <li><%= link_to player.tag, player.twitter_url, target: "_blank" %></li>
-                  <% else %>
-                    <li><%= player.tag %></li>
-                  <% end %>
+              <% if event.featured_entrants.present? %>
+                <% event.featured_entrants.each do |entrant| %>
+                  <li>
+                    <% if entrant.player.twitter_username.present? %>
+                      <%= link_to entrant.player.tag, entrant.player.twitter_url, target: "_blank" %>
+                    <% else %>
+                      <%= entrant.player.tag %>
+                    <% end %>
+                    <% if entrant.player2.present? %>
+                      /
+                      <% if entrant.player2.twitter_username.present? %>
+                        <%= link_to entrant.player2.tag, entrant.player2.twitter_url, target: "_blank" %>
+                      <% else %>
+                        <%= entrant.player2.tag %>
+                      <% end %>
+                    <% end %>
+                  </li>
                 <% end %>
               <% else %>
                 <li>Featured players coming soon</li>

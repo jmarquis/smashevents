@@ -8,8 +8,8 @@ class Twitter
         if event.player_count.present? && event.player_count > 0
           blurb = "#{event.game.name.upcase}: #{event.player_count} players"
 
-          if event.featured_players.present?
-            blurb + " featuring #{event.players_sentence(twitter: true, show_count: false)}\n"
+          if event.featured_entrants.present?
+            blurb + " featuring #{event.entrants_sentence(twitter: true, show_count: false)}\n"
           end
         else
           "#{event.game.name}: (player count TBD)"

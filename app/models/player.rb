@@ -27,16 +27,14 @@ class Player < ApplicationRecord
     'mvlvchi' => '_mvlvchi_',
     'wizzrobe' => 'Wizzrobe',
     'plup' => 'Plup_Club',
+    'zain' => 'ZainNaghmi',
+    'jmook' => 'jakedirado',
+    'soonsay' => 's00nsay',
+    'pewpewu' => '_PewPewU'
   }
 
   has_many :entrants
   has_many :events, through: :entrants
-
-  before_save :set_defaults
-
-  def set_defaults
-    self.twitter_username ||= TWITTER_USERNAME_FALLBACKS[tag.downcase]
-  end
 
   def self.from_json(serialized_player)
     new(JSON.parse(serialized_player).deep_symbolize_keys)
@@ -44,7 +42,7 @@ class Player < ApplicationRecord
     new(tag: serialized_player)
   end
 
-  def self.from_startgg(data)
+  def self.from_startgg_player(data)
     p = find_by(startgg_player_id: data.id) || new
 
     p.startgg_player_id = data.id
@@ -64,6 +62,10 @@ class Player < ApplicationRecord
 
   def twitter_url
     "https://twitter.com/#{twitter_username}" if twitter_username.present?
+  end
+
+  def twitter_username
+    self[:twitter_username] || TWITTER_USERNAME_FALLBACKS[tag.downcase]
   end
 
 end

@@ -76,6 +76,33 @@ class Event < ApplicationRecord
     end
   end
 
+  def entrants_sentence(twitter: false, show_count: true)
+    entrants = featured_entrants
+    if entrants.present?
+      remaining_entrant_count = player_count - entrants.count
+
+      entrants_tags = entrants.map { |entrant| entrant.tag(twitter:) }
+
+      if show_count && remaining_entrant_count >= 10
+        "#{[*entrants_tags, "#{(player_count - entrants.count)} more!"].to_sentence}"
+      else
+        "#{[*entrants_tags, 'more!'].to_sentence}"
+      end
+    elsif show_count
+      "#{player_count} players!"
+    end
+  end
+
+  def featured_entrants
+    Rails.cache.fetch("featured_entrants_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
+      if is_seeded
+        entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(10)
+      elsif ranked_player_count.present? && ranked_player_count > 0
+        entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(10)
+      end
+    end
+  end
+
   def featured_players
     Rails.cache.fetch("featured_players_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
       if is_seeded

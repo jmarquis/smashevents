@@ -19,7 +19,7 @@ namespace :startgg do
       break if tournaments.count.zero?
 
       tournaments.each do |data|
-        tournament, events = Tournament.from_startgg(data)
+        tournament, events = Tournament.from_startgg_tournament(data)
 
         next if events.blank?
         next if tournament.exclude?
@@ -84,7 +84,7 @@ namespace :startgg do
         Startgg.tournament(slug: override.slug)
       end
 
-      tournament, events = Tournament.from_startgg(data)
+      tournament, events = Tournament.from_startgg_tournament(data)
 
       if tournament.persisted?
         if tournament.changed? || events.any?(&:changed?)
@@ -113,13 +113,18 @@ namespace :startgg do
     puts "Deleted: #{num_deleted}"
   end
 
-  task sync_entrants: [:environment] do
+  task :sync_entrants, [:tournament_id] => [:environment] do |task, args|
     num_events = 0
 
     puts 'Starting entrant sync...'
 
-    Tournament.upcoming.each do |tournament|
-      tournament.events.should_sync.each do |event|
+    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.upcoming
+
+    tournaments.each do |tournament|
+      events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync
+
+      events.each do |event|
+        puts_dev "Syncing entrants for #{tournament.slug} (#{event.game.slug})..."
         entrants = []
 
         # Get all the entrants, 1 chunk at a time
@@ -157,12 +162,12 @@ namespace :startgg do
 
         # Populate entrants
         entrants = entrants.map do |entrant|
-          entrant = Entrant.from_startgg(event, entrant)
+          entrant = Entrant.from_startgg_entrant(entrant, event:)
 
           if !entrant.persisted?
             entrant.save!
             StatsD.increment('startgg.entrant_added')
-          elsif entrant.changed?
+          elsif entrant.changed? || entrant.player_changed? || entrant.player2_changed?
             entrant.save!
             entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
               StatsD.increment("startgg.entrant_field_updated.#{field}")
@@ -235,5 +240,9 @@ namespace :startgg do
 
       puts "  ~ #{event.game.slug.upcase}: #{event_changes}"
     end
+  end
+
+  def puts_dev(msg)
+    puts msg if Rails.env.development?
   end
 end
