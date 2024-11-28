@@ -178,6 +178,12 @@ namespace :startgg do
           entrant
         end
 
+        # Delete entrants that are no longer registered
+        event.entrants.where.not(id: entrants.map(&:id)).each do |entrant|
+          entrant.destroy!
+          StatsD.increment('startgg.entrant_deleted')
+        end
+
         # Denormalize whether the event is seeded
         event.is_seeded = entrants.any? { |entrant| entrant.seed.present? }
 
