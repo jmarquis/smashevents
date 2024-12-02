@@ -44,7 +44,7 @@ class Event < ApplicationRecord
 
     # If the event is stacked with ranked players, always display it. This
     # should catch invitationals and stuff.
-    if ranked_player_count.present? && ranked_player_count > 0 && player_count.present? && player_count > 0
+    if ranked_player_count.present? && ranked_player_count > 0 && player_count.present? && player_count >= 8
       return true if ranked_player_count.to_f / player_count.to_f > 0.3
       return true if ranked_player_count > 10
     end
