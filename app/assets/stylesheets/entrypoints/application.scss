@@ -137,16 +137,16 @@ nav .unselected-games {
   background-color: #859D9D;
 }
 
-input[type="checkbox"]:checked ~ .unselected-games {
+input[type="checkbox"]:checked~.unselected-games {
   visibility: visible;
 }
 
-input[type="checkbox"]:checked ~ .menu-toggle {
+input[type="checkbox"]:checked~.menu-toggle {
   color: #081212;
   cursor: default;
 }
 
-input[type="checkbox"]:checked ~ .menu-toggle::after {
+input[type="checkbox"]:checked~.menu-toggle::after {
   visibility: visible;
 }
 
@@ -156,7 +156,7 @@ nav .unselected-games li {
   white-space: nowrap;
 }
 
-nav .unselected-games li + li {
+nav .unselected-games li+li {
   margin-top: 4px;
 }
 
@@ -211,20 +211,20 @@ time.event-time {
   font-weight: normal;
 }
 
-article + article {
+article+article {
   margin-top: 80px;
 }
 
-article > div + div {
+article>div+div {
   margin-top: 8px;
 }
 
-article > .game,
-article > .streams {
+article>.game,
+article>.streams {
   margin-top: 40px;
 }
 
-article > .game > .players {
+article>.game>.players {
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
@@ -235,7 +235,7 @@ article > .game > .players {
   gap: 16px 32px;
 }
 
-article > .streams ul {
+article>.streams ul {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
@@ -246,11 +246,11 @@ article > .streams ul {
   gap: 16px 32px;
 }
 
-article > .streams li {
+article>.streams li {
   display: flex;
 }
 
-article > .streams .live {
+article>.streams .live {
   background-color: #910830;
   color: #fff;
   margin-left: 8px;
@@ -278,6 +278,6 @@ footer p {
   margin: 0;
 }
 
-footer p + p {
+footer p+p {
   margin-top: 8px;
 }

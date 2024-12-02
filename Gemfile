@@ -90,3 +90,7 @@ gem "statsd-instrument", "~> 3.9"
 gem "stackprof", "~> 0.2.26"
 gem "sentry-ruby", "~> 5.21"
 gem "sentry-rails", "~> 5.21"
+
+gem "jsbundling-rails", "~> 1.3"
+
+gem "cssbundling-rails", "~> 1.4"

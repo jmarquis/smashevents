@@ -3,6 +3,7 @@ FROM ruby:3.3.5-alpine
 ARG RAILS_ENV=development
 
 RUN apk add --update --no-cache \
+  bash \
   curl \
   build-base \
   less \
@@ -13,7 +14,13 @@ RUN apk add --update --no-cache \
   tzdata \
   gcompat \
   inotify-tools \
-  jemalloc
+  jemalloc \
+  yarn \
+  nodejs \
+  npm
+
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
 
 ENV LD_PRELOAD=libjemalloc.so.2
 
