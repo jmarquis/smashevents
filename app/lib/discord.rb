@@ -15,22 +15,22 @@ class Discord
           embed.title = event.tournament.name
           embed.url = "https://start.gg/#{event.tournament.slug}"
 
+          players_blurb = if event.player_count.present? && event.player_count > 0
+            blurb = "#{event.player_count} players"
+
+            if event.featured_entrants.present?
+              blurb += " featuring #{event.entrants_sentence(show_count: false)}\n"
+            end
+          else
+            "#{event.game.name}: (player count TBD)"
+          end
+
           # List all events for the tournament just to give some context.
           embed.description = <<~TEXT
             #{event.tournament.formatted_date_range}
             #{event.tournament.formatted_location}
 
-            #{event.tournament.events.sort_by(&:player_count).reverse.map { |event|
-              if event.player_count.present? && event.player_count > 0
-                blurb = "#{event.game.name}: #{event.player_count} players"
-
-                if event.featured_entrants.present?
-                  blurb += " featuring #{event.entrants_sentence(show_count: false)}\n"
-                end
-              else
-                "#{event.game.name}: (player count TBD)"
-              end
-            }.join("\n")}
+            #{players_blurb}
           TEXT
 
           embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
