@@ -23,6 +23,42 @@
   </head>
 
   <body>
-    <%= yield %>
+
+    <div class="social">
+      <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag "twitter.svg" %></a>
+      <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag "discord.svg" %></a>
+    </div>
+
+    <h1>Smash Events</h1>
+
+    <nav>
+      <% @games.each do |game| %>
+        <div class="selected-game"><%= game.name %>
+        <%= remove_game_link(game, @games) if @games.count > 1 %></div>
+      <% end %>
+      <% if @unselected_games.any? %>
+        <div class="menu-container">
+          <input id="menu-toggle" type="checkbox">
+          <label for="menu-toggle" class="menu-toggle">+</label>
+          <ul class="unselected-games">
+            <% @unselected_games.each do |game| %>
+              <li><%= add_game_link(game, @games) %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </nav>
+
+    <main>
+      <%= yield %>
+    </main>
+
+    <footer>
+      <p>Made with ♥ by <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
+      <p>Powered by <a href="https://start.gg" target="_blank">start.gg</a>.</p>
+      <p>Got feedback? Is a tournament missing?<br><a href="https://discord.gg/x7E38ygc42" target="_blank">Let me know on Discord</a>!</p>
+      <p>This website is <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
+    </footer>
+
   </body>
 </html>

@@ -1,109 +1,70 @@
-<div class="social">
-  <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag "twitter.svg" %></a>
-  <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag "discord.svg" %></a>
-</div>
-
-<h1>Smash Events</h1>
-
-<nav>
-  <% @games.each do |game| %>
-    <div class="selected-game"><%= game.name %>
-      <%= remove_game_link(game, @games) if @games.count > 1 %></div>
-  <% end %>
-  <% if @unselected_games.any? %>
-    <div class="menu-container">
-      <input id="menu-toggle" type="checkbox">
-      <label for="menu-toggle" class="menu-toggle">+</label>
-      <ul class="unselected-games">
-        <% @unselected_games.each do |game| %>
-          <li><%= add_game_link(game, @games) %></li>
-        <% end %>
-      </ul>
+<% @tournaments.each do |tournament| %>
+  <article>
+    <time><%= tournament.formatted_date_range %></time>
+    <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
+    <div>
+      <%= tournament.formatted_location %>
     </div>
-  <% end %>
-</nav>
 
-<main>
-
-  <% @tournaments.each do |tournament| %>
-    <article>
-      <time><%= tournament.formatted_date_range %></time>
-      <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
-      <div>
-        <%= tournament.formatted_location %>
-      </div>
-
-      <% @games.each do |game| %>
-        <% event = tournament.events.filter { |event| event.game_slug == game.slug }.first %>
-        <% if event.present? %>
-          <div class="game">
-            <h3 class="game-heading">
-              <a href="<%= event.startgg_url %>" target="_blank">
-                <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
-                  <%= event.player_count.round(-1) %>+ players<% end %>
-              </a>
-            </h3>
-            <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
-              <%= event
-                .start_at
-                .in_time_zone(tournament.timezone || "America/New_York")
-                .strftime("%A @ %l:%M %p") %>
-              (local time)
-            </time>
-            <ul class="players">
-              <% if event.featured_entrants.present? %>
-                <% event.featured_entrants.each do |entrant| %>
-                  <li>
-                    <% if entrant.player.twitter_username.present? %>
-                      <%= link_to entrant.player.tag, entrant.player.twitter_url, target: "_blank" %>
+    <% @games.each do |game| %>
+      <% event = tournament.events.filter { |event| event.game_slug == game.slug }.first %>
+      <% if event.present? %>
+        <div class="game">
+          <h3 class="game-heading">
+            <a href="<%= event.startgg_url %>" target="_blank">
+              <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
+                <%= event.player_count.round(-1) %>+ players<% end %>
+          </a>
+          </h3>
+          <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
+            <%= event
+              .start_at
+              .in_time_zone(tournament.timezone || "America/New_York")
+              .strftime("%A @ %l:%M %p") %>
+            (local time)
+          </time>
+          <ul class="players">
+            <% if event.featured_entrants.present? %>
+              <% event.featured_entrants.each do |entrant| %>
+                <li>
+                  <% if entrant.player.twitter_username.present? %>
+                    <%= link_to entrant.player.tag, entrant.player.twitter_url, target: "_blank" %>
+                  <% else %>
+                    <%= entrant.player.tag %>
+                  <% end %>
+                  <% if entrant.player2.present? %>
+                    /
+                    <% if entrant.player2.twitter_username.present? %>
+                      <%= link_to entrant.player2.tag, entrant.player2.twitter_url, target: "_blank" %>
                     <% else %>
-                      <%= entrant.player.tag %>
+                      <%= entrant.player2.tag %>
                     <% end %>
-                    <% if entrant.player2.present? %>
-                      /
-                      <% if entrant.player2.twitter_username.present? %>
-                        <%= link_to entrant.player2.tag, entrant.player2.twitter_url, target: "_blank" %>
-                      <% else %>
-                        <%= entrant.player2.tag %>
-                      <% end %>
-                    <% end %>
-                  </li>
-                <% end %>
-              <% else %>
-                <li>Featured players coming soon</li>
+                  <% end %>
+                </li>
               <% end %>
-            </ul>
-          </div>
-        <% end %>
-      <% end %>
-
-      <% if tournament.start_at <= Time.now && tournament.stream_data.present? %>
-        <div class="streams">
-          <h3>Streams</h3>
-          <ul class="streams">
-            <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase.in?(['twitch', 'youtube']) }.each do |stream| %>
-              <li>
-                <%= stream_link(stream) %>
-                <% if stream[:status]&.downcase == Tournament::STREAM_STATUS_LIVE %>
-                  <span class="live">Live</span>
-                <% end %>
-              </li>
+            <% else %>
+              <li>Featured players coming soon</li>
             <% end %>
           </ul>
         </div>
       <% end %>
+    <% end %>
 
-    </article>
-  <% end %>
+    <% if tournament.start_at <= Time.now && tournament.stream_data.present? %>
+      <div class="streams">
+        <h3>Streams</h3>
+        <ul class="streams">
+          <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase.in?(['twitch', 'youtube']) }.each do |stream| %>
+            <li>
+              <%= stream_link(stream) %>
+              <% if stream[:status]&.downcase == Tournament::STREAM_STATUS_LIVE %>
+                <span class="live">Live</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
-</main>
-
-<footer>
-  <p>Made with ♥ by
-    <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
-  <p>Powered by
-    <a href="https://start.gg" target="_blank">start.gg</a>.</p>
-  <p>Got feedback? Is a tournament missing?<br><a href="https://discord.gg/x7E38ygc42" target="_blank">Let me know on Discord</a>!</p>
-  <p>This website is
-    <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
-</footer>
+  </article>
+<% end %>
