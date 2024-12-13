@@ -65,13 +65,14 @@ namespace :notifications do
       .filter { |event| event.should_display? }
       .group_by(&:game)
       .each do |game, events|
-        puts "Sending weekend briefing notifications for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
 
+        puts "Sending weekend briefing tweet for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
         Twitter.weekend_briefing(
           game:,
           events: events.sort_by(&:player_count).reverse
         )
 
+        puts "Sending weekend briefing Discord notification for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
         Discord.weekend_briefing(
           game:,
           events: events.sort_by(&:player_count).reverse
@@ -93,13 +94,14 @@ namespace :notifications do
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| t.should_display? }
       .each do |tournament|
-        puts "Sending happening today notifications for #{tournament.slug}..."
 
+        puts "Sending happening today tweet for #{tournament.slug}..."
         begin
           Twitter.happening_today(tournament)
         rescue X::Error
         end
 
+        puts "Sending happening today Discord notification for #{tournament.slug}..."
         Discord.happening_today(tournament)
 
         # Avoid rate limits
