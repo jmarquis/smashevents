@@ -9,12 +9,14 @@
 
 body {
   box-sizing: border-box;
-  font: 16px forma-djr-mono, sans-serif;
+  font:
+    16px forma-djr-mono,
+    sans-serif;
   font-weight: 500;
   letter-spacing: 1.5px;
   line-height: 1.5;
   background-color: #081212;
-  color: #859D9D;
+  color: #859d9d;
 }
 
 a {
@@ -36,7 +38,7 @@ a:hover {
 }
 
 .social a {
-  color: #859D9D;
+  color: #859d9d;
   padding: 8px;
   display: flex;
 }
@@ -52,7 +54,9 @@ a:hover {
 
 h1 {
   text-align: center;
-  font: 80px dharma-gothic-m, sans-serif;
+  font:
+    80px dharma-gothic-m,
+    sans-serif;
   font-style: italic;
   text-transform: uppercase;
   letter-spacing: 24px;
@@ -63,111 +67,140 @@ h1 {
   pointer-events: none;
 }
 
-nav {
+nav + nav {
+  margin-top: 24px;
+}
+
+nav.pages {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px;
+  height: 48px;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: bold;
+  cursor: default;
+
+  a {
+    font-weight: normal;
+    color: #859d9d;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+nav.game-selector {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   gap: 16px;
   padding: 0 24px;
-}
 
-nav .selected-game {
-  height: 32px;
-  color: #081212;
-  font-weight: bold;
-  padding: 3px 12px 0;
-  cursor: default;
-  white-space: nowrap;
-  background-color: #859D9D;
-}
+  .selected-game {
+    height: 32px;
+    color: #081212;
+    font-weight: bold;
+    padding: 3px 12px 0;
+    cursor: default;
+    white-space: nowrap;
+    background-color: #859d9d;
 
-nav .selected-game a {
-  text-decoration: none;
-  color: #445555;
-}
+    a {
+      text-decoration: none;
+      color: #445555;
 
-nav .selected-game a:hover {
-  color: #081212;
-}
+      &:hover {
+        color: #081212;
+      }
+    }
+  }
 
-nav .menu-container {
-  position: relative;
-}
+  .menu-container {
+    position: relative;
+  }
 
-nav .menu-toggle {
-  display: block;
-  height: 32px;
-  color: #081212;
-  font-weight: bold;
-  padding: 0px 11px 0 12px;
-  font-size: 20px;
-  color: #445555;
-  cursor: pointer;
-  letter-spacing: 0;
-  background-color: #859D9D;
-}
+  .menu-toggle {
+    display: block;
+    height: 32px;
+    color: #081212;
+    font-weight: bold;
+    padding: 0px 11px 0 12px;
+    font-size: 20px;
+    color: #445555;
+    cursor: pointer;
+    letter-spacing: 0;
+    background-color: #859d9d;
 
-nav .menu-toggle::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 100%;
-  height: 16px;
-  visibility: hidden;
-  background-color: #859D9D;
-}
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 100%;
+      height: 16px;
+      visibility: hidden;
+      background-color: #859d9d;
+    }
 
-nav .menu-toggle:hover {
-  color: #081212;
-}
+    &:hover {
+      color: #081212;
+    }
+  }
 
-nav input[type="checkbox"] {
-  display: none;
-}
+  input[type="checkbox"] {
+    display: none;
 
-nav .unselected-games {
-  list-style: none;
-  margin: 16px 0 0;
-  padding: 12px 24px 16px 16px;
-  visibility: hidden;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: #859D9D;
-}
+    &:checked {
+      & ~ .unselected-games {
+        visibility: visible;
+      }
 
-input[type="checkbox"]:checked~.unselected-games {
-  visibility: visible;
-}
+      & ~ .menu-toggle {
+        color: #081212;
+        cursor: default;
 
-input[type="checkbox"]:checked~.menu-toggle {
-  color: #081212;
-  cursor: default;
-}
+        &::after {
+          visibility: visible;
+        }
+      }
+    }
+  }
 
-input[type="checkbox"]:checked~.menu-toggle::after {
-  visibility: visible;
-}
+  .unselected-games {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 12px 24px 16px 16px;
+    visibility: hidden;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #859d9d;
 
-nav .unselected-games li {
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
-}
+    li {
+      margin: 0;
+      padding: 0;
+      white-space: nowrap;
 
-nav .unselected-games li+li {
-  margin-top: 4px;
-}
+      & + li {
+        margin-top: 4px;
+      }
+    }
 
-nav .unselected-games a {
-  color: #445555;
-  text-decoration: none;
-  font-weight: bold;
-}
+    a {
+      color: #445555;
+      text-decoration: none;
+      font-weight: bold;
 
-nav .unselected-games a:hover {
-  color: #081212;
+      &:hover {
+        color: #081212;
+      }
+    }
+  }
 }
 
 main {
@@ -178,7 +211,7 @@ main {
 }
 
 h2 {
-  color: #EBF1F1;
+  color: #ebf1f1;
   font-size: 32px;
   letter-spacing: 4px;
   font-weight: 500;
@@ -211,20 +244,20 @@ time.event-time {
   font-weight: normal;
 }
 
-article+article {
+article + article {
   margin-top: 80px;
 }
 
-article>div+div {
+article > div + div {
   margin-top: 8px;
 }
 
-article>.game,
-article>.streams {
+article > .game,
+article > .streams {
   margin-top: 40px;
 }
 
-article>.game>.players {
+article > .game > .players {
   margin: 24px 0 0;
   padding: 0;
   list-style: none;
@@ -235,7 +268,7 @@ article>.game>.players {
   gap: 16px 32px;
 }
 
-article>.streams ul {
+article > .streams ul {
   list-style: none;
   margin: 12px 0 0;
   padding: 0;
@@ -246,11 +279,11 @@ article>.streams ul {
   gap: 16px 32px;
 }
 
-article>.streams li {
+article > .streams li {
   display: flex;
 }
 
-article>.streams .live {
+article > .streams .live {
   background-color: #910830;
   color: #fff;
   margin-left: 8px;
@@ -274,10 +307,10 @@ footer {
 }
 
 footer p {
-  text-size: 14px;
+  font-size: 14px;
   margin: 0;
 }
 
-footer p+p {
+footer p + p {
   margin-top: 8px;
 }

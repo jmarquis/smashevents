@@ -1,7 +1,39 @@
 class ApplicationController < ActionController::Base
 
   def index
+    @games = selected_games
+    @unselected_games = Game.all_games_except(@games)
 
+    @tournaments = tournaments(@games)
+      # Leave a few hours of leeway for events that run long
+      .where('end_at > ?', Time.now - 6.hours)
+      .order(start_at: :asc, end_at: :asc, name: :asc)
+
+    if params[:player]
+      @tournaments = @tournaments.where('LOWER(players.tag) = ?', params[:player].downcase)
+    end
+  end
+
+  def past
+    @games = selected_games
+    @unselected_games = Game.all_games_except(@games)
+
+    @tournaments = tournaments(@games)
+      .where('end_at < ?', Time.now)
+      .where('end_at > ?', Time.now - 6.months)
+      .order(start_at: :desc, end_at: :desc, name: :asc)
+      .limit(50)
+
+    if params[:player]
+      @tournaments = @tournaments.where('LOWER(players.tag) = ?', params[:player].downcase)
+    end
+
+    render :index
+  end
+
+  private
+
+  def selected_games
     game_slugs = nil
     if params[:game].present?
       game_slugs = Game.filter_valid_game_slugs([params[:game]])
@@ -13,14 +45,13 @@ class ApplicationController < ActionController::Base
 
     game_slugs = ['melee', 'ultimate'] if game_slugs.blank?
     cookies.permanent[:games] = game_slugs.join(',')
-    @games = game_slugs.map { |slug| Game.find_by(slug:) }
-    @unselected_games = Game.all_games_except(@games)
+    game_slugs.map { |slug| Game.find_by(slug:) }
+  end
 
-    @tournaments = Tournament
+  def tournaments(games)
+    Tournament
       .includes(:override, events: [:game, entrants: :player])
-      # Leave a few hours of leeway for events that run long
-      .where('end_at > ?', Time.now - 6.hours)
-      .where(events: { game: @games })
+      .where(events: { game: games })
       .merge(
         Tournament.where(override: { include: true }).or(
           Tournament.where.not(events: { player_count: nil }).merge(
@@ -34,13 +65,6 @@ class ApplicationController < ActionController::Base
           )
         )
       )
-
-    if params[:player]
-      @tournaments = @tournaments.where('LOWER(players.tag) = ?', params[:player].downcase)
-    end
-
-    @tournaments = @tournaments.order(start_at: :asc, end_at: :asc, name: :asc)
-
   end
 
 end

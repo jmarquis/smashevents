@@ -1,12 +1,12 @@
 module ApplicationHelper
 
   def add_game_link(game, selected_games)
-    link_to "+ #{game.name}", CGI::unescape(root_path(games: (selected_games.map(&:slug) + [game.slug]).join(',')))
+    link_to "+ #{game.name}", CGI::unescape(url_for(games: (selected_games.map(&:slug) + [game.slug]).join(',')))
   end
 
   def remove_game_link(game, selected_games)
     new_selected_games = selected_games.reject { |selected_game| selected_game.slug == game.slug }
-    link_to 'X', CGI::unescape(new_selected_games.count == 1 ? root_path(game: new_selected_games.first.slug) : root_path(games: new_selected_games.map(&:slug).join(',')))
+    link_to 'X', CGI::unescape(new_selected_games.count == 1 ? url_for(game: new_selected_games.first.slug) : url_for(games: new_selected_games.map(&:slug).join(',')))
   end
 
   def stream_link(stream)

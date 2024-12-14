@@ -4,7 +4,10 @@
     <title>Smash Events: Upcoming Smash tournaments!</title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!">
+    <meta
+      name="description"
+      content="Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!"
+    >
     <link rel="shortcut icon" href="/favicon.png">
 
     <%= csrf_meta_tags %>
@@ -16,9 +19,9 @@
     <%= stylesheet_link_tag "normalize" %>
     <%= stylesheet_link_tag "application" %>
 
-    <%= javascript_include_tag '/scripts/moment.min.js' %>
-    <%= javascript_include_tag '/scripts/moment-timezone-with-data.min.js' %>
-    <%= javascript_include_tag 'application' %>
+    <%= javascript_include_tag "/scripts/moment.min.js" %>
+    <%= javascript_include_tag "/scripts/moment-timezone-with-data.min.js" %>
+    <%= javascript_include_tag "application" %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -31,10 +34,17 @@
 
     <h1>Smash Events</h1>
 
-    <nav>
+    <nav class="pages">
+      <%= link_to_unless_current "Upcoming events",
+      root_path(game: params[:game], games: params[:games]) %>
+      <%= link_to_unless_current "Past events",
+      past_events_path(game: params[:game], games: params[:games]) %>
+    </nav>
+
+    <nav class="game-selector">
       <% @games.each do |game| %>
         <div class="selected-game"><%= game.name %>
-        <%= remove_game_link(game, @games) if @games.count > 1 %></div>
+          <%= remove_game_link(game, @games) if @games.count > 1 %></div>
       <% end %>
       <% if @unselected_games.any? %>
         <div class="menu-container">
@@ -54,10 +64,13 @@
     </main>
 
     <footer>
-      <p>Made with ♥ by <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
-      <p>Powered by <a href="https://start.gg" target="_blank">start.gg</a>.</p>
+      <p>Made with ♥ by
+        <a href="https://twitter.com/mathssbm" target="_blank">Math</a>.</p>
+      <p>Powered by
+        <a href="https://start.gg" target="_blank">start.gg</a>.</p>
       <p>Got feedback? Is a tournament missing?<br><a href="https://discord.gg/x7E38ygc42" target="_blank">Let me know on Discord</a>!</p>
-      <p>This website is <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
+      <p>This website is
+        <a href="https://github.com/jmarquis/smashevents" target="_blank">open source</a>.</p>
     </footer>
 
   </body>
