@@ -82,7 +82,7 @@ class Discord
         when Tournament::STREAM_SOURCE_TWITCH
           "[#{stream['name']}](https://twitch.tv/#{stream['name']})"
         when Tournament::STREAM_SOURCE_YOUTUBE
-          "[#{stream['name']}](#{Youtube.channel_url(stream['name'])}/live)"
+          "[#{stream['name']}](#{stream['url']})"
         end
       end.compact
 

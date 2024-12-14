@@ -66,7 +66,7 @@ class Twitter
         when Tournament::STREAM_SOURCE_TWITCH
           "https://twitch.tv/#{stream['name']}"
         when Tournament::STREAM_SOURCE_YOUTUBE
-          "#{Youtube.channel_url(stream['name'])}/live"
+          "#{stream['url']}/live"
         end
       end.compact
 
