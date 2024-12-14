@@ -14,15 +14,17 @@
             <a href="<%= event.startgg_url %>" target="_blank">
               <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
                 <%= event.player_count.round(-1) %>+ players<% end %>
-          </a>
+            </a>
           </h3>
-          <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
-            <%= event
-              .start_at
-              .in_time_zone(tournament.timezone || "America/New_York")
-              .strftime("%A @ %l:%M %p") %>
-            (local time)
-          </time>
+          <% if event.start_at.present? %>
+            <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
+              <%= event
+                .start_at
+                .in_time_zone(tournament.timezone || "America/New_York")
+                .strftime("%A @ %l:%M %p") %>
+              (local time)
+            </time>
+          <% end %>
           <ul class="players">
             <% if event.featured_entrants.present? %>
               <% event.featured_entrants.each do |entrant| %>
