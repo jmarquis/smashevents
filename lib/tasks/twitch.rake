@@ -7,7 +7,7 @@ namespace :twitch do
       next unless tournament.stream_data.present?
       next unless tournament.should_display?
 
-      puts "Syncing streams for #{tournament.slug}..."
+      puts "Syncing Twitch streams for #{tournament.slug}..."
 
       streams = tournament.stream_data.reduce([]) do |streams, stream|
         stream = stream.with_indifferent_access
