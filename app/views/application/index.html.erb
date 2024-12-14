@@ -52,7 +52,7 @@
       <% end %>
     <% end %>
 
-    <% if tournament.start_at <= Time.now && tournament.stream_data.present? %>
+    <% if tournament.start_at <= Time.now && tournament.stream_data.present? && !tournament.past? %>
       <div class="streams">
         <h3>Streams</h3>
         <ul class="streams">

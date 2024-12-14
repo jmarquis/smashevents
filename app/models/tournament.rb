@@ -180,7 +180,7 @@ class Tournament < ApplicationRecord
   end
 
   def past?
-    end_at.present? && Time.now > end_at
+    end_at.present? && Time.now - 6.hours > end_at
   end
 
   def startgg_data
