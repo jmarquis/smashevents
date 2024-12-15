@@ -116,4 +116,75 @@ class Event < ApplicationRecord
   def startgg_url
     "https://start.gg/#{slug}"
   end
+
+  def sync_entrants
+    puts "Syncing entrants for #{tournament.slug} (#{game.slug})..."
+    entrants = []
+
+    # Get all the entrants, 1 chunk at a time
+    (1..100).each do |page|
+      event_entrants = with_retries(5) do
+        Startgg.event_entrants(
+          id: startgg_id,
+          game: game,
+          batch_size: 100,
+          page:
+        )
+      end
+
+      # Respect startgg's rate limits...
+      sleep 1
+
+      # This means the tournament was probably deleted.
+      if event_entrants.nil?
+        puts "Tournament #{tournament.slug} not found. Deleting..."
+        StatsD.increment('startgg.tournament_deleted')
+        tournament.destroy
+        break
+      end
+
+      # This means there are no available entrants.
+      break if event_entrants.count.zero?
+
+      entrants = [*entrants, *event_entrants]
+
+      # If we don't have a full batch, this is the last page.
+      break if event_entrants.count != 100
+    end
+
+    return if tournament.destroyed?
+
+    # Populate entrants
+    entrants = entrants.map do |entrant|
+      entrant = Entrant.from_startgg_entrant(entrant, event: self)
+
+      if !entrant.persisted?
+        entrant.save!
+        StatsD.increment('startgg.entrant_added')
+      elsif entrant.changed? || entrant.player_changed? || entrant.player2_changed?
+        entrant.save!
+        entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+          StatsD.increment("startgg.entrant_field_updated.#{field}")
+        end
+        StatsD.increment('startgg.entrant_updated')
+      end
+
+      entrant
+    end
+
+    # Delete entrants that are no longer registered
+    self.entrants.where.not(id: entrants.map(&:id)).each do |entrant|
+      entrant.destroy!
+      StatsD.increment('startgg.entrant_deleted')
+    end
+
+    # Denormalize whether the event is seeded
+    self.is_seeded = entrants.any? { |entrant| entrant.seed.present? }
+
+    # Denormalize ranked entrant count
+    self.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
+
+    self.synced_at = Time.now
+    save!
+  end
 end

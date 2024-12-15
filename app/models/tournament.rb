@@ -187,4 +187,8 @@ class Tournament < ApplicationRecord
     Startgg.tournament(slug:)
   end
 
+  def sync_entrants
+    events.each(&:sync_entrants)
+  end
+
 end
