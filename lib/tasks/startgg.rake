@@ -27,15 +27,15 @@ namespace :startgg do
 
         if tournament.persisted?
           if tournament.changed? || events.any?(&:changed?)
-            tournament.save
-            events.each(&:save)
+            tournament.save!
+            events.each(&:save!)
 
             StatsD.increment('startgg.tournament_updated')
             updated_log(tournament, events)
             num_updated += 1
           end
         else
-          tournament.save
+          tournament.save!
 
           StatsD.increment('startgg.tournament_added')
           event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
@@ -88,14 +88,14 @@ namespace :startgg do
 
       if tournament.persisted?
         if tournament.changed? || events.any?(&:changed?)
-          tournament.save
+          tournament.save!
 
           StatsD.increment('startgg.tournament_updated')
           updated_log(tournament, events)
           num_updated += 1
         end
       else
-        tournament.save
+        tournament.save!
 
         StatsD.increment('startgg.tournament_added')
         event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }

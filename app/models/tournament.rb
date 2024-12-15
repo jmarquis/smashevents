@@ -187,6 +187,16 @@ class Tournament < ApplicationRecord
     Startgg.tournament(slug:)
   end
 
+  def sync
+    tournament, events = Tournament.from_startgg_tournament(startgg_data)
+
+    tournament.save!
+    events.each(&:save!)
+
+    reload
+    self
+  end
+
   def sync_entrants
     events.each(&:sync_entrants)
   end
