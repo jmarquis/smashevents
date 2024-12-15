@@ -123,7 +123,7 @@ class Event < ApplicationRecord
 
     # Get all the entrants, 1 chunk at a time
     (1..100).each do |page|
-      event_entrants = with_retries(5) do
+      event_entrants = Startgg.with_retries(5) do
         Startgg.event_entrants(
           id: startgg_id,
           game: game,
