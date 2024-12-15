@@ -9,7 +9,7 @@ namespace :startgg do
     puts 'Starting tournament sync...'
 
     (1..100).each do |page|
-      tournaments = with_retries(5) do
+      tournaments = Startgg.with_retries(5) do
         puts "Fetching page #{page} of tournaments..."
         Startgg.tournaments(batch_size: 40, page:, after_date: Time.now - 7.days)
       end
@@ -79,7 +79,7 @@ namespace :startgg do
 
       num_analyzed += 1
 
-      data = with_retries(5) do
+      data = Startgg.with_retries(5) do
         puts "Fetching tournament #{override.slug}..."
         Startgg.tournament(slug: override.slug)
       end
@@ -137,38 +137,6 @@ namespace :startgg do
   end
 
   private
-
-  def with_retries(num_retries)
-    retries = 0
-    result = nil
-
-    loop do
-      result = yield
-      break
-    rescue Graphlient::Errors::ExecutionError,
-      Graphlient::Errors::FaradayServerError,
-      Graphlient::Errors::ConnectionFailedError,
-      Graphlient::Errors::TimeoutError,
-      Faraday::ParsingError,
-      OpenSSL::SSL::SSLError => e
-      StatsD.increment('startgg.request_error')
-
-      if retries < num_retries
-        puts "Transient error communicating with startgg, will retry: #{e.message}"
-        retries += 1
-        sleep 5 * retries
-        next
-      else
-        puts "Retry threshold exceeded, exiting: #{e.message}"
-        raise e
-      end
-    rescue StandardError => e
-      puts "Unexpected error communicating with startgg: #{e.message}"
-      raise e
-    end
-
-    result
-  end
 
   def updated_log(tournament, events)
     tournament_changes = tournament.saved_changes.reject { |k| k == 'updated_at' }

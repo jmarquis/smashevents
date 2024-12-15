@@ -134,6 +134,38 @@ class Startgg
       end
     end
 
+    def with_retries(num_retries)
+      retries = 0
+      result = nil
+
+      loop do
+        result = yield
+        break
+      rescue Graphlient::Errors::ExecutionError,
+        Graphlient::Errors::FaradayServerError,
+        Graphlient::Errors::ConnectionFailedError,
+        Graphlient::Errors::TimeoutError,
+        Faraday::ParsingError,
+        OpenSSL::SSL::SSLError => e
+        StatsD.increment('startgg.request_error')
+
+        if retries < num_retries
+          puts "Transient error communicating with startgg, will retry: #{e.message}"
+          retries += 1
+          sleep 5 * retries
+          next
+        else
+          puts "Retry threshold exceeded, exiting: #{e.message}"
+          raise e
+        end
+      rescue StandardError => e
+        puts "Unexpected error communicating with startgg: #{e.message}"
+        raise e
+      end
+
+      result
+    end
+
     def client
       return @client if @client
 
