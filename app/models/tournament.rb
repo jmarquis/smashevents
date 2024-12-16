@@ -92,6 +92,12 @@ class Tournament < ApplicationRecord
         event.game = game
         event.player_count = biggest_event.num_entrants
 
+        winner_data = biggest_event.standings&.nodes&.first&.entrant
+        if winner_data.present?
+          winner_entrant = event.entrants&.find_by(startgg_entrant_id: winner_data.id)
+          event.winner_entrant = winner_entrant if winner_entrant.present?
+        end
+
         events << event
       end
     end

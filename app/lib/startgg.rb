@@ -40,6 +40,18 @@ class Startgg
                 videogame {
                   id
                 }
+                standings(query: {
+                  sortBy: "placement desc",
+                  page: 1,
+                  perPage: 1
+                }) {
+                  nodes {
+                    isFinal
+                    entrant {
+                      id
+                    }
+                  }
+                }
               }
               streams {
                 streamName
@@ -83,6 +95,18 @@ class Startgg
               numEntrants
               videogame {
                 id
+              }
+              standings(query: {
+                sortBy: "placement desc",
+                page: 1,
+                perPage: 1
+              }) {
+                nodes {
+                  isFinal
+                  entrant {
+                    id
+                  }
+                }
               }
             }
             streams {

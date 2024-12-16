@@ -25,6 +25,10 @@
               (local time)
             </time>
           <% end %>
+          <% if event.winner_entrant.present? %>
+            <h4>Winner:
+              <%= event.winner_player.tag %></h4>
+          <% end %>
           <ul class="players">
             <% if event.featured_entrants.present? %>
               <% event.featured_entrants.each do |entrant| %>

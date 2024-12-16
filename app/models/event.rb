@@ -16,18 +16,22 @@
 #  is_seeded           :boolean
 #  synced_at           :datetime
 #  slug                :string
+#  winner_entrant_id   :integer
 #
 # Indexes
 #
 #  index_events_on_startgg_id                   (startgg_id) UNIQUE
 #  index_events_on_tournament_id                (tournament_id)
 #  index_events_on_tournament_id_and_game_slug  (tournament_id,game_slug) UNIQUE
+#  index_events_on_winner_entrant_id            (winner_entrant_id)
 #
 
 class Event < ApplicationRecord
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
+  belongs_to :winner_entrant, class_name: 'Entrant', optional: true
+  has_one :winner_player, class_name: 'Player', through: :winner_entrant, source: :player
   belongs_to :game, foreign_key: :game_slug, primary_key: :slug
 
   scope :should_sync, -> { where("coalesce(synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
