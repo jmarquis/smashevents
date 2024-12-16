@@ -37,6 +37,7 @@
     <nav class="pages">
       <%= link_to_unless_current "Upcoming events",
       root_path(game: params[:game], games: params[:games]) %>
+      <span>/</span>
       <%= link_to_unless_current "Past events",
       past_events_path(game: params[:game], games: params[:games]) %>
     </nav>
