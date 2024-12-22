@@ -22,4 +22,25 @@ module ApplicationHelper
     end
   end
 
+  def colors_css(action)
+    case action
+    when 'past' 
+      [
+        '--color-bg: #121212',
+        '--color-bg-2: #353535',
+        '--color-text: #9d9d9d',
+        '--color-text-2: #555555',
+        '--color-text-3: #f1f1f1',
+      ].join(';')
+    else
+      [
+        '--color-bg: #081212',
+        '--color-bg-2: #183535',
+        '--color-text: #859d9d',
+        '--color-text-2: #445555',
+        '--color-text-3: #ebf1f1',
+      ].join(';')
+    end
+  end
+
 end
