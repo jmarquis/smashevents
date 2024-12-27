@@ -84,6 +84,11 @@ nav.pages {
   font-weight: bold;
   cursor: default;
 
+  @media (max-width: 420px) {
+    gap: 16px;
+    padding: 0 16px;
+  }
+
   span {
     color: var(--color-text);
     font-weight: normal;
