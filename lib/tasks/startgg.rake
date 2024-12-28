@@ -103,6 +103,10 @@ namespace :startgg do
         num_imported += 1
       end
 
+      # Update override slug to match actual tournament slug
+      override.slug = tournament.slug
+      override.save!
+
       sleep 1
     end
 
