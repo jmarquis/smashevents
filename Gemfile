@@ -87,6 +87,7 @@ gem "dalli", "~> 3.2"
 
 gem "statsd-instrument", "~> 3.9"
 
+gem 'vernier'
 gem "stackprof", "~> 0.2.26"
 gem "sentry-ruby", "~> 5.21"
 gem "sentry-rails", "~> 5.21"

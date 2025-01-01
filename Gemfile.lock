@@ -350,6 +350,7 @@ GEM
     uber (0.1.0)
     uri (1.0.1)
     useragent (0.16.10)
+    vernier (1.5.0)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -406,6 +407,7 @@ DEPENDENCIES
   statsd-instrument (~> 3.9)
   twitch-api
   tzinfo-data
+  vernier
   web-console
   x
 
