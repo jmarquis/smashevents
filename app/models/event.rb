@@ -75,11 +75,17 @@ class Event < ApplicationRecord
   end
 
   def featured_entrants
-    Rails.cache.fetch("featured_entrants_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
-      if is_seeded
-        entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(10)
-      elsif ranked_player_count.present? && ranked_player_count > 0
-        entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(10)
+    if is_seeded
+      entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(10)
+    elsif ranked_player_count.present? && ranked_player_count > 0
+      entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(10)
+    end
+  end
+
+  def featured_entrants_data
+    Rails.cache.fetch("featured_entrants_data_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
+      featured_entrants.pluck('player.tag', 'player.twitter_username', 'player2.tag', 'player2.twitter_username').map do |tag, twitter_username, player2_tag, player2_twitter_username|
+        { tag:, twitter_username:, player2_tag:, player2_twitter_username: }
       end
     end
   end

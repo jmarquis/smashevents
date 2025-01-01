@@ -30,20 +30,24 @@
               <%= event.winner_player.tag %></h4>
           <% end %>
           <ul class="players">
-            <% if event.featured_entrants.present? %>
-              <% event.featured_entrants.each do |entrant| %>
+            <% if event.featured_entrants_data.present? %>
+              <% event.featured_entrants_data.each do |entrant_data| %>
                 <li>
-                  <% if entrant.player.twitter_username.present? %>
-                    <%= link_to entrant.player.tag, entrant.player.twitter_url, target: "_blank" %>
+                  <% if entrant_data[:twitter_username].present? %>
+                    <%= link_to entrant_data[:tag],
+                    "https://twitter.com/#{entrant_data[:twitter_username]}",
+                    target: "_blank" %>
                   <% else %>
-                    <%= entrant.player.tag %>
+                    <%= entrant_data[:tag] %>
                   <% end %>
-                  <% if entrant.player2.present? %>
+                  <% if entrant_data[:player2_tag].present? %>
                     /
-                    <% if entrant.player2.twitter_username.present? %>
-                      <%= link_to entrant.player2.tag, entrant.player2.twitter_url, target: "_blank" %>
+                    <% if entrant_data[:player2_twitter_username].present? %>
+                      <%= link_to entrant_data[:player2_tag],
+                      "https://twitter.com/#{entrant_data[:player2_twitter_username]}",
+                      target: "_blank" %>
                     <% else %>
-                      <%= entrant.player2.tag %>
+                      <%= entrant_data[:player2_tag] %>
                     <% end %>
                   <% end %>
                 </li>
