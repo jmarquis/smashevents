@@ -7,7 +7,6 @@
 #  startgg_id          :integer          not null
 #  game_slug           :string           not null
 #  player_count        :integer
-#  featured_players    :string           is an Array
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  ranked_player_count :integer
