@@ -108,7 +108,7 @@ class Discord
             embed.description = <<~TEXT
               #{tournament.formatted_location}
 
-              Featuring #{events.first.players_sentence}
+              Featuring #{events.first.entrants_sentence}
               #{stream_text}
             TEXT
 

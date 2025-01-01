@@ -37,7 +37,7 @@ class Twitter
         next unless event.should_display?
 
         blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
-        blurb += " featuring #{event.players_sentence(twitter: true)}"
+        blurb += " featuring #{event.entrants_sentence(twitter: true)}"
 
         blurb += "\nhttps://start.gg/#{event.tournament.slug}"
         blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
@@ -79,7 +79,7 @@ class Twitter
       # Don't filter by should_display?, might as well just show all the events
       # on the day of.
       event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
-        "#{event.game.name.upcase} featuring #{event.players_sentence(twitter: true)}"
+        "#{event.game.name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
       end
 
       text = <<~TEXT

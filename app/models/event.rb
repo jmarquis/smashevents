@@ -57,29 +57,7 @@ class Event < ApplicationRecord
     score > game.display_threshold
   end
 
-  # Meant to be used like: "Featuring #{event.players_sentence}"
-  def players_sentence(twitter: false, show_count: true)
-    if featured_players.present?
-      remaining_player_count = player_count - featured_players.count
-
-      players = featured_players.map do |player|
-        if twitter && player.twitter_username.present?
-          "#{player.tag} (@#{player.twitter_username})"
-        else
-          player.tag
-        end
-      end
-
-      if show_count && remaining_player_count >= 10
-        "#{[*players, "#{(player_count - featured_players.count)} more!"].to_sentence}"
-      else
-        "#{[*players, 'more!'].to_sentence}"
-      end
-    elsif show_count
-      "#{player_count} players!"
-    end
-  end
-
+  # Meant to be used like: "Featuring #{event.entrants_sentence}"
   def entrants_sentence(twitter: false, show_count: true)
     entrants = featured_entrants
     if entrants.present?
@@ -103,16 +81,6 @@ class Event < ApplicationRecord
         entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(10)
       elsif ranked_player_count.present? && ranked_player_count > 0
         entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(10)
-      end
-    end
-  end
-
-  def featured_players
-    Rails.cache.fetch("featured_players_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
-      if is_seeded
-        entrants.includes(:player).where('seed is not null').order(seed: :asc).limit(10).map(&:player)
-      elsif ranked_player_count.present? && ranked_player_count > 0
-        entrants.includes(:player).where('rank is not null').order(rank: :asc).limit(10).map(&:player)
       end
     end
   end
