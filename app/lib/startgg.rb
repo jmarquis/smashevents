@@ -3,7 +3,7 @@ class Startgg
 
   class << self
 
-    def tournaments(batch_size:, page: , after_date: Time.now)
+    def tournaments(batch_size:, page:, after_date: Time.now)
       query = <<~GRAPHQL
         query($perPage: Int, $page: Int, $afterDate: Timestamp) {
           tournaments(query: {
