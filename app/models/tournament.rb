@@ -121,6 +121,10 @@ class Tournament < ApplicationRecord
 
     return override.include unless override&.include.blank?
 
+    # Ignore long tournaments because some TOs reuse the same tournament for
+    # weeklies, ladders, etc.
+    return false if end_at - start_at > 7.days
+
     game_slugs.each do |game_slug|
       event = events.find_by(game_slug:)
       return true if event.present? && event.should_display?
