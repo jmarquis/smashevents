@@ -16,6 +16,7 @@
 #  synced_at           :datetime
 #  slug                :string
 #  winner_entrant_id   :integer
+#  state               :string
 #
 # Indexes
 #

@@ -88,6 +88,7 @@ class Tournament < ApplicationRecord
 
         event.startgg_id = biggest_event.id
         event.slug = biggest_event.slug
+        event.state = biggest_event.state
         event.start_at = Time.at(biggest_event.start_at)
         event.game = game
         event.player_count = biggest_event.num_entrants
