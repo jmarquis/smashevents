@@ -35,6 +35,7 @@ class Startgg
               }) {
                 id
                 slug
+                state
                 startAt
                 numEntrants
                 videogame {
@@ -91,6 +92,7 @@ class Startgg
             }) {
               id
               slug
+              state
               startAt
               numEntrants
               videogame {
