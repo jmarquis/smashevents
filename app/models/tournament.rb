@@ -27,8 +27,6 @@
 #
 
 class Tournament < ApplicationRecord
-  include Memery
-
   STREAM_SOURCE_TWITCH = 'twitch'
   STREAM_SOURCE_YOUTUBE = 'youtube'
 
@@ -141,11 +139,11 @@ class Tournament < ApplicationRecord
     override&.include == false
   end
 
-  memoize def adjusted_start_at
+  def adjusted_start_at
     start_at.in_time_zone(timezone || 'America/New_York')
   end
 
-  memoize def adjusted_end_at
+  def adjusted_end_at
     # Subtract a second because a lot of people set their tournaments to stop
     # at midnight, which is technically the next day.
     end_at.in_time_zone(timezone || 'America/New_York') - 1.second

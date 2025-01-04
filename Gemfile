@@ -18,7 +18,7 @@ gem "puma", ">= 5.0"
 gem "importmap-rails"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
-gem "jbuilder"
+gem "jbuilder", require: false
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
@@ -39,8 +39,6 @@ gem "bootsnap", require: false
 # gem "image_processing", "~> 1.2"
 
 gem 'graphlient'
-
-gem 'memery'
 
 gem 'twitch-api'
 
@@ -71,6 +69,8 @@ group :development do
 
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
+
+  gem 'derailed_benchmarks'
 end
 
 group :test do
