@@ -17,9 +17,7 @@ RUN apk add --update --no-cache \
   openssh \
   iproute2 \
   jq \
-  jemalloc \
-  nodejs \
-  npm
+  jemalloc
 
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
