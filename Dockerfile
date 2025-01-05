@@ -15,7 +15,6 @@ RUN apk add --update --no-cache \
   gcompat \
   inotify-tools \
   jemalloc \
-  yarn \
   nodejs \
   npm
 

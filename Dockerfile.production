@@ -18,7 +18,6 @@ RUN apk add --update --no-cache \
   iproute2 \
   jq \
   jemalloc \
-  yarn \
   nodejs \
   npm
 

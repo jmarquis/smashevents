@@ -2,6 +2,6 @@
 
 bundle install
 rails db:seed
-yarn install
+bun install
 
 exec "$@"

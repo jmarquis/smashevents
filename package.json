@@ -6,6 +6,9 @@
     "build:css": "sass ./app/assets/stylesheets/entrypoints:./app/assets/builds --no-source-map --load-path=node_modules"
   },
   "dependencies": {
+    "glob": "^11.0.0",
+    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.46",
     "sass": "^1.81.0"
   },
   "devDependencies": {
