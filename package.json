@@ -9,9 +9,13 @@
     "glob": "^11.0.0",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "sass": "^1.81.0"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.14"
+    "@types/bun": "^1.1.14",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2"
   }
 }

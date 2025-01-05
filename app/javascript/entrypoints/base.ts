@@ -1,11 +1,12 @@
+import "../react-mounter"
 import moment from "moment-timezone"
 
 window.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.querySelector("#menu-toggle")
+  const toggle = document.querySelector("#menu-toggle") as HTMLInputElement
   const menuContainer = document.querySelector(".menu-container")
   if (toggle && menuContainer) {
     document.body.addEventListener("click", event => {
-      if (menuContainer.contains(event.target)) return
+      if (menuContainer.contains(event.target as Node)) return
       toggle.checked = false
     })
   }
