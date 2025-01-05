@@ -27,6 +27,8 @@
 #
 
 class Event < ApplicationRecord
+  STATE_COMPLETED = 'COMPLETED'
+
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants

@@ -92,7 +92,7 @@ class Tournament < ApplicationRecord
         event.player_count = biggest_event.num_entrants
 
         winner_data = biggest_event.standings&.nodes&.first&.entrant
-        if event.state == 'COMPLETED' && winner_data.present?
+        if event.state == Event::STATE_COMPLETED && winner_data.present?
           winner_entrant = event.entrants&.find_by(startgg_entrant_id: winner_data.id)
           event.winner_entrant = winner_entrant if winner_entrant.present?
         else

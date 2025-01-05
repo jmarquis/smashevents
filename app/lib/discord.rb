@@ -93,8 +93,8 @@ class Discord
       TEXT
 
       events = tournament.events
-        .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') >= Time.now.in_time_zone(tournament.timezone || 'America/New_York') - 6.hours }
         .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
+        .filter { |e| e.state != Event::STATE_COMPLETED }
 
       events.group_by(&:game).each do |game, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
