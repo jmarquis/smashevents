@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
 
   def tournaments(games)
     Tournament
-      .includes(:override, events: [:game, entrants: :player, winner_entrant: :player])
+      .includes(:override, events: [:game, winner_entrant: :player])
       .where(events: { game: games })
       .merge(
         Tournament.where(override: { include: true }).or(
