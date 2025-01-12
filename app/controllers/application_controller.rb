@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
       .order(start_at: :asc, end_at: :asc, name: :asc)
 
     if params[:player]
-      @tournaments = @tournaments.where('LOWER(players.tag) = ?', params[:player].downcase)
+      @tournaments = @tournaments.joins(events: { entrants: :player}).where('LOWER(players.tag) = ?', params[:player].downcase)
     end
   end
 
@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
       .limit(50)
 
     if params[:player]
-      @tournaments = @tournaments.where('LOWER(players.tag) = ?', params[:player].downcase)
+      @tournaments = @tournaments.joins(events: { entrants: :player }).where('LOWER(players.tag) = ?', params[:player].downcase)
     end
 
     render :index
