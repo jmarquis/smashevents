@@ -134,6 +134,7 @@ GEM
       rest-client (>= 2.0.0)
     domain_name (0.6.20240107)
     drb (2.2.1)
+    dry-cli (1.2.0)
     erubi (1.13.1)
     event_emitter (0.2.6)
     faraday (2.12.2)
@@ -289,6 +290,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.8)
+    rack-proxy (0.7.7)
+      rack
     rack-session (2.0.0)
       rack (>= 3.0.0)
     rack-test (2.2.0)
@@ -384,6 +387,15 @@ GEM
     uri (1.0.2)
     useragent (0.16.11)
     vernier (1.5.0)
+    vite_rails (3.0.19)
+      railties (>= 5.1, < 9)
+      vite_ruby (~> 3.0, >= 3.2.2)
+    vite_ruby (3.9.1)
+      dry-cli (>= 0.7, < 2)
+      logger (~> 1.6)
+      mutex_m
+      rack-proxy (~> 0.6, >= 0.6.1)
+      zeitwerk (~> 2.2)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -443,6 +455,7 @@ DEPENDENCIES
   twitch-api
   tzinfo-data
   vernier
+  vite_rails (~> 3.0)
   web-console
   x
 

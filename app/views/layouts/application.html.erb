@@ -16,10 +16,9 @@
     <%= Sentry.get_trace_propagation_meta.html_safe %>
 
     <link rel="stylesheet" href="https://use.typekit.net/bzh2sqm.css">
-    <%= stylesheet_link_tag "normalize" %>
-    <%= stylesheet_link_tag "base" %>
-
-    <%= javascript_include_tag "base" %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag "app" %>
+    <%= vite_stylesheet_tag "app.scss" %>
   </head>
 
   <body style="<%= colors_css(action_name) %>">

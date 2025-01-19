@@ -43,7 +43,7 @@ module ApplicationHelper
     end
   end
 
-  def react_component(component, props)
+  def react_component(component, props = {})
     render 'react_component', locals: {
       component:,
       props: props

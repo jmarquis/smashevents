@@ -6,6 +6,16 @@ services:
     volumes:
       - ./tmp/db:/var/lib/postgresql/data:delegated
 
+  vite:
+    build: .
+    command: sh -c "bun install && bin/vite dev"
+    tty: true
+    ports:
+      - "3391:3391"
+    volumes:
+      - .:/opt/rails:delegated
+      - bundle_cache:/usr/local/bundle:delegated
+
   web:
     build: .
     command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -b0"
@@ -22,6 +32,7 @@ services:
       - db
       - redis
       - memcached
+      - vite
 
   redis:
     image: redis:alpine

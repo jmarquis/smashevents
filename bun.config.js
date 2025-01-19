@@ -1,15 +1,19 @@
 import path from "path"
 import fs from "fs"
-import { glob } from "glob"
+import { Glob } from "bun"
+import { compile } from "sass"
 
-const config = {
-  sourcemap: "external",
-  entrypoints: await glob("app/javascript/entrypoints/*.*"),
-  outdir: path.join(process.cwd(), "app/assets/builds")
-}
+const build = async () => {
+  const entrypoints = []
+  for await (const entrypoint of new Glob("*.ts").scan("app/ui/entrypoints")) {
+    entrypoints.push(`app/ui/entrypoints/${entrypoint}`)
+  }
 
-const build = async config => {
-  const result = await Bun.build(config)
+  const result = await Bun.build({
+    sourcemap: "external",
+    entrypoints,
+    outdir: path.join(process.cwd(), "app/assets/builds")
+  })
 
   if (!result.success) {
     if (process.argv.includes("--watch")) {
@@ -25,15 +29,15 @@ const build = async config => {
 }
 
 ;(async () => {
-  await build(config)
+  await build()
 
   if (process.argv.includes("--watch")) {
     fs.watch(
-      path.join(process.cwd(), "app/javascript"),
+      path.join(process.cwd(), "app/ui"),
       { recursive: true },
       (eventType, filename) => {
         console.log(`File changed: ${filename}. Rebuilding...`)
-        build(config)
+        build()
       }
     )
   } else {
