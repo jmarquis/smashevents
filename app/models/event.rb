@@ -48,6 +48,10 @@ class Event < ApplicationRecord
     return true if tournament.override.present? && tournament.override.include
     return false unless player_count.present?
 
+    # Ignore long tournaments because some TOs reuse the same tournament for
+    # weeklies, ladders, etc.
+    return false if tournament.end_at - tournament.start_at > 7.days
+
     # If the event is stacked with ranked players, always display it. This
     # should catch invitationals and stuff.
     if ranked_player_count.present? && ranked_player_count > 0 && player_count.present? && player_count >= 8
