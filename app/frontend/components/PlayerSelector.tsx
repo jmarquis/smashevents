@@ -44,7 +44,9 @@ export default () => {
     selectedItem,
     onSelectedItemChange({ selectedItem }) {
       setSelectedItem(selectedItem)
-      window.location.href = `/players/${selectedItem}`
+      window.location.href = past
+        ? `/players/${selectedItem}/past`
+        : `/players/${selectedItem}`
     },
     defaultHighlightedIndex: 0
   })
