@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_04_174600) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_08_014100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "entrants", force: :cascade do |t|
     t.bigint "player_id", null: false
@@ -76,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_01_04_174600) do
     t.datetime "updated_at", null: false
     t.index ["startgg_player_id"], name: "index_players_on_startgg_player_id", unique: true
     t.index ["startgg_user_id"], name: "index_players_on_startgg_user_id", unique: true
+    t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin
     t.index ["tag"], name: "index_players_on_tag"
   end
 

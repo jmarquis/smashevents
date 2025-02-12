@@ -21,7 +21,7 @@
     <%= vite_stylesheet_tag "app.scss" %>
   </head>
 
-  <body style="<%= colors_css(action_name) %>">
+  <body style="<%= colors_css(action_name) %>"<%= " data-current-tag=\"#{params[:player]}\"".html_safe if params[:player] %>>
 
     <div class="social">
       <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag "twitter.svg" %></a>
@@ -31,11 +31,21 @@
     <h1>Smash Events</h1>
 
     <nav class="pages">
-      <%= link_to_unless_current "Upcoming events",
-      root_path(game: params[:game], games: params[:games]) %>
+      <% if action_name == 'index' %>
+        Upcoming events
+      <% elsif params[:player].present? %>
+        <%= link_to "Upcoming events", player_path(player: params[:player], game: params[:game], games: params[:games]) %>
+      <% else %>
+        <%= link_to "Upcoming events", root_path(game: params[:game], games: params[:games]) %>
+      <% end %>
       <span>/</span>
-      <%= link_to_unless_current "Past events",
-      past_events_path(game: params[:game], games: params[:games]) %>
+      <% if action_name == 'past' %>
+        Past events
+      <% elsif params[:player].present? %>
+        <%= link_to "Past events", player_past_path(player: params[:player], game: params[:game], games: params[:games]) %>
+      <% else %>
+        <%= link_to "Past events", past_events_path(game: params[:game], games: params[:games]) %>
+      <% end %>
     </nav>
 
     <nav class="game-selector">
@@ -54,6 +64,10 @@
           </ul>
         </div>
       <% end %>
+    </nav>
+
+    <nav class="player-selector">
+      <%= react_component "PlayerSelector" %>
     </nav>
 
     <main>

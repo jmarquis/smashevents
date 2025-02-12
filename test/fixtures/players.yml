@@ -12,6 +12,7 @@
 #
 # Indexes
 #
+#  gin_index_players_on_tag            (tag)
 #  index_players_on_startgg_player_id  (startgg_player_id) UNIQUE
 #  index_players_on_startgg_user_id    (startgg_user_id) UNIQUE
 #  index_players_on_tag                (tag)

@@ -28,6 +28,7 @@ module ApplicationHelper
       [
         '--color-bg: #121212',
         '--color-bg-2: #353535',
+        '--color-bg-3: #6A6A6A',
         '--color-text: #9d9d9d',
         '--color-text-2: #555555',
         '--color-text-3: #f1f1f1',
@@ -36,6 +37,7 @@ module ApplicationHelper
       [
         '--color-bg: #081212',
         '--color-bg-2: #183535',
+        '--color-bg-3: #306A6A',
         '--color-text: #859d9d',
         '--color-text-2: #445555',
         '--color-text-3: #ebf1f1',

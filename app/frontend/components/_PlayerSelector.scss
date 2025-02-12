@@ -1,5 +1,115 @@
-$a: green;
-
 .PlayerSelector {
-  background-color: $a;
+  position: relative;
+
+  input[type="text"] {
+    width: 320px;
+    height: 48px;
+    border: 2px solid var(--color-bg-2);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    outline: 0;
+    padding: 0 52px 2px;
+    letter-spacing: 1.5px;
+
+    &::placeholder {
+      color: var(--color-text-2);
+    }
+
+    &:hover {
+      border-color: var(--color-text-2);
+    }
+
+    &:focus {
+      background-color: var(--color-bg-2);
+      border-color: var(--color-text-2);
+    }
+
+    &:focus,
+    &:not(:placeholder-shown) {
+      & + svg {
+        color: var(--color-text);
+      }
+    }
+  }
+
+  &.item-selected input[type="text"]:not(:focus) {
+    background-color: var(--color-bg-2);
+    color: var(--color-text-3);
+    font-weight: bold;
+  }
+
+  > svg {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-2);
+    pointer-events: none;
+  }
+
+  .clear {
+    appearance: none;
+    border: 0;
+    background: none;
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-2);
+    visibility: hidden;
+
+    &:hover {
+      color: var(--color-text);
+    }
+
+    > svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &.item-selected .clear,
+  input[type="text"]:not(:placeholder-shown) ~ .clear {
+    visibility: visible;
+  }
+
+  .menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border: 2px solid var(--color-text-2);
+    border-top: 0;
+    background-color: var(--color-bg-2);
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+    max-height: 280px;
+    overflow: auto;
+
+    &.hidden {
+      visibility: hidden;
+    }
+
+    > li {
+      margin: 0;
+      padding: 8px 16px 10px;
+      cursor: pointer;
+
+      &.highlighted {
+        background-color: var(--color-bg-3);
+      }
+
+      &.selected {
+        font-weight: bold;
+      }
+    }
+  }
 }

@@ -12,6 +12,7 @@
 #
 # Indexes
 #
+#  gin_index_players_on_tag            (tag)
 #  index_players_on_startgg_player_id  (startgg_player_id) UNIQUE
 #  index_players_on_startgg_user_id    (startgg_user_id) UNIQUE
 #  index_players_on_tag                (tag)
@@ -35,6 +36,11 @@ class Player < ApplicationRecord
 
   has_many :entrants
   has_many :events, through: :entrants
+
+  scope :tag_similar_to, lambda { |query|
+    quoted_query = ActiveRecord::Base.connection.quote_string(query)
+    where('tag % :query', query:).order(Arel.sql("similarity(tag, '#{quoted_query}') desc"))
+  }
 
   def self.from_json(serialized_player)
     new(JSON.parse(serialized_player).deep_symbolize_keys)
