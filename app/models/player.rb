@@ -48,7 +48,9 @@ class Player < ApplicationRecord
     new(tag: serialized_player)
   end
 
-  def self.from_startgg_player(data)
+  def self.from_startgg_player(data, tag: nil)
+    return new(tag:) if data.blank?
+
     p = find_by(startgg_player_id: data.id) || new
 
     p.startgg_player_id = data.id
