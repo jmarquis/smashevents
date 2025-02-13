@@ -132,6 +132,7 @@ class Startgg
             entrants(query: { page: $page, perPage: $perPage }) {
               nodes {
                 id
+                name
                 initialSeedNum
                 participants {
                   player {
