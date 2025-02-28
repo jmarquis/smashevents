@@ -83,6 +83,26 @@ namespace :notifications do
       end
   end
 
+  task congratulations: [:environment] do
+    effective_time = Time.now - 11.days
+
+    Tournament
+      .includes(:events)
+      .where('end_at > ?', effective_time - 3.days)
+      .where('end_at < ?', effective_time)
+      .where('start_at > ?', effective_time - 6.days)
+      .order(start_at: :asc, end_at: :asc, name: :asc)
+      .map(&:events)
+      .flatten
+      .filter { |event| event.should_display? }
+      .tap do |events|
+        next if events.blank?
+
+        puts "Sending congratulations tweet for #{events.count} events"
+        Twitter.congratulations(events)
+      end
+  end
+
   task happening_today: [:environment] do
     effective_time = Time.now
 

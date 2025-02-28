@@ -58,6 +58,22 @@ class Twitter
       tweet(text, images: banner_images)
     end
 
+    def congratulations(events)
+      blurbs = events.map do |event|
+        <<~TEXT
+          Congratulations to #{event.winner_player.tag} (@#{event.winner_player.twitter_username}) for winning #{event.tournament.name} (#{event.game.name})! ##{event.tournament.hashtag}
+        TEXT
+      end
+
+      text = <<~TEXT
+        WEEKEND RECAP
+        \n\n
+        #{blurbs.join("\n\n")}
+      TEXT
+
+      tweet(text)
+    end
+
     def happening_today(tournament)
       return unless tournament.events.map(&:should_display?).any?
 
