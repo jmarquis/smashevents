@@ -84,7 +84,9 @@ namespace :notifications do
   end
 
   task congratulations: [:environment] do
-    effective_time = Time.now - 11.days
+    next unless Time.now.strftime('%a') == 'Mon' || Rails.env.development?
+
+    effective_time = Time.now
 
     Tournament
       .includes(:events)
