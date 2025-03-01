@@ -84,19 +84,17 @@ namespace :notifications do
   end
 
   task congratulations: [:environment] do
-    next unless Time.now.strftime('%a') == 'Mon' || Rails.env.development?
-
     effective_time = Time.now
 
     Tournament
       .includes(:events)
-      .where('end_at > ?', effective_time - 3.days)
-      .where('end_at < ?', effective_time)
-      .where('start_at > ?', effective_time - 6.days)
+      .where('end_at between ? and ?', effective_time - 1.day, effective_time)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
       .filter { |event| event.should_display? }
+      .sort_by { |event| event.player_count }
+      .reverse
       .tap do |events|
         next if events.blank?
 

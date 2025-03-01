@@ -60,10 +60,15 @@ class Twitter
 
     def congratulations(events)
       blurbs = events.map do |event|
+        next if event.winner_player.blank?
+
         <<~TEXT
           Congratulations to #{event.winner_player.tag} (@#{event.winner_player.twitter_username}) for winning #{event.tournament.name} (#{event.game.name})! ##{event.tournament.hashtag}
         TEXT
       end
+
+      blurbs.compact!
+      return if blurbs.blank?
 
       text = <<~TEXT
         WEEKEND RECAP
