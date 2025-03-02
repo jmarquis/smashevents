@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_08_014100) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_02_181451) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -66,6 +66,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_08_014100) do
     t.index ["slug"], name: "index_games_on_slug"
     t.index ["startgg_id"], name: "index_games_on_startgg_id"
     t.index ["twitch_name"], name: "index_games_on_twitch_name"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.boolean "success", null: false
+    t.string "platform", null: false
+    t.string "notification_type", null: false
+    t.datetime "sent_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
   end
 
   create_table "players", force: :cascade do |t|
