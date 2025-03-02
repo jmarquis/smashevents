@@ -29,6 +29,10 @@ class Notification < ApplicationRecord
   TYPE_CONGRATULATIONS = 'congratulations'
   TYPE_HAPPENING_TODAY = 'happening_today'
 
+  before_create do |notification|
+    notification.sent_at ||= Time.now
+  end
+
   def self.log(notifiables, type:, platform:)
     notifiables = [notifiables] if !notifiables.is_a? Array
 
@@ -47,8 +51,7 @@ class Notification < ApplicationRecord
         notifiable:,
         notification_type: type,
         platform:,
-        success: exception.nil?,
-        sent_at: Time.now
+        success: exception.nil?
       )
 
       raise exception unless exception.nil?
