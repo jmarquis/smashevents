@@ -12,13 +12,25 @@ namespace :notifications do
       .where('start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .filter { |tournament| tournament.should_display? }
-      .filter { |tournament| tournament.events.map(&:notified_added_at).compact.empty? }
+      .filter { |tournament|
+        Notification.find_by(
+          notifiable: tournament,
+          notification_type: Notification::TYPE_TOURNAMENT_ADDED,
+          platform: Notification::PLATFORM_TWITTER,
+          success: true
+        ).blank?
+      }
       .each do |tournament|
-        puts "Sending tournament added Twitter notification about #{tournament.name}"
-
         begin
-          Twitter.tournament_added(tournament)
+          Notification.log(
+            tournament,
+            type: Notification::TYPE_TOURNAMENT_ADDED,
+            platform: Notification::PLATFORM_TWITTER
+          ) do
+            Twitter.tournament_added(tournament)
+          end
         rescue X::Error
+          # Swallow errors, they got logged from the Twitter class
         end
 
         # Avoid rate limits
@@ -34,17 +46,22 @@ namespace :notifications do
       .map(&:events)
       .flatten
       .filter { |event| event.should_display? }
-      .filter { |event| event.notified_added_at.blank? }
+      .filter { |event|
+        Notification.find_by(
+          notifiable: event,
+          notification_type: Notification::TYPE_EVENT_ADDED,
+          platform: Notification::PLATFORM_DISCORD,
+          success: true
+        ).blank?
+      }
       .each do |event|
-        puts "Sending tournament added Discord notification about #{event.tournament.name}"
-
-        Discord.event_added(event)
-
-        # Mark this notification as complete here since we do it per
-        # event/game. Twitter notifications will ignore any tournament with
-        # any event marked as notified.
-        event.notified_added_at = Time.now
-        event.save
+        Notification.log(
+          event,
+          type: Notification::TYPE_EVENT_ADDED,
+          platform: Notification::PLATFORM_DISCORD
+        ) do
+          Discord.event_added(event)
+        end
 
         # Avoid rate limits
         sleep 1
