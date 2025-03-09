@@ -102,6 +102,10 @@ class Event < ApplicationRecord
     "https://start.gg/#{slug}"
   end
 
+  def completed?
+    state == STATE_COMPLETED
+  end
+
   def sync_entrants
     puts "Syncing entrants for #{tournament.slug} (#{game.slug})..."
     entrants = []

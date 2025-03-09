@@ -14,6 +14,10 @@ class ApplicationController < ActionController::Base
         .joins(events: { entrants: :player})
         .where('LOWER(players.tag) = ?', params[:player].downcase)
     end
+
+    @tournaments = @tournaments.filter do |tournament|
+      tournament.events.any? { |event| !event.completed? }
+    end
   end
 
   def past
@@ -21,15 +25,19 @@ class ApplicationController < ActionController::Base
     @unselected_games = Game.all_games_except(@games)
 
     @tournaments = tournaments(@games)
-      .where('end_at < ?', Time.now)
+      .where('end_at < ?', Time.now + 7.days)
       .where('end_at > ?', Time.now - 6.months)
-      .order(start_at: :desc, end_at: :desc, name: :asc)
+      .order(end_at: :desc, start_at: :desc, name: :asc)
       .limit(50)
 
     if params[:player]
       @tournaments = @tournaments
         .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
+    end
+
+    @tournaments = @tournaments.filter do |tournament|
+      tournament.events.any?(&:completed?)
     end
 
     render :index
