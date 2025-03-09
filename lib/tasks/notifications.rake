@@ -138,13 +138,27 @@ namespace :notifications do
       .map(&:events)
       .flatten
       .filter { |event| event.should_display? }
+      .filter { |event|
+        Notification.find_by(
+          notifiable: event,
+          notification_type: Notification::TYPE_CONGRATULATIONS,
+          platform: Notification::PLATFORM_TWITTER,
+          success: true
+        ).blank?
+      }
       .sort_by { |event| event.player_count }
       .reverse
       .tap do |events|
         next if events.blank?
 
         puts "Sending congratulations tweet for #{events.count} events"
-        Twitter.congratulations(events)
+        Notification.log(
+          events,
+          type: Notification::TYPE_CONGRATULATIONS,
+          platform: Notification::PLATFORM_TWITTER
+        ) do
+          Twitter.congratulations(events)
+        end
       end
   end
 
