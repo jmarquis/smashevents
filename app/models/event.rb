@@ -10,7 +10,6 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  ranked_player_count :integer
-#  notified_added_at   :datetime
 #  start_at            :datetime
 #  is_seeded           :boolean
 #  synced_at           :datetime
