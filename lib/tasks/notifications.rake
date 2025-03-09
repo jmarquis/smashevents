@@ -172,16 +172,38 @@ namespace :notifications do
       .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| t.should_display? }
+      .filter { |t|
+        notification = Notification.where(
+          notifiable: t,
+          notification_type: Notification::TYPE_HAPPENING_TODAY,
+          platform: Notification::PLATFORM_TWITTER,
+          success: true
+        ).order(sent_at: :desc).limit(1).first
+
+        notification.blank? || notification.day != Time.now.day
+      }
       .each do |tournament|
 
         puts "Sending happening today tweet for #{tournament.slug}..."
         begin
-          Twitter.happening_today(tournament)
+          Notification.log(
+            tournament,
+            type: Notification::TYPE_HAPPENING_TODAY,
+            platform: Notification::PLATFORM_TWITTER
+          ) do
+            Twitter.happening_today(tournament)
+          end
         rescue X::Error
         end
 
         puts "Sending happening today Discord notification for #{tournament.slug}..."
-        Discord.happening_today(tournament)
+        Notification.log(
+          tournament,
+          type: Notification::TYPE_HAPPENING_TODAY,
+          platform: Notification::PLATFORM_DISCORD
+        ) do
+          Discord.happening_today(tournament)
+        end
 
         # Avoid rate limits
         sleep 1
