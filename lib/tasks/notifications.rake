@@ -83,17 +83,45 @@ namespace :notifications do
       .group_by(&:game)
       .each do |game, events|
 
-        puts "Sending weekend briefing tweet for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
-        Twitter.weekend_briefing(
-          game:,
-          events: events.sort_by(&:player_count).reverse
-        )
+        events.filter { |event|
+          Notification.find_by(
+            notifiable: event,
+            notification_type: Notification::TYPE_WEEKEND_BRIEFING,
+            platform: Notification::PLATFORM_TWITTER,
+            success: true
+          ).blank?
+        }.tap do |events|
+          Notification.log(
+            events,
+            type: Notification::TYPE_WEEKEND_BRIEFING,
+            platform: Notification::PLATFORM_TWITTER
+          ) do
+            Twitter.weekend_briefing(
+              game:,
+              events: events.sort_by(&:player_count).reverse
+            )
+          end
+        end
 
-        puts "Sending weekend briefing Discord notification for #{game.slug.upcase} for #{events.map(&:tournament).map(&:slug).to_sentence}..."
-        Discord.weekend_briefing(
-          game:,
-          events: events.sort_by(&:player_count).reverse
-        )
+        events.filter { |event|
+          Notification.find_by(
+            notifiable: event,
+            notification_type: Notification::TYPE_WEEKEND_BRIEFING,
+            platform: Notification::PLATFORM_DISCORD,
+            success: true
+          ).blank?
+        }.tap do |events|
+          Notification.log(
+            events,
+            type: Notification::TYPE_WEEKEND_BRIEFING,
+            platform: Notification::PLATFORM_DISCORD
+          ) do
+            Discord.weekend_briefing(
+              game:,
+              events: events.sort_by(&:player_count).reverse
+            )
+          end
+        end
 
         # Avoid rate limits
         sleep 1
