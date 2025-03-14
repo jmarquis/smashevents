@@ -138,6 +138,7 @@ namespace :notifications do
       .map(&:events)
       .flatten
       .filter { |event| event.should_display? }
+      .filter { |event| event.winner_entrant.present? }
       .filter { |event|
         Notification.find_by(
           notifiable: event,

@@ -34,8 +34,6 @@ class Twitter
 
     def weekend_briefing(game:, events:)
       tournament_blurbs = events.map do |event|
-        next unless event.should_display?
-
         blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
         blurb += " featuring #{event.entrants_sentence(twitter: true)}"
 
@@ -44,8 +42,6 @@ class Twitter
 
         blurb
       end.compact
-
-      return if tournament_blurbs.empty?
 
       text = <<~TEXT
         THIS WEEKEND IN #{game.name.upcase}
@@ -60,15 +56,10 @@ class Twitter
 
     def congratulations(events)
       blurbs = events.map do |event|
-        next if event.winner_entrant.blank?
-
         <<~TEXT
           Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event.tournament.name} (#{event.game.name})!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}
         TEXT
       end
-
-      blurbs.compact!
-      return if blurbs.blank?
 
       text = <<~TEXT
         EVENT RECAP
