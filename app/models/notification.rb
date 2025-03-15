@@ -28,6 +28,7 @@ class Notification < ApplicationRecord
   TYPE_WEEKEND_BRIEFING = 'weekend_briefing'
   TYPE_CONGRATULATIONS = 'congratulations'
   TYPE_HAPPENING_TODAY = 'happening_today'
+  TYPE_STREAM_LIVE = 'stream_live'
 
   before_create do |notification|
     notification.sent_at ||= Time.now
