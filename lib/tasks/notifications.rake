@@ -11,22 +11,15 @@ namespace :notifications do
       .includes(:events)
       .where('start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
-      .filter { |tournament| tournament.should_display? }
-      .filter { |tournament|
-        Notification.find_by(
-          notifiable: tournament,
-          notification_type: Notification::TYPE_TOURNAMENT_ADDED,
-          platform: Notification::PLATFORM_TWITTER,
-          success: true
-        ).blank?
-      }
+      .filter(&:should_display?)
       .each do |tournament|
         begin
           Notification.log(
             tournament,
             type: Notification::TYPE_TOURNAMENT_ADDED,
-            platform: Notification::PLATFORM_TWITTER
-          ) do
+            platform: Notification::PLATFORM_TWITTER,
+            idempotent: true
+          ) do |tournament|
             Twitter.tournament_added(tournament)
           end
         rescue X::Error
@@ -45,21 +38,14 @@ namespace :notifications do
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter { |event| event.should_display? }
-      .filter { |event|
-        Notification.find_by(
-          notifiable: event,
-          notification_type: Notification::TYPE_EVENT_ADDED,
-          platform: Notification::PLATFORM_DISCORD,
-          success: true
-        ).blank?
-      }
+      .filter(&:should_display?)
       .each do |event|
         Notification.log(
           event,
           type: Notification::TYPE_EVENT_ADDED,
-          platform: Notification::PLATFORM_DISCORD
-        ) do
+          platform: Notification::PLATFORM_DISCORD,
+          idempotent: true
+        ) do |event|
           Discord.event_added(event)
         end
 
@@ -79,48 +65,32 @@ namespace :notifications do
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter { |event| event.should_display? }
+      .filter(&:should_display?)
       .group_by(&:game)
       .each do |game, events|
 
-        events.filter { |event|
-          Notification.find_by(
-            notifiable: event,
-            notification_type: Notification::TYPE_WEEKEND_BRIEFING,
-            platform: Notification::PLATFORM_TWITTER,
-            success: true
-          ).blank?
-        }.tap do |events|
-          Notification.log(
-            events,
-            type: Notification::TYPE_WEEKEND_BRIEFING,
-            platform: Notification::PLATFORM_TWITTER
-          ) do
-            Twitter.weekend_briefing(
-              game:,
-              events: events.sort_by(&:player_count).reverse
-            )
-          end
+        Notification.log(
+          events,
+          type: Notification::TYPE_WEEKEND_BRIEFING,
+          platform: Notification::PLATFORM_TWITTER,
+          idempotent: true
+        ) do |events|
+          Twitter.weekend_briefing(
+            game:,
+            events: events.sort_by(&:player_count).reverse
+          )
         end
 
-        events.filter { |event|
-          Notification.find_by(
-            notifiable: event,
-            notification_type: Notification::TYPE_WEEKEND_BRIEFING,
-            platform: Notification::PLATFORM_DISCORD,
-            success: true
-          ).blank?
-        }.tap do |events|
-          Notification.log(
-            events,
-            type: Notification::TYPE_WEEKEND_BRIEFING,
-            platform: Notification::PLATFORM_DISCORD
-          ) do
-            Discord.weekend_briefing(
-              game:,
-              events: events.sort_by(&:player_count).reverse
-            )
-          end
+        Notification.log(
+          events,
+          type: Notification::TYPE_WEEKEND_BRIEFING,
+          platform: Notification::PLATFORM_DISCORD,
+          idempotent: true
+        ) do |events|
+          Discord.weekend_briefing(
+            game:,
+            events: events.sort_by(&:player_count).reverse
+          )
         end
 
         # Avoid rate limits
@@ -137,27 +107,19 @@ namespace :notifications do
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter { |event| event.should_display? }
+      .filter(&:should_display?)
       .filter { |event| event.winner_entrant.present? }
-      .filter { |event|
-        Notification.find_by(
-          notifiable: event,
-          notification_type: Notification::TYPE_CONGRATULATIONS,
-          platform: Notification::PLATFORM_TWITTER,
-          success: true
-        ).blank?
-      }
-      .sort_by { |event| event.player_count }
+      .sort_by(&:player_count)
       .reverse
       .tap do |events|
         next if events.blank?
 
-        puts "Sending congratulations tweet for #{events.count} events"
         Notification.log(
           events,
           type: Notification::TYPE_CONGRATULATIONS,
-          platform: Notification::PLATFORM_TWITTER
-        ) do
+          platform: Notification::PLATFORM_TWITTER,
+          idempotent: true
+        ) do |events|
           Twitter.congratulations(events)
         end
       end
@@ -172,8 +134,11 @@ namespace :notifications do
       .where('start_at < ?', effective_time + 2.days)
       .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
-      .filter { |t| t.should_display? }
+      .filter(&:should_display?)
       .filter { |t|
+
+        # Custom idempotency logic since a multi-day tournament is supposed to
+        # have more than one of these.
         notification = Notification.where(
           notifiable: t,
           notification_type: Notification::TYPE_HAPPENING_TODAY,
@@ -181,7 +146,8 @@ namespace :notifications do
           success: true
         ).order(sent_at: :desc).limit(1).first
 
-        notification.blank? || notification.day != Time.now.day
+        notification.blank? || notification.sent_at.day != Time.now.day
+
       }
       .each do |tournament|
 
@@ -191,7 +157,7 @@ namespace :notifications do
             tournament,
             type: Notification::TYPE_HAPPENING_TODAY,
             platform: Notification::PLATFORM_TWITTER
-          ) do
+          ) do |tournament|
             Twitter.happening_today(tournament)
           end
         rescue X::Error
@@ -202,7 +168,7 @@ namespace :notifications do
           tournament,
           type: Notification::TYPE_HAPPENING_TODAY,
           platform: Notification::PLATFORM_DISCORD
-        ) do
+        ) do |tournament|
           Discord.happening_today(tournament)
         end
 

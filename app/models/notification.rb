@@ -33,14 +33,30 @@ class Notification < ApplicationRecord
     notification.sent_at ||= Time.now
   end
 
-  def self.log(notifiables, type:, platform:)
-    notifiables = [notifiables] if !notifiables.is_a? Array
+  def self.log(notifiable_or_notifiables, type:, platform:, idempotent: false)
+    notifiables = notifiable_or_notifiables.is_a?(Array) ? notifiable_or_notifiables : [notifiable_or_notifiables]
+
+    if idempotent
+      notifiables.filter! do |notifiable|
+        !Notification.exists?(
+          notifiable:,
+          notification_type: type,
+          platform:,
+          success: true
+        )
+      end
+    end
+
+    return unless notifiables.any?
 
     puts "Attempting to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}"
 
     exception = nil
     begin
-      yield
+      # Pass the singular notifiable since that's what the block will be
+      # expecting if that's what was passed in. We will have short circuited by
+      # now if needed regardless.
+      yield(notifiable_or_notifiables.is_a?(Array) ? notifiables : notifiable_or_notifiables)
     rescue => e
       puts "Failed to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}: #{e.message}"
       exception = e
@@ -53,8 +69,8 @@ class Notification < ApplicationRecord
         platform:,
         success: exception.nil?
       )
-
-      raise exception unless exception.nil?
     end
+
+    raise exception unless exception.nil?
   end
 end
