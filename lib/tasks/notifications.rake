@@ -69,16 +69,15 @@ namespace :notifications do
       .group_by(&:game)
       .each do |game, events|
 
+        events = events.sort_by(&:player_count).reverse
+
         Notification.log(
           events,
           type: Notification::TYPE_WEEKEND_BRIEFING,
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |events|
-          Twitter.weekend_briefing(
-            game:,
-            events: events.sort_by(&:player_count).reverse
-          )
+          Twitter.weekend_briefing(game:, events:)
         end
 
         Notification.log(
@@ -87,10 +86,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_DISCORD,
           idempotent: true
         ) do |events|
-          Discord.weekend_briefing(
-            game:,
-            events: events.sort_by(&:player_count).reverse
-          )
+          Discord.weekend_briefing(game:, events:)
         end
 
         # Avoid rate limits
@@ -109,10 +105,9 @@ namespace :notifications do
       .flatten
       .filter(&:should_display?)
       .filter { |event| event.winner_entrant.present? }
-      .sort_by(&:player_count)
-      .reverse
-      .tap do |events|
-        next if events.blank?
+      .group_by(&:game)
+      .each do |game, events|
+        events = events.sort_by(&:player_count).reverse
 
         Notification.log(
           events,
@@ -120,7 +115,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |events|
-          Twitter.congratulations(events)
+          Twitter.congratulations(game:, events:)
         end
       end
   end

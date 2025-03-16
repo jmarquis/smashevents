@@ -54,15 +54,13 @@ class Twitter
       tweet(text, images: banner_images)
     end
 
-    def congratulations(events)
+    def congratulations(game:, events:)
       blurbs = events.map do |event|
-        <<~TEXT
-          Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event.tournament.name} (#{event.game.name})!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}
-        TEXT
+        "Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event.tournament.name}!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}"
       end
 
       text = <<~TEXT
-        EVENT RECAP
+        #{game.name.upcase} RECAP
         \n\n
         #{blurbs.join("\n\n")}
       TEXT
