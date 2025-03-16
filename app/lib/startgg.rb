@@ -161,13 +161,26 @@ class Startgg
       end
     end
 
-    def with_retries(num_retries)
+    def with_retries(num_retries, batch_size: nil)
       retries = 0
       result = nil
 
       loop do
-        result = yield
+        result = yield batch_size
         break
+      rescue Graphlient::Errors::GraphQLError => e
+        raise e unless e.message.match? /query complexity/
+        raise e unless batch_size.present?
+
+        if retries < num_retries
+          puts "Query complexity error, reducing batch size"
+          batch_size -= 1
+          sleep 5 * retries
+          next
+        else
+          puts "Retry threshold exceeded, exiting: #{e.message}"
+          raise e
+        end
       rescue Graphlient::Errors::ExecutionError,
         Graphlient::Errors::FaradayServerError,
         Graphlient::Errors::ConnectionFailedError,
