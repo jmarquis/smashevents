@@ -95,3 +95,7 @@ gem "sentry-rails", "~> 5.21"
 
 
 gem "vite_rails", "~> 3.0"
+
+gem "yabeda-prometheus", "~> 0.9.1"
+gem "yabeda-rails", "~> 0.9.0"
+gem "yabeda-puma-plugin", "~> 0.7.1"
