@@ -58,6 +58,7 @@ class Notification < ApplicationRecord
       # expecting if that's what was passed in. We will have short circuited by
       # now if needed regardless.
       yield(notifiable_or_notifiables.is_a?(Array) ? notifiables : notifiable_or_notifiables)
+      StatsD.increment("notification.#{platform}.#{type}")
     rescue => e
       puts "Failed to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}: #{e.message}"
       exception = e
