@@ -1,5 +1,6 @@
 class Discord
   @clients = {}
+  @bot = nil
 
   DEFAULT_FOOTER = Discordrb::Webhooks::EmbedFooter.new(
     text: 'smashevents.gg',
@@ -147,9 +148,15 @@ class Discord
 
     def post(game_slug)
       StatsD.measure('discord.post') do
-        client(game_slug).execute do |builder|
-          yield builder
-        end
+        builder = Discordrb::Webhooks::Builder.new
+        yield builder
+
+        bot.send_message(
+          Rails.application.credentials.dig(:discord, :channel_ids, game_slug),
+          builder.content,
+          false, # tts
+          builder.embeds
+        )
       end
     end
 
@@ -157,6 +164,19 @@ class Discord
       return @clients[game_slug.to_sym] if @clients[game_slug.to_sym].present?
 
       @clients[game_slug.to_sym] = Discordrb::Webhooks::Client.new(url: Rails.application.credentials.dig(:discord, :webhook_urls, game_slug.to_sym))
+    end
+
+    def bot
+      return @bot if @bot.present?
+
+      @bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :token)
+
+      at_exit do
+        bot.stop
+      end
+
+      @bot.run(true)
+      @bot
     end
 
   end
