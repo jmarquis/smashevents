@@ -186,6 +186,7 @@ class Startgg
         Graphlient::Errors::ConnectionFailedError,
         Graphlient::Errors::TimeoutError,
         Faraday::ParsingError,
+        Faraday::SSLError,
         OpenSSL::SSL::SSLError => e
         StatsD.increment('startgg.request_error')
 
