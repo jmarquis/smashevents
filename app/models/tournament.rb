@@ -107,6 +107,27 @@ class Tournament < ApplicationRecord
     return t, events
   end
 
+  def self.should_display_for_games(game_slugs = Game.all.map(&:slug))
+    Tournament
+      .includes(:override, events: [:game, winner_entrant: :player])
+      .where(events: { game: game_slugs })
+      .merge(
+        Tournament.where(override: { include: true }).or(
+          Tournament.where("end_at - tournaments.start_at <= interval '7 days'").merge(
+            Tournament.where.not(events: { player_count: nil }).merge(
+              Tournament.where('coalesce(events.player_count, 0) >= 8').merge(
+                Tournament.where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.player_count, 1) = 0 then 1.0 else coalesce(events.player_count, 1)::float end > ?', 0.3).or(
+                  Tournament.where('events.ranked_player_count > ?', 10)
+                ).or(
+                  Tournament.where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
+                )
+              )
+            )
+          )
+        )
+      )
+  end
+
   def should_ingest?
     return override.include unless override&.include.nil?
 
