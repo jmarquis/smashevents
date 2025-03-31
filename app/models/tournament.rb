@@ -38,9 +38,9 @@ class Tournament < ApplicationRecord
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
   scope :live, -> { where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now)}
-  scope :should_display_for_games, ->(game_slugs = Game.all.map(&:slug)) {
+  scope :should_display, ->(games: Game.all.map(&:slug)) {
     includes(:override, events: [:game, winner_entrant: :player])
-    .where(events: { game: game_slugs })
+    .where(events: { game: games })
     .merge(
       where(override: { include: true }).or(
         where("end_at - tournaments.start_at <= interval '7 days'").merge(

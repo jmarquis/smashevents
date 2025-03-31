@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
 
-    @tournaments = Tournament.should_display_for_games(@games)
+    @tournaments = Tournament.should_display(games: @games)
       # Leave a few hours of leeway for events that run long
       .where('end_at > ?', Time.now - 6.hours)
       .order(start_at: :asc, end_at: :asc, name: :asc)
@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
 
-    @tournaments = Tournament.should_display_for_games(@games)
+    @tournaments = Tournament.should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
       .where('end_at > ?', Time.now - 6.months)
       .order(end_at: :desc, start_at: :desc, name: :asc)
