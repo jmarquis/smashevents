@@ -37,6 +37,26 @@ class Tournament < ApplicationRecord
   has_one :override, class_name: 'TournamentOverride', foreign_key: :slug, primary_key: :slug
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
+  scope :live, -> { where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now)}
+  scope :should_display_for_games, ->(game_slugs = Game.all.map(&:slug)) {
+    includes(:override, events: [:game, winner_entrant: :player])
+    .where(events: { game: game_slugs })
+    .merge(
+      where(override: { include: true }).or(
+        where("end_at - tournaments.start_at <= interval '7 days'").merge(
+          where.not(events: { player_count: nil }).merge(
+            where('coalesce(events.player_count, 0) >= 8').merge(
+              where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.player_count, 1) = 0 then 1.0 else coalesce(events.player_count, 1)::float end > ?', 0.3).or(
+                where('events.ranked_player_count > ?', 10)
+              ).or(
+                where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
+              )
+            )
+          )
+        )
+      )
+    )
+  }
 
   def self.from_startgg_tournament(data)
     t = find_by(startgg_id: data.id) || new
@@ -105,27 +125,6 @@ class Tournament < ApplicationRecord
     end
 
     return t, events
-  end
-
-  def self.should_display_for_games(game_slugs = Game.all.map(&:slug))
-    Tournament
-      .includes(:override, events: [:game, winner_entrant: :player])
-      .where(events: { game: game_slugs })
-      .merge(
-        Tournament.where(override: { include: true }).or(
-          Tournament.where("end_at - tournaments.start_at <= interval '7 days'").merge(
-            Tournament.where.not(events: { player_count: nil }).merge(
-              Tournament.where('coalesce(events.player_count, 0) >= 8').merge(
-                Tournament.where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.player_count, 1) = 0 then 1.0 else coalesce(events.player_count, 1)::float end > ?', 0.3).or(
-                  Tournament.where('events.ranked_player_count > ?', 10)
-                ).or(
-                  Tournament.where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
-                )
-              )
-            )
-          )
-        )
-      )
   end
 
   def should_ingest?
