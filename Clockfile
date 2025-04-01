@@ -1,0 +1,5 @@
+using RubyClock::DSL
+
+every '5 minutes' do
+  puts 'Clock tick'
+end

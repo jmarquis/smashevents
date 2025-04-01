@@ -95,3 +95,5 @@ gem "sentry-rails", "~> 5.21"
 
 
 gem "vite_rails", "~> 3.0"
+
+gem "ruby-clock", "~> 2.0", require: false
