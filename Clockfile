@@ -1,5 +1,6 @@
+$stdout.sync = true
 using RubyClock::DSL
 
-every '5 minutes' do
+every '1 minute' do
   puts 'Clock tick'
 end
