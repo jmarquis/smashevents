@@ -1,6 +1,26 @@
 $stdout.sync = true
 using RubyClock::DSL
 
+around_action do |job_proc, job_info|
+  puts "Starting job: #{job_info[:task]}"
+  job_proc.call
+  puts "Job finished: #{job_info[:task]}"
+  STDOUT.flush
+end
+
+on_error do |job, error|
+  case job
+  when String # this means there was a problem parsing the Clockfile while starting
+    Sentry.capture_exception(StandardError.new('Error when loading Clockfile'))
+  else
+    Sentry.capture_exception(error)
+  end
+end
+
+cron '*/10 * * * *', locals: { task: 'twitch:sync_streams' } do
+  rake('twitch:sync_streams')
+end
+
 every '5 seconds' do
   puts "Clock tick #{rand(1..100)}"
   STDOUT.flush
