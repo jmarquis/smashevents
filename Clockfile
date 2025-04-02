@@ -21,7 +21,6 @@ cron '*/10 * * * *', locals: { task: 'twitch:sync_streams' } do
   rake('twitch:sync_streams')
 end
 
-every '5 seconds' do
-  puts "Clock tick #{rand(1..100)}"
-  STDOUT.flush
+cron '40 * * * *', locals: { task: 'startgg:sync' } do
+  rake('startgg:sync')
 end
