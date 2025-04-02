@@ -3,4 +3,5 @@ using RubyClock::DSL
 
 every '5 seconds' do
   puts "Clock tick #{rand(1..100)}"
+  STDOUT.flush
 end
