@@ -2,5 +2,5 @@ $stdout.sync = true
 using RubyClock::DSL
 
 every '1 minute' do
-  puts 'Clock tick'
+  puts "Clock tick #{rand(1, 100)}"
 end
