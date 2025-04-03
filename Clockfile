@@ -63,3 +63,8 @@ end
 cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' } do
   rake('twitch:sync_streams')
 end
+
+# Every minute
+cron '* * * * *', locals: { task: 'startgg:scan_stream_sets' } do
+  rake('startgg:scan_stream_sets')
+end
