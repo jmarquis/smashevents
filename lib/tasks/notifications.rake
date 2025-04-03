@@ -14,7 +14,7 @@ namespace :notifications do
       .filter(&:should_display?)
       .each do |tournament|
         begin
-          Notification.send(
+          Notification.send_notification(
             tournament,
             type: Notification::TYPE_TOURNAMENT_ADDED,
             platform: Notification::PLATFORM_TWITTER,
@@ -40,7 +40,7 @@ namespace :notifications do
       .flatten
       .filter(&:should_display?)
       .each do |event|
-        Notification.send(
+        Notification.send_notification(
           event,
           type: Notification::TYPE_EVENT_ADDED,
           platform: Notification::PLATFORM_DISCORD,
@@ -71,7 +71,7 @@ namespace :notifications do
 
         events = events.sort_by(&:player_count).reverse
 
-        Notification.send(
+        Notification.send_notification(
           events,
           type: Notification::TYPE_WEEKEND_BRIEFING,
           platform: Notification::PLATFORM_TWITTER,
@@ -80,7 +80,7 @@ namespace :notifications do
           Twitter.weekend_briefing(game:, events:)
         end
 
-        Notification.send(
+        Notification.send_notification(
           events,
           type: Notification::TYPE_WEEKEND_BRIEFING,
           platform: Notification::PLATFORM_DISCORD,
@@ -109,7 +109,7 @@ namespace :notifications do
       .each do |game, events|
         events = events.sort_by(&:player_count).reverse
 
-        Notification.send(
+        Notification.send_notification(
           events,
           type: Notification::TYPE_CONGRATULATIONS,
           platform: Notification::PLATFORM_TWITTER,
@@ -148,7 +148,7 @@ namespace :notifications do
 
         puts "Sending happening today tweet for #{tournament.slug}..."
         begin
-          Notification.send(
+          Notification.send_notification(
             tournament,
             type: Notification::TYPE_HAPPENING_TODAY,
             platform: Notification::PLATFORM_TWITTER
@@ -159,7 +159,7 @@ namespace :notifications do
         end
 
         puts "Sending happening today Discord notification for #{tournament.slug}..."
-        Notification.send(
+        Notification.send_notification(
           tournament,
           type: Notification::TYPE_HAPPENING_TODAY,
           platform: Notification::PLATFORM_DISCORD

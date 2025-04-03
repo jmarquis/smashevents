@@ -185,7 +185,7 @@ namespace :startgg do
 
               next if previous_notification.present? && previous_notification.metadata[:startgg_set_id] == set.id
 
-              Notification.send(
+              Notification.send_notification(
                 player,
                 notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
                 platform: Notification::PLATFORM_DISCORD,
