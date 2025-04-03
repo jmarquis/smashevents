@@ -10,7 +10,7 @@ class Discord
   class << self
 
     def event_added(event)
-      post(event.game_slug) do |builder|
+      post(game_channel_id(event.game_slug)) do |builder|
         builder.content = '## NEW EVENT ADDED'
         builder.add_embed do |embed|
           embed.title = event.tournament.name
@@ -43,7 +43,7 @@ class Discord
     end
 
     def weekend_briefing(game:, events:)
-      post(game.slug) do |builder|
+      post(game_channel_id(game.slug)) do |builder|
         builder.content = "## THIS WEEKEND IN #{game.name.upcase}"
         events.each do |event|
           next unless event.should_display?
@@ -100,7 +100,7 @@ class Discord
       events.group_by(&:game).each do |game, events|
         next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
 
-        post(game.slug) do |builder|
+        post(game_channel_id(game.slug)) do |builder|
           builder.content = '## HAPPENING TODAY'
           builder.add_embed do |embed|
             embed.title = tournament.name
@@ -127,7 +127,7 @@ class Discord
       game = Game.find_by(twitch_name: stream[:game])
       return unless game.present?
 
-      post(game.slug) do |builder|
+      post(game_channel_id(game.slug)) do |builder|
         builder.content = "### #{tournament.name.upcase} STREAM IS LIVE"
         builder.add_embed do |embed|
           embed.title = stream[:name]
@@ -146,13 +146,32 @@ class Discord
       end
     end
 
-    def post(game_slug)
+    def player_stream_live(event:, player:, opponent:, stream_name:)
+      post(player.discord_notification_channel) do |builder|
+        builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"
+        builder.add_embed do |embed|
+          embed.title = stream[:name]
+          embed.url = "https://twitch.tv/#{stream_name}"
+
+          embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
+          embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
+
+          embed.footer = DEFAULT_FOOTER
+        end
+      end
+    end
+
+    def game_channel_id(game_slug)
+      Rails.application.credentials.dig(:discord, :channel_ids, game_slug)
+    end
+
+    def post(channel_id)
       StatsD.measure('discord.post') do
         builder = Discordrb::Webhooks::Builder.new
         yield builder
 
         bot.send_message(
-          Rails.application.credentials.dig(:discord, :channel_ids, game_slug),
+          channel_id,
           builder.content,
           false, # tts
           builder.embeds

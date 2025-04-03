@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_09_194124) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_03_022424) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -46,6 +46,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_194124) do
     t.string "slug"
     t.bigint "winner_entrant_id"
     t.string "state"
+    t.datetime "sets_synced_at"
     t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
     t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"
@@ -76,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_194124) do
     t.datetime "sent_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "metadata"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
   end
 
@@ -86,6 +88,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_09_194124) do
     t.string "twitter_username"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "discord_notification_channel"
     t.index ["startgg_player_id"], name: "index_players_on_startgg_player_id", unique: true
     t.index ["startgg_user_id"], name: "index_players_on_startgg_user_id", unique: true
     t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin

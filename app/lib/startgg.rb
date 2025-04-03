@@ -161,6 +161,46 @@ class Startgg
       end
     end
 
+    def sets(event_id, batch_size: 50, page: 1, updated_after: 1.year.ago)
+      query = <<~GRAPHQL
+        query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
+          event(id: $id) {
+            sets(
+              perPage: $perPage,
+              page: $page,
+              filters: {
+                updatedAfter: $updatedAfter
+              }
+            ) {
+              nodes {
+                completedAt
+                slots {
+                  entrant {
+                    name
+                    participants {
+                      player {
+                        id
+                      }
+                    }
+                  }
+                }
+                startedAt
+                state
+                stream {
+                  streamName
+                  streamSource
+                }
+              }
+            }
+          }
+        }
+      GRAPHQL
+
+      StatsD.measure('startgg.sets') do
+        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
+      end
+    end
+
     def with_retries(num_retries, batch_size: nil)
       retries = 0
       result = nil

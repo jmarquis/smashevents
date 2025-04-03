@@ -30,7 +30,7 @@ namespace :twitch do
             stream[:game] = live_streams[stream[:name].downcase][:game]
             stream[:title] = live_streams[stream[:name].downcase][:title]
 
-            Notification.log(
+            Notification.send(
               tournament,
               type: Notification::TYPE_STREAM_LIVE,
               platform: Notification::PLATFORM_DISCORD

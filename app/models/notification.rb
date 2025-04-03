@@ -11,6 +11,7 @@
 #  sent_at           :datetime         not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  metadata          :json
 #
 # Indexes
 #
@@ -29,12 +30,13 @@ class Notification < ApplicationRecord
   TYPE_CONGRATULATIONS = 'congratulations'
   TYPE_HAPPENING_TODAY = 'happening_today'
   TYPE_STREAM_LIVE = 'stream_live'
+  TYPE_PLAYER_STREAM_LIVE = 'player_stream_live'
 
   before_create do |notification|
     notification.sent_at ||= Time.now
   end
 
-  def self.log(notifiable_or_notifiables, type:, platform:, idempotent: false)
+  def self.send(notifiable_or_notifiables, type:, platform:, idempotent: false, metadata: nil)
     notifiables = notifiable_or_notifiables.is_a?(Array) ? notifiable_or_notifiables : [notifiable_or_notifiables]
 
     if idempotent
@@ -69,7 +71,8 @@ class Notification < ApplicationRecord
         notifiable:,
         notification_type: type,
         platform:,
-        success: exception.nil?
+        success: exception.nil?,
+        metadata:
       )
     end
 

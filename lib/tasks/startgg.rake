@@ -140,6 +140,76 @@ namespace :startgg do
     puts 'Entrant sync complete.'
   end
 
+  task scan_stream_sets: [:environment] do
+    Tournament.should_display.live.each do |tournament|
+      tournament.events.each do |event|
+        next if event.completed?
+
+        (1..1000).each do |page|
+          sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
+            puts "Fetching sets for #{tournament.slug} #{event.game.slug}..."
+
+            # TODO: Filter by set state?
+            Startgg.sets(event, batch_size:, page:, updated_after: event.sets_synced_at)
+          end
+
+          sets.each do |set|
+
+            # Most sets don't have a stream, so this filters a ton.
+            next unless set.stream.present?
+            next unless set.stream.stream_source == Tournament::STREAM_SOURCE_TWITCH
+
+            # We only care about currently ongoing sets.
+            next unless set.started_at.present?
+            next unless set.completed_at.blank?
+
+            # If the player records aren't set, we can't do anything.
+            next unless set.slots&.first&.entrant&.participants&.first&.player&.present?
+            next unless set.slots&.second&.entrant&.participants&.first&.player&.present?
+
+            players = Player.where(startgg_id: set.slots.first.entrant.participants.map(&:id))
+
+            # Make sure we have players we want to notify about.
+            next unless players.any?(&:discord_notification_channel)
+
+            players.each do |player|
+
+              next unless player.discord_notification_channel.present?
+
+              previous_notification = Notification.find_by(
+                notifiable: player,
+                notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
+                platform: Notification::PLATFORM_DISCORD,
+                success: true
+              )
+
+              next if previous_notification.present? && previous_notification.metadata[:startgg_set_id] == set.id
+
+              Notification.send(
+                player,
+                notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
+                platform: Notification::PLATFORM_DISCORD,
+                metadata: { startgg_set_id: set.id }
+              ) do |player|
+                Discord.player_stream_live(
+                  event:,
+                  player:,
+                  opponent: (players - [player]).first,
+                  stream_name: set.stream.stream_name
+                )
+              end
+
+            end
+
+          end
+        end
+
+        event.sets_synced_at = Time.now
+        event.save!
+      end
+    end
+  end
+
   private
 
   def updated_log(tournament, events)
