@@ -2,9 +2,9 @@ $stdout.sync = true
 using RubyClock::DSL
 
 around_action do |job_proc, job_info|
-  puts "Starting job: #{job_info[:task]}"
+  Rails.logger.info "Starting job: #{job_info[:task]}"
   job_proc.call
-  puts "Job finished: #{job_info[:task]}"
+  Rails.logger.info "Job finished: #{job_info[:task]}"
   STDOUT.flush
 end
 

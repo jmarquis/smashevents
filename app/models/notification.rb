@@ -52,7 +52,7 @@ class Notification < ApplicationRecord
 
     return unless notifiables.any?
 
-    puts "Attempting to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}"
+    Rails.logger.info "Attempting to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}"
 
     exception = nil
     begin
@@ -62,7 +62,7 @@ class Notification < ApplicationRecord
       yield(notifiable_or_notifiables.is_a?(Array) ? notifiables : notifiable_or_notifiables)
       StatsD.increment("notification.#{platform}.#{type}")
     rescue => e
-      puts "Failed to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}: #{e.message}"
+      Rails.logger.error "Failed to send #{type} #{platform} notification for #{notifiables.count} #{notifiables.first.class.name.pluralize(notifiables.count)}: #{e.message}"
       exception = e
     end
 

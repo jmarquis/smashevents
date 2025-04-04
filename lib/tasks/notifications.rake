@@ -2,7 +2,7 @@ namespace :notifications do
 
   task new_events: [:environment] do
 
-    puts 'Scanning for new event notifications that need to be sent...'
+    Rails.logger.info 'Scanning for new event notifications that need to be sent...'
 
     # We only do this notification once per tournament for Twitter, and just
     # list all the games regardless of player count as soon as one event has
@@ -146,7 +146,7 @@ namespace :notifications do
       }
       .each do |tournament|
 
-        puts "Sending happening today tweet for #{tournament.slug}..."
+        Rails.logger.info "Sending happening today tweet for #{tournament.slug}..."
         begin
           Notification.send_notification(
             tournament,
@@ -158,7 +158,7 @@ namespace :notifications do
         rescue X::Error
         end
 
-        puts "Sending happening today Discord notification for #{tournament.slug}..."
+        Rails.logger.info "Sending happening today Discord notification for #{tournament.slug}..."
         Notification.send_notification(
           tournament,
           type: Notification::TYPE_HAPPENING_TODAY,

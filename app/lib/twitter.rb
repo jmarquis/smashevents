@@ -118,7 +118,7 @@ class Twitter
           media: media_ids.blank? ? nil : { media_ids: }
         }.compact))
       rescue X::Error => e
-        puts "ERROR POSTING TO TWITTER: #{e.message}"
+        Rails.logger.error "ERROR POSTING TO TWITTER: #{e.message}"
         raise e
       end
     end

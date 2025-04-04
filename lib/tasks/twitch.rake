@@ -1,13 +1,13 @@
 namespace :twitch do
 
   task sync_streams: [:environment] do
-    puts 'Starting Twitch stream sync...'
+    Rails.logger.info 'Starting Twitch stream sync...'
 
     Tournament.where('start_at <= ?', Time.now + 12.hours).where('end_at >= ?', Time.now - 12.hours).each do |tournament|
       next unless tournament.stream_data.present?
       next unless tournament.should_display?
 
-      puts "Syncing Twitch streams for #{tournament.slug}..."
+      Rails.logger.info "Syncing Twitch streams for #{tournament.slug}..."
 
       streams = tournament.stream_data.reduce([]) do |streams, stream|
         stream = stream.with_indifferent_access
@@ -46,10 +46,10 @@ namespace :twitch do
           stream
         end
 
-        puts "#{tournament.slug}: #{tournament.changes}"
+        Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
         tournament.save
       rescue Twitch::APIError => e
-        puts "Error syncing stream: #{e.message}"
+        Rails.logger.error "Error syncing stream: #{e.message}"
       end
     end
   end

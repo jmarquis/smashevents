@@ -107,7 +107,7 @@ class Event < ApplicationRecord
   end
 
   def sync_entrants
-    puts "Syncing entrants for #{tournament.slug} (#{game.slug})..."
+    Rails.logger.info "Syncing entrants for #{tournament.slug} (#{game.slug})..."
     entrants = []
 
     # Get all the entrants, 1 chunk at a time
@@ -126,7 +126,7 @@ class Event < ApplicationRecord
 
       # This means the tournament was probably deleted.
       if event_entrants.nil?
-        puts "Tournament #{tournament.slug} not found. Deleting..."
+        Rails.logger.info "Tournament #{tournament.slug} not found. Deleting..."
         StatsD.increment('startgg.tournament_deleted')
         tournament.destroy
         break

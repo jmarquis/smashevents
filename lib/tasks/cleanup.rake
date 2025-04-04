@@ -7,7 +7,7 @@ namespace :cleanup do
       .filter { |t| !t.should_display? }
 
     tournaments.each do |tournament|
-      puts "Deleting #{tournament.slug}..."
+      Rails.logger.info "Deleting #{tournament.slug}..."
       tournament.destroy!
     end
   end

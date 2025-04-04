@@ -213,12 +213,12 @@ class Startgg
         raise e unless batch_size.present?
 
         if retries < num_retries
-          puts "Query complexity error, reducing batch size"
+          Rails.logger.info "Query complexity error, reducing batch size"
           batch_size -= 1
           sleep 5 * retries
           next
         else
-          puts "Retry threshold exceeded, exiting: #{e.message}"
+          Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
           raise e
         end
       rescue Graphlient::Errors::ExecutionError,
@@ -231,16 +231,16 @@ class Startgg
         StatsD.increment('startgg.request_error')
 
         if retries < num_retries
-          puts "Transient error communicating with startgg, will retry: #{e.message}"
+          Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
           retries += 1
           sleep 5 * retries
           next
         else
-          puts "Retry threshold exceeded, exiting: #{e.message}"
+          Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
           raise e
         end
       rescue StandardError => e
-        puts "Unexpected error communicating with startgg: #{e.message}"
+        Rails.logger.error "Unexpected error communicating with startgg: #{e.message}"
         raise e
       end
 

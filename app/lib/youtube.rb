@@ -4,7 +4,7 @@ class Youtube
   class << self
 
     def channel_url(channel_name)
-      puts "Fetching YouTube channel info for #{channel_name}..."
+      Rails.logger.info "Fetching YouTube channel info for #{channel_name}..."
 
       response = StatsD.measure('youtube.list_searches') do
         client.list_searches('snippet', type: 'channel', q: channel_name)
@@ -12,7 +12,7 @@ class Youtube
 
       "https://youtube.com/channel/#{response.items.first.id.channel_id}/live"
     rescue => e
-      puts e.message
+      Rails.logger.error e.message
       "https://youtube.com/#{channel_name}"
     end
 
