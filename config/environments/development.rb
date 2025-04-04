@@ -67,7 +67,9 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
 
-  logger = ActiveSupport::Logger.new(STDOUT)
-  logger.formatter = config.log_formatter
-  config.logger = ActiveSupport::TaggedLogging.new(logger)
+  config.log_tags = [:request_id, lambda { Time.now }]
+  config.logger = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.logger.formatter = lambda do |severity, time, progname, msg|
+    "[#{severity.upcase}] [#{time.strftime("%Y-%m-%d %H:%M:%S.%L")}] [#{progname}] #{String === msg ? msg : msg.inspect}\n"
+  end
 end
