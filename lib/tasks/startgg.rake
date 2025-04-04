@@ -153,6 +153,7 @@ namespace :startgg do
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at)
           end
 
+          puts "Found #{sets.count} sets. Analyzing..."
           break if sets.count.zero?
 
           sets.each do |set|
