@@ -14,7 +14,7 @@ export default () => {
   const [items, setItems] = useState(selectedItem ? [selectedItem] : [])
 
   useEffect(() => {
-    if (inputValue.length < 2 && items && items.length) {
+    if (inputValue.length < 2) {
       setItems([])
       return
     }
