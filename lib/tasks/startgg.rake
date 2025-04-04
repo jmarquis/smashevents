@@ -202,6 +202,8 @@ namespace :startgg do
             end
 
           end
+
+          sleep 1
         end
 
         event.sets_synced_at = Time.now
