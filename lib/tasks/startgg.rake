@@ -153,6 +153,8 @@ namespace :startgg do
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at)
           end
 
+          break if sets.count.zero?
+
           sets.each do |set|
 
             # Most sets don't have a stream, so this filters a ton.
