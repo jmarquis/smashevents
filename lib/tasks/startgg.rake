@@ -150,7 +150,7 @@ namespace :startgg do
             puts "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
             # TODO: Filter by set state?
-            Startgg.sets(event, batch_size:, page:, updated_after: event.sets_synced_at)
+            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at)
           end
 
           sets.each do |set|
