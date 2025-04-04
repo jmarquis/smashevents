@@ -1,4 +1,4 @@
-class PlayersController < ActionController::Base
+class PlayersController < BaseController
 
   def search
     if params[:q].blank?

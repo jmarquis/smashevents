@@ -1,4 +1,4 @@
-class ApplicationController < ActionController::Base
+class ApplicationController < BaseController
 
   def index
     @games = selected_games
