@@ -18,9 +18,9 @@ namespace :startgg do
         Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: last_sync.present? ? last_sync - 6.hours : 1.year.ago)
       end
 
+      break if tournaments.count.zero?
       Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
       stats[:analyzed] += tournaments.count
-      break if tournaments.count.zero?
 
       tournaments.each do |data|
         tournament, events = Tournament.from_startgg_tournament(data)
