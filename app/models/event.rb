@@ -146,7 +146,7 @@ class Event < ApplicationRecord
       break if event_entrants.count != 100
     end
 
-    return if tournament.destroyed?
+    return stats if tournament.destroyed?
 
     # Populate entrants
     entrants = entrants.map do |entrant|
