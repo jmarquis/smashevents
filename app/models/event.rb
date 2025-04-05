@@ -109,6 +109,11 @@ class Event < ApplicationRecord
   def sync_entrants
     Rails.logger.info "Syncing entrants for #{tournament.slug} (#{game.slug})..."
     entrants = []
+    stats = {
+      created: 0,
+      updated: 0,
+      deleted: 0
+    }
 
     # Get all the entrants, 1 chunk at a time
     (1..100).each do |page|
@@ -149,9 +154,13 @@ class Event < ApplicationRecord
 
       if !entrant.persisted?
         entrant.save!
+
+        stats[:created] += 1
         StatsD.increment('startgg.entrant_added')
       elsif entrant.changed? || entrant.player_changed? || entrant.player2_changed?
         entrant.save!
+
+        stats[:updated] += 1
         entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
           StatsD.increment("startgg.entrant_field_updated.#{field}")
         end
@@ -164,6 +173,8 @@ class Event < ApplicationRecord
     # Delete entrants that are no longer registered
     self.entrants.where.not(id: entrants.map(&:id)).each do |entrant|
       entrant.destroy!
+
+      stats[:deleted] += 1
       StatsD.increment('startgg.entrant_deleted')
     end
 
@@ -175,5 +186,7 @@ class Event < ApplicationRecord
 
     self.synced_at = Time.now
     save!
+
+    stats
   end
 end

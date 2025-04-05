@@ -2,20 +2,24 @@ namespace :startgg do
   task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
 
   task sync_tournaments: [:environment] do
-    num_analyzed = 0
-    num_imported = 0
-    num_updated = 0
+    stats = {
+      analyzed: 0,
+      imported: 0,
+      updated: 0
+    }
+    start_time = Time.now
+    last_sync = Rails.cache.read('startgg/last_tournament_sync')
 
-    Rails.logger.info 'Starting tournament sync...'
+    Rails.logger.info "Starting tournament sync (last sync: #{last_sync.inspect})..."
 
     (1..1000).each do |page|
       tournaments = Startgg.with_retries(5, batch_size: 15) do |batch_size|
         Rails.logger.info "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: Time.now - 6.hours)
+        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: last_sync.present? ? last_sync - 6.hours : 1.year.ago)
       end
 
       Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
-      num_analyzed += tournaments.count
+      stats[:analyzed] += tournaments.count
       break if tournaments.count.zero?
 
       tournaments.each do |data|
@@ -32,11 +36,12 @@ namespace :startgg do
 
             StatsD.increment('startgg.tournament_updated')
             updated_log(tournament, events)
-            num_updated += 1
+            stats[:updated] += 1
           end
         else
           tournament.save!
 
+          stats[:imported] += 1
           StatsD.increment('startgg.tournament_added')
           event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
           Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
@@ -46,17 +51,18 @@ namespace :startgg do
       sleep 1
     end
 
-    Rails.logger.info '----------------------------------'
-    Rails.logger.info "Analyzed: #{num_analyzed}"
-    Rails.logger.info "Imported: #{num_imported}"
-    Rails.logger.info "Updated: #{num_updated}"
+    Rails.cache.write('startgg/last_tournament_sync', start_time, expires_in: 1.day)
+
+    Rails.logger.info "Tournament sync complete. #{stats.to_json}"
   end
 
   task sync_overrides: [:environment] do
-    num_analyzed = 0
-    num_imported = 0
-    num_updated = 0
-    num_deleted = 0
+    stats = {
+      analyzed: 0,
+      imported: 0,
+      updated: 0,
+      deleted: 0
+    }
 
     Rails.logger.info 'Starting override sync...'
 
@@ -68,7 +74,7 @@ namespace :startgg do
 
           StatsD.increment('startgg.tournament_deleted')
           tournament.destroy
-          num_deleted += 1
+          stats[:deleted] += 1
         end
 
         next
@@ -77,7 +83,7 @@ namespace :startgg do
       tournament = Tournament.find_by(slug: override.slug)
       next if tournament.present? && tournament.past?
 
-      num_analyzed += 1
+      stats[:analyzed] += 1
 
       data = Startgg.with_retries(5) do
         Rails.logger.info "Fetching tournament #{override.slug}..."
@@ -92,7 +98,7 @@ namespace :startgg do
 
           StatsD.increment('startgg.tournament_updated')
           updated_log(tournament, events)
-          num_updated += 1
+          stats[:updated] += 1
         end
       else
         tournament.save!
@@ -100,7 +106,7 @@ namespace :startgg do
         StatsD.increment('startgg.tournament_added')
         event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
         Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(',')}"
-        num_imported += 1
+        stats[:imported] += 1
       end
 
       # Update override slug to match actual tournament slug
@@ -110,15 +116,16 @@ namespace :startgg do
       sleep 1
     end
 
-    Rails.logger.info '----------------------------------'
-    Rails.logger.info "Analyzed: #{num_analyzed}"
-    Rails.logger.info "Imported: #{num_imported}"
-    Rails.logger.info "Updated: #{num_updated}"
-    Rails.logger.info "Deleted: #{num_deleted}"
+    Rails.logger.info "Tournament override sync complete. #{stats.to_json}"
   end
 
   task :sync_entrants, [:tournament_id] => [:environment] do |task, args|
     num_events = 0
+    stats = {
+      created: 0,
+      updated: 0,
+      deleted: 0
+    }
 
     Rails.logger.info 'Starting entrant sync...'
 
@@ -128,7 +135,10 @@ namespace :startgg do
       events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync
 
       events.each do |event|
-        event.sync_entrants
+        stats = event.sync_entrants.reduce(stats) do |stats, (key, total)|
+          stats[key] += total
+          stats
+        end
 
         num_events += 1
         if num_events % 50 == 0
@@ -137,7 +147,7 @@ namespace :startgg do
       end
     end
 
-    Rails.logger.info 'Entrant sync complete.'
+    Rails.logger.info "Entrant sync complete. #{stats.to_json}"
   end
 
   task scan_stream_sets: [:environment] do
