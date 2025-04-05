@@ -163,8 +163,8 @@ namespace :startgg do
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at)
           end
 
-          Rails.logger.info "Found #{sets.count} sets. Analyzing..."
           break if sets.count.zero?
+          Rails.logger.info "Found #{sets.count} sets. Analyzing..."
 
           sets.each do |set|
 
