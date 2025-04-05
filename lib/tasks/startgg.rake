@@ -182,7 +182,8 @@ namespace :startgg do
             players = Player.where(startgg_id: set.slots.first.entrant.participants.map(&:id))
 
             # Make sure we have players we want to notify about.
-            next unless players.any?(&:discord_notification_channel)
+            # TODO: uncomment
+            # next unless players.any?(&:discord_notification_channel)
 
             players.each do |player|
 
