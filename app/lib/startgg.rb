@@ -3,16 +3,17 @@ class Startgg < Api
 
   class << self
 
-    def tournaments(batch_size:, page:, after_date: Time.now)
+    def tournaments(batch_size:, page:, after_date: Time.now, updated_after: Time.now - 6.hours)
       query = <<~GRAPHQL
-        query($perPage: Int, $page: Int, $afterDate: Timestamp) {
+        query($perPage: Int, $page: Int, $afterDate: Timestamp, $updatedAfter: Timestamp) {
           tournaments(query: {
             perPage: $perPage
             page: $page
             sortBy: "startAt asc"
             filter: {
               videogameIds: [#{Game.pluck(:startgg_id).join(',')}],
-              afterDate: $afterDate
+              afterDate: $afterDate,
+              computedUpdatedAt: $updatedAfter
             }
           }) {
             nodes {
@@ -65,7 +66,7 @@ class Startgg < Api
       GRAPHQL
 
       instrument('tournaments') do
-        client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
+        client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i, updatedAfter: updated_after.to_i)&.data&.tournaments&.nodes
       end
     end
 

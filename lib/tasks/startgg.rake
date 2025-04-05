@@ -11,7 +11,7 @@ namespace :startgg do
     (1..1000).each do |page|
       tournaments = Startgg.with_retries(5, batch_size: 15) do |batch_size|
         Rails.logger.info "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days)
+        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: Time.now - 6.hours)
       end
 
       Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
