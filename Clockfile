@@ -22,49 +22,49 @@ end
 
 # 8:00am UTC
 cron '0 8 * * *', locals: { task: 'cleanup:delete_old_tournaments' } do
-  rake('cleanup:delete_old_tournaments')
+  rake_async('cleanup:delete_old_tournaments')
 end
 
 # 2:00pm UTC
 cron '0 14 * * *', locals: { task: 'notifications:happening_today' } do
-  rake('notifications:happening_today')
+  rake_async('notifications:happening_today')
 end
 
 # 3:00pm UTC
 cron '0 15 * * *', locals: { task: 'notifications:congratulations' } do
-  rake('notifications:congratulations')
+  rake_async('notifications:congratulations')
 end
 
 # 4:00pm UTC
 cron '0 16 * * *', locals: { task: 'notifications:weekend_briefing' } do
-  rake('notifications:weekend_briefing')
+  rake_async('notifications:weekend_briefing')
 end
 
 ### HOURLY JOBS
 
 # Every hour at :10
 cron '10 * * * *', locals: { task: 'youtube:fetch_stream_urls' } do
-  rake('youtube:fetch_stream_urls')
+  rake_async('youtube:fetch_stream_urls')
 end
 
 # Every hour at :40
 cron '40 * * * *', locals: { task: 'startgg:sync' } do
-  rake('startgg:sync')
+  rake_async('startgg:sync')
 end
 
 ### MORE FREQUENT JOBS
 
 # Every 10 minutes
 cron '*/10 * * * *', locals: { task: 'notifications:new_events' } do
-  rake('notifications:new_events')
+  rake_async('notifications:new_events')
 end
 
 # Every 10 minutes (5 minute offset)
 cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' } do
-  rake('twitch:sync_streams')
+  rake_async('twitch:sync_streams')
 end
 
 # Every minute
 cron '* * * * *', locals: { task: 'startgg:scan_stream_sets' } do
-  rake('startgg:scan_stream_sets')
+  rake_async('startgg:scan_stream_sets')
 end
