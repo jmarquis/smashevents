@@ -1,4 +1,4 @@
-class Twitter
+class Twitter < Api
   @client = nil
 
   class << self
@@ -112,7 +112,7 @@ class Twitter
         image.present? ? upload_image(image)['media_id_string'] : nil
       end.compact
 
-      StatsD.measure('twitter.tweet') do
+      instrument('tweet') do
         client.post('tweets', JSON.generate({
           text:,
           media: media_ids.blank? ? nil : { media_ids: }

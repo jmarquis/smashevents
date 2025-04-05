@@ -1,4 +1,4 @@
-class Youtube
+class Youtube < Api
   @client = nil
 
   class << self
@@ -6,7 +6,7 @@ class Youtube
     def channel_url(channel_name)
       Rails.logger.info "Fetching YouTube channel info for #{channel_name}..."
 
-      response = StatsD.measure('youtube.list_searches') do
+      response = instrument('list_searches') do
         client.list_searches('snippet', type: 'channel', q: channel_name)
       end
 

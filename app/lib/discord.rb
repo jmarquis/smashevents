@@ -1,4 +1,4 @@
-class Discord
+class Discord < Api
   @clients = {}
   @bot = nil
 
@@ -166,7 +166,7 @@ class Discord
     end
 
     def post(channel_id)
-      StatsD.measure('discord.post') do
+      instrument('post') do
         builder = Discordrb::Webhooks::Builder.new
         yield builder
 
