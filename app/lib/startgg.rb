@@ -64,9 +64,7 @@ class Startgg
         }
       GRAPHQL
 
-      StatsD.measure('startgg.tournaments') do
-        client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
-      end
+      execute('tournaments', query, perPage: batch_size, page:, afterDate: after_date.to_i)&.data&.tournaments&.nodes
     end
 
     def tournament(slug:)
@@ -120,9 +118,7 @@ class Startgg
         }
       GRAPHQL
 
-      StatsD.measure('startgg.tournament') do
-        client.query(query, slug:)&.data&.tournament
-      end
+      execute('tournament', query, slug:)&.data&.tournament
     end
 
     def event_entrants(id:, game:, batch_size:, page:)
@@ -156,9 +152,7 @@ class Startgg
         }
       GRAPHQL
 
-      StatsD.measure('startgg.event_entrants') do
-        client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
-      end
+      execute('event_entrants', query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
     end
 
     def sets(event_id, batch_size: 50, page: 1, updated_after: 1.year.ago)
@@ -196,9 +190,7 @@ class Startgg
         }
       GRAPHQL
 
-      StatsD.measure('startgg.sets') do
-        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
-      end
+      execute('sets', query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
     end
 
     def with_retries(num_retries, batch_size: nil)
@@ -245,6 +237,15 @@ class Startgg
       end
 
       result
+    end
+
+    private
+
+    def execute(name, query, **args)
+      StatsD.increment("startgg.#{name}")
+      StatsD.measure("startgg.#{name}") do
+        client.query(query, **args)
+      end
     end
 
     def client
