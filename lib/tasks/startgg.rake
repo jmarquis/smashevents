@@ -159,8 +159,7 @@ namespace :startgg do
           sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
             Rails.logger.info "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
-            # TODO: Filter by set state?
-            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at)
+            Startgg.sets(event.startgg_id, batch_size:, page:)
           end
 
           break if sets.count.zero?

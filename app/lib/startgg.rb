@@ -162,15 +162,15 @@ class Startgg < Api
       end
     end
 
-    def sets(event_id, batch_size: 50, page: 1, updated_after: 1.year.ago)
+    def sets(event_id, batch_size: 50, page: 1)
       query = <<~GRAPHQL
-        query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
+        query($id: ID, $perPage: Int, $page: Int) {
           event(id: $id) {
             sets(
               perPage: $perPage,
               page: $page,
               filters: {
-                updatedAfter: $updatedAfter
+                state: 2
               }
             ) {
               nodes {
@@ -198,7 +198,7 @@ class Startgg < Api
       GRAPHQL
 
       instrument('sets') do
-        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
+        client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
       end
     end
 
