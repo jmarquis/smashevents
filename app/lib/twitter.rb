@@ -86,9 +86,15 @@ class Twitter < Api
         #{streams.join("\n")}
       TEXT
 
+      events = tournament.events
+        .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
+        .filter { |e| e.state != Event::STATE_COMPLETED }
+
+      return if events.blank?
+
       # Don't filter by should_display?, might as well just show all the events
       # on the day of.
-      event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
+      event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
         "#{event.game.name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
       end
 
