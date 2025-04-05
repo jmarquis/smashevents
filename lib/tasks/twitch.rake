@@ -30,12 +30,14 @@ namespace :twitch do
             stream[:game] = live_streams[stream[:name].downcase][:game]
             stream[:title] = live_streams[stream[:name].downcase][:title]
 
-            Notification.send_notification(
-              tournament,
-              type: Notification::TYPE_STREAM_LIVE,
-              platform: Notification::PLATFORM_DISCORD
-            ) do |tournament|
-              Discord.stream_live(tournament:, stream:) if should_notify
+            if should_notify
+              Notification.send_notification(
+                tournament,
+                type: Notification::TYPE_STREAM_LIVE,
+                platform: Notification::PLATFORM_DISCORD
+              ) do |tournament|
+                Discord.stream_live(tournament:, stream:)
+              end
             end
           else
             stream.delete(:status)
