@@ -31,6 +31,8 @@ namespace :twitch do
             stream[:title] = live_streams[stream[:name].downcase][:title]
 
             if should_notify
+              Rails.logger.info "Sending stream live notification for #{tournament.slug} #{stream[:game]}: #{stream[:name]}"
+
               Notification.send_notification(
                 tournament,
                 type: Notification::TYPE_STREAM_LIVE,
