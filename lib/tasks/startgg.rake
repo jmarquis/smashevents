@@ -48,6 +48,8 @@ namespace :startgg do
         end
       end
 
+      break if tournaments.count < 15
+
       sleep 1
     end
 
@@ -215,6 +217,8 @@ namespace :startgg do
             end
 
           end
+
+          break if sets.count < 50
 
           sleep 1
         end
