@@ -183,19 +183,13 @@ class Discord < Api
       end
     end
 
-    def client(game_slug)
-      return @clients[game_slug.to_sym] if @clients[game_slug.to_sym].present?
-
-      @clients[game_slug.to_sym] = Discordrb::Webhooks::Client.new(url: Rails.application.credentials.dig(:discord, :webhook_urls, game_slug.to_sym))
-    end
-
     def bot
       return @bot if @bot.present?
 
       @bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :token)
 
       at_exit do
-        bot.stop
+        @bot.stop
       end
 
       @bot.run(true)
