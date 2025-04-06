@@ -202,7 +202,7 @@ namespace :startgg do
                 success: true
               )
 
-              next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id] == set.id
+              next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
 
               Notification.send_notification(
                 player,
