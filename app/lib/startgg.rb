@@ -175,6 +175,7 @@ class Startgg < Api
             ) {
               nodes {
                 completedAt
+                id
                 slots {
                   entrant {
                     name

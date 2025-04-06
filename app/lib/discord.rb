@@ -150,12 +150,15 @@ class Discord < Api
       # post(player.discord_notification_channel) do |builder|
       post('1358137925346398398') do |builder|
         builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"
+
         builder.add_embed do |embed|
-          embed.title = stream[:name]
+          embed.title = stream_name
           embed.url = "https://twitch.tv/#{stream_name}"
 
-          embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
-          embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
+          embed.description = "#{event.tournament.name} (#{event.game.name})"
+
+          embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+          embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
           embed.footer = DEFAULT_FOOTER
         end

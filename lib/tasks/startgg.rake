@@ -171,7 +171,7 @@ namespace :startgg do
 
             # Most sets don't have a stream, so this filters a ton.
             next unless set.stream.present?
-            next unless set.stream.stream_source == Tournament::STREAM_SOURCE_TWITCH
+            next unless set.stream.stream_source.downcase == Tournament::STREAM_SOURCE_TWITCH
 
             # We only care about currently ongoing sets.
             next unless set.started_at.present?
@@ -181,7 +181,10 @@ namespace :startgg do
             next unless set.slots&.first&.entrant&.participants&.first&.player&.present?
             next unless set.slots&.second&.entrant&.participants&.first&.player&.present?
 
-            players = Player.where(startgg_id: set.slots.first.entrant.participants.map(&:id))
+            players = Player.where(startgg_player_id: [
+              set.slots.first.entrant.participants.first.player.id,
+              set.slots.second.entrant.participants.first.player.id
+            ])
 
             # Make sure we have players we want to notify about.
             # TODO: uncomment
@@ -189,7 +192,8 @@ namespace :startgg do
 
             players.each do |player|
 
-              next unless player.discord_notification_channel.present?
+              # TODO: uncomment
+              # next unless player.discord_notification_channel.present?
 
               previous_notification = Notification.find_by(
                 notifiable: player,
@@ -198,11 +202,11 @@ namespace :startgg do
                 success: true
               )
 
-              next if previous_notification.present? && previous_notification.metadata[:startgg_set_id] == set.id
+              next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id] == set.id
 
               Notification.send_notification(
                 player,
-                notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
+                type: Notification::TYPE_PLAYER_STREAM_LIVE,
                 platform: Notification::PLATFORM_DISCORD,
                 metadata: { startgg_set_id: set.id }
               ) do |player|
