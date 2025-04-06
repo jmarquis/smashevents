@@ -195,15 +195,14 @@ namespace :startgg do
               # TODO: uncomment
               # next unless player.discord_notification_channel.present?
 
-              previous_notification = Notification.find_by(
+              previous_notification = Notification.where(
                 notifiable: player,
                 notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
                 platform: Notification::PLATFORM_DISCORD,
                 success: true
-              )
+              ).order(sent_at: :desc).first
 
               next if previous_notification&.metadata&.with_indifferent_access[:startgg_set_id]&.to_s == set.id.to_s
-              Rails.logger.info("Set IDs: #{previous_notification&.metadata&.with_indifferent_access[:startgg_set_id]&.to_s} #{set.id.to_s}")
 
               Notification.send_notification(
                 player,
