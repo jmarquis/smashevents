@@ -23,7 +23,7 @@ namespace :twitch do
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
 
-          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams)
+          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams) && Game.find_by(twitch_name: stream[:game]).present?
             should_notify = stream[:status] != Tournament::STREAM_STATUS_LIVE
 
             stream[:status] = Tournament::STREAM_STATUS_LIVE
