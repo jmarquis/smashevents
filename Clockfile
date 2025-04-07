@@ -64,7 +64,7 @@ cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' } do
   rake_async('twitch:sync_streams')
 end
 
-# Every minute
-cron '* * * * *', locals: { task: 'startgg:scan_stream_sets' } do
+# Every 10 seconds
+every '10 seconds', locals: { task: 'startgg:scan_stream_sets' }, overlap: false do
   rake_async('startgg:scan_stream_sets')
 end
