@@ -2,9 +2,9 @@ $stdout.sync = true
 using RubyClock::DSL
 
 around_action do |job_proc, job_info|
-  Rails.logger.info "Starting job: #{job_info[:task]}"
+  Rails.logger.info "Starting job: #{job_info[:task]}" unless job_info[:task] == 'setbot:run'
   job_proc.call
-  Rails.logger.info "Job finished: #{job_info[:task]}"
+  Rails.logger.info "Job finished: #{job_info[:task]}" unless job_info[:task] == 'setbot:run'
   STDOUT.flush
 end
 
