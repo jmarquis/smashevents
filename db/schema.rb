@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_03_022424) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_07_035531) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -89,6 +89,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_03_022424) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "discord_notification_channel"
+    t.string "name"
     t.index ["startgg_player_id"], name: "index_players_on_startgg_player_id", unique: true
     t.index ["startgg_user_id"], name: "index_players_on_startgg_user_id", unique: true
     t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin

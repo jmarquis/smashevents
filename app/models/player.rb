@@ -10,6 +10,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  discord_notification_channel :string
+#  name                         :string
 #
 # Indexes
 #
@@ -58,6 +59,7 @@ class Player < ApplicationRecord
     p.startgg_user_id = data.user&.id
     p.tag = data.gamer_tag
     p.twitter_username = data&.user&.authorizations&.first&.external_username
+    p.name = data.user&.name
 
     p
   end
