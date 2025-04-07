@@ -197,7 +197,7 @@ namespace :startgg do
 
               previous_notification = Notification.where(
                 notifiable: player,
-                notification_type: Notification::TYPE_PLAYER_STREAM_LIVE,
+                notification_type: Notification::TYPE_PLAYER_SET_LIVE,
                 platform: Notification::PLATFORM_DISCORD,
                 success: true
               ).order(sent_at: :desc).first
