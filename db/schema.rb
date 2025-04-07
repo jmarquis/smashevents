@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_07_035531) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_07_041232) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -79,6 +79,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_035531) do
     t.datetime "updated_at", null: false
     t.json "metadata"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+  end
+
+  create_table "player_subscriptions", force: :cascade do |t|
+    t.bigint "player_id", null: false
+    t.string "discord_server_id"
+    t.string "discord_channel_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discord_server_id", "discord_channel_id"], name: "idx_on_discord_server_id_discord_channel_id_569c7cf4d2"
+    t.index ["player_id"], name: "index_player_subscriptions_on_player_id"
   end
 
   create_table "players", force: :cascade do |t|

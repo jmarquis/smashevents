@@ -1,0 +1,192 @@
+class Setbot < Api
+
+  class << self
+
+    def run
+      bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
+
+      at_exit do
+        bot.stop
+      end
+
+      bot.register_application_command(:connect, 'Add a SetBot connection', server_id: '1260259175586467840')
+      bot.register_application_command(:disconnect, 'Remove a SetBot connection', server_id: '1260259175586467840')
+
+      bot.application_command :connect do |event|
+        event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
+          modal.row do |row|
+            row.text_input(
+              style: :short,
+              custom_id: 'player_input',
+              label: 'Player tag',
+              required: true,
+              min_length: 2,
+              placeholder: 'Type exact player tag'
+            )
+          end
+        end
+      end
+
+      bot.modal_submit custom_id: 'add_connection_modal' do |event|
+        input_value = event.value('player_input')
+        return unless input_value.present?
+
+        players = Player.tag_similar_to(input_value).limit(10).uniq
+
+        if players.empty?
+          event.respond(
+            content: 'No player found for that tag. Try again.',
+            ephemeral: true
+          )
+        elsif players.count == 1
+          PlayerSubscription.create!(
+            player: players.first,
+            discord_server_id: event.server_id,
+            discord_channel_id: event.channel_id
+          )
+
+          event.respond(
+            content: "Connection added. All streamed sets for #{players.first.tag} will be announced in this channel. Use `/disconnect` to remove the connection.",
+            ephemeral: true
+          )
+        else
+          event.respond(ephemeral: true) do |builder, view|
+            view.row do |r|
+              r.string_select(custom_id: 'player_select', placeholder: 'Choose a player', max_values: 1) do |ss|
+                players.each do |player|
+                  ss.option(label: player.tag, value: player.id, description: player.name, emoji: { name: '👤' })
+                end
+              end
+            end
+          end
+        end
+      end
+
+      bot.string_select custom_id: 'player_select' do |event|
+        player = Player.find(event.values.first)
+
+        if player.blank?
+          event.respond(
+            content: 'Unable to create connection. Please try again.',
+            ephemeral: true
+          )
+          break
+        end
+
+        if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
+          event.respond(
+            content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.',
+            ephemeral: true
+          )
+        end
+
+        PlayerSubscription.create!(
+          player:,
+          discord_server_id: event.server_id,
+          discord_channel_id: event.channel_id
+        )
+
+        event.respond(
+          content: "Connection added. All streamed sets for #{player.tag} will be announced in this channel. Use `/disconnect` to remove the connection.",
+          ephemeral: true
+        )
+      end
+
+      bot.application_command :disconnect do |event|
+        subscriptions = PlayerSubscription.where(
+          discord_server_id: event.server_id,
+          discord_channel_id: event.channel_id
+        )
+
+        if subscriptions.empty?
+          event.respond(
+            content: 'No connections found for this channel. Use `/connect` to add one.',
+            ephemeral: true
+          )
+          break
+        end
+
+        event.respond(ephemeral: true) do |builder, view|
+          view.row do |r|
+            r.string_select(custom_id: 'connection_select', placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
+              subscriptions.each do |subscription|
+                ss.option(label: subscription.player.tag, value: subscription.id, description: subscription.player.name, emoji: { name: '👤' })
+              end
+            end
+          end
+        end
+      end
+
+      bot.string_select custom_id: 'connection_select' do |event|
+        PlayerSubscription.find_by(
+          id: event.values.first,
+          discord_server_id: event.server_id,
+          discord_channel_id: event.channel_id
+        ).destroy
+
+        event.respond(
+          content: 'Connection removed.',
+          ephemeral: true
+        )
+      end
+
+      bot.run
+    end
+
+    def notify_subscriptions(event:, player:, opponent:, stream_name:, startgg_set_id:)
+      bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
+
+      PlayerSubscription.where(player:).each do |subscription|
+        previous_notification = Notification.where(
+          notifiable: subscription,
+          notification_type: Notification::TYPE_SETBOT_SET_LIVE,
+          platform: Notification::PLATFORM_DISCORD,
+          success: true
+        ).order(sent_at: :desc).first
+
+        next if
+          previous_notification.present? &&
+          previous_notification.metadata[:discord_server_id] == subscription.discord_server_id && 
+          previous_notification.metadata[:discord_channel_id] == subscription.discord_channel_id && 
+          previous_notification.metadata[:startgg_set_id] == startgg_set_id 
+
+        Notification.send_notification(
+          subscription,
+          type: Notification::TYPE_SETBOT_SET_LIVE,
+          platform: Notification::PLATFORM_DISCORD,
+          metadata: {
+            discord_server_id: subscription.discord_server_id,
+            discord_channel_id: subscription.discord_channel_id,
+            startgg_set_id:
+          }
+        ) do |subscription|
+          instrument('post') do
+            builder = Discordrb::Webhooks::Builder.new
+
+            builder.content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
+            builder.add_embed do |embed|
+              embed.title = stream_name
+              embed.url = "https://twitch.tv/#{stream_name}"
+
+              embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
+
+              embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+
+              embed.footer = DEFAULT_FOOTER
+            end
+
+            bot.send_message(
+              subscription.discord_channel_id,
+              builder.content,
+              false, # tts
+              builder.embeds
+            )
+          end
+        end
+      end
+    end
+
+  end
+
+end

@@ -192,6 +192,14 @@ namespace :startgg do
 
             players.each do |player|
 
+              Setbot.notify_subscriptions(
+                event:,
+                player:,
+                opponent: (players - [player]).first,
+                stream_name: set.stream.stream_name,
+                startgg_set_id: set.id
+              )
+
               # TODO: uncomment
               # next unless player.discord_notification_channel.present?
 
