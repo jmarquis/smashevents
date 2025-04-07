@@ -146,7 +146,7 @@ class Discord < Api
       end
     end
 
-    def player_stream_live(event:, player:, opponent:, stream_name:)
+    def player_set_live(event:, player:, opponent:, stream_name:)
       # post(player.discord_notification_channel) do |builder|
       post('1358137925346398398') do |builder|
         builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"

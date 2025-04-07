@@ -206,11 +206,11 @@ namespace :startgg do
 
               Notification.send_notification(
                 player,
-                type: Notification::TYPE_PLAYER_STREAM_LIVE,
+                type: Notification::TYPE_PLAYER_SET_LIVE,
                 platform: Notification::PLATFORM_DISCORD,
                 metadata: { startgg_set_id: set.id }
               ) do |player|
-                Discord.player_stream_live(
+                Discord.player_set_live(
                   event:,
                   player:,
                   opponent: (players - [player]).first,

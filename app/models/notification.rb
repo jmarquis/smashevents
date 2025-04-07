@@ -30,7 +30,7 @@ class Notification < ApplicationRecord
   TYPE_CONGRATULATIONS = 'congratulations'
   TYPE_HAPPENING_TODAY = 'happening_today'
   TYPE_STREAM_LIVE = 'stream_live'
-  TYPE_PLAYER_STREAM_LIVE = 'player_stream_live'
+  TYPE_PLAYER_SET_LIVE = 'player_set_live'
 
   before_create do |notification|
     notification.sent_at ||= Time.now
