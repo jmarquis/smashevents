@@ -78,6 +78,7 @@ class Setbot < Api
             content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.',
             ephemeral: true
           )
+          break
         end
 
         PlayerSubscription.create!(
