@@ -4,6 +4,10 @@ class ApplicationController < BaseController
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
 
+    @games.each do |game|
+      StatsD.increment("view.index.#{game.slug}")
+    end
+
     @tournaments = Tournament.should_display(games: @games)
       # Leave a few hours of leeway for events that run long
       .where('end_at > ?', Time.now - 6.hours)
@@ -23,6 +27,10 @@ class ApplicationController < BaseController
   def past
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
+
+    @games.each do |game|
+      StatsD.increment("view.past.#{game.slug}")
+    end
 
     @tournaments = Tournament.should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
