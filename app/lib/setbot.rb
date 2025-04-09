@@ -5,6 +5,7 @@ class Setbot < Api
 
     def run
       bot.application_command :connect do |event|
+        StatsD.increment('setbot.command.connect')
         event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
           modal.row do |row|
             row.text_input(
@@ -20,6 +21,7 @@ class Setbot < Api
       end
 
       bot.modal_submit custom_id: 'add_connection_modal' do |event|
+        StatsD.increment('setbot.modal_submit.add_connection_modal')
         input_value = event.value('player_input')
         return unless input_value.present?
 
@@ -66,6 +68,7 @@ class Setbot < Api
       end
 
       bot.string_select custom_id: 'player_select' do |event|
+        StatsD.increment('setbot.string_select.player_select')
         player = Player.find(event.values.first)
 
         if player.blank?
@@ -108,6 +111,7 @@ class Setbot < Api
       end
 
       bot.application_command :disconnect do |event|
+        StatsD.increment('setbot.command.disconnect')
         subscriptions = PlayerSubscription.where(
           discord_server_id: event.server_id,
           discord_channel_id: event.channel_id
@@ -133,6 +137,7 @@ class Setbot < Api
       end
 
       bot.string_select custom_id: 'connection_select' do |event|
+        StatsD.increment('setbot.string_select.connection_select')
         PlayerSubscription.find_by(
           id: event.values.first,
           discord_server_id: event.server_id,
@@ -216,6 +221,7 @@ class Setbot < Api
       bot.get_application_commands.each(&:delete)
       bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5)
       bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
+      Rails.logger.info 'Global commands successfully registered.'
     end
 
     def register_test_commands
@@ -223,6 +229,7 @@ class Setbot < Api
       bot.get_application_commands(server_id:).each(&:delete)
       bot.register_application_command(:connect, 'Add a SetBot connection', server_id:, default_permission: 1 << 5)
       bot.register_application_command(:disconnect, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
+      Rails.logger.info 'Server-specific commands successfully registered.'
     end
 
     def bot
