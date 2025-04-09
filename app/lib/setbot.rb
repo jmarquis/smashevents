@@ -12,7 +12,7 @@ class Setbot < Api
         bot.application_command(:disconnect_local) { |event| handle_disconnect_command(event) }
       end
 
-      bot.modal_submit custom_id: 'add_connection_modal' do |event|
+      bot.modal_submit custom_id: custom_id('add_connection_modal') do |event|
         StatsD.increment('setbot.modal_submit.add_connection_modal')
         input_value = event.value('player_input')
         return unless input_value.present?
@@ -29,7 +29,7 @@ class Setbot < Api
         else
           event.respond(ephemeral: true) do |builder, view|
             view.row do |r|
-              r.string_select(custom_id: 'player_select', placeholder: 'Choose a player', max_values: 1) do |ss|
+              r.string_select(custom_id: custom_id('player_select'), placeholder: 'Choose a player', max_values: 1) do |ss|
                 players.each do |player|
                   ss.option(label: player.tag, value: player.id, description: player.name, emoji: { name: '👤' })
                 end
@@ -39,7 +39,7 @@ class Setbot < Api
         end
       end
 
-      bot.string_select custom_id: 'player_select' do |event|
+      bot.string_select custom_id: custom_id('player_select') do |event|
         StatsD.increment('setbot.string_select.player_select')
         player = Player.find_by(id: event.values.first)
 
@@ -54,7 +54,7 @@ class Setbot < Api
         add_player_subscription(player, event:)
       end
 
-      bot.string_select custom_id: 'connection_select' do |event|
+      bot.string_select custom_id: custom_id('connection_select') do |event|
         StatsD.increment('setbot.string_select.connection_select')
         PlayerSubscription.find_by(
           id: event.values.first,
@@ -68,7 +68,7 @@ class Setbot < Api
         )
       end
 
-      bot.role_select custom_id: 'role_ping_select' do |event|
+      bot.role_select custom_id: custom_id('role_ping_select') do |event|
         event.respond(
           content: "Selection: #{event.values.map(&:name)}",
           ephemeral: true
@@ -84,11 +84,11 @@ class Setbot < Api
 
     def handle_connect_command(event)
       StatsD.increment('setbot.command.connect')
-      event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
+      event.show_modal(title: 'Add SetBot connection', custom_id: custom_id('add_connection_modal')) do |modal|
         modal.row do |row|
           row.text_input(
             style: :short,
-            custom_id: 'player_input',
+            custom_id: custom_id('player_input'),
             label: 'Player tag',
             required: true,
             min_length: 2,
@@ -115,7 +115,7 @@ class Setbot < Api
 
       event.respond(ephemeral: true) do |builder, view|
         view.row do |r|
-          r.string_select(custom_id: 'connection_select', placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
+          r.string_select(custom_id: custom_id('connection_select'), placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
             subscriptions.each do |subscription|
               ss.option(label: subscription.player.tag, value: subscription.id, description: subscription.player.name, emoji: { name: '👤' })
             end
@@ -153,11 +153,9 @@ class Setbot < Api
       event.respond(
         content: "Connection added. All streamed sets for #{player.tag} will be announced in this channel. Use `/disconnect` to remove the connection. Optionally, add a role to ping for set notifications below.",
         ephemeral: true
-      )
-
-      event.respond(ephemeral: true) do |builder, view|
+      ) do |builder, view|
         view.row do |r|
-          r.role_select(custom_id: 'role_ping_select', placeholder: 'Choose a role to ping', max_values: 1)
+          r.role_select(custom_id: custom_id('role_ping_select'), placeholder: 'Choose a role to ping', max_values: 1)
         end
       end
     end
@@ -234,6 +232,10 @@ class Setbot < Api
         bot.register_application_command(:disconnect_local, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
         Rails.logger.info 'Server-specific commands successfully registered.'
       end
+    end
+
+    def custom_id(str)
+      "#{str}_#{Rails.env}"
     end
 
     def bot
