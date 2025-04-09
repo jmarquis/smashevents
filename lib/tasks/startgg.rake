@@ -153,7 +153,7 @@ namespace :startgg do
   end
 
   task scan_stream_sets: [:environment] do
-    Tournament.should_display.live.each do |tournament|
+    Tournament.should_display.live.has_streams.each do |tournament|
       tournament.events.each do |event|
         next if event.completed?
 
@@ -186,10 +186,6 @@ namespace :startgg do
               set.slots.second.entrant.participants.first.player.id
             ])
 
-            # Make sure we have players we want to notify about.
-            # TODO: uncomment
-            # next unless players.any?(&:discord_notification_channel)
-
             players.each do |player|
 
               Setbot.notify_subscriptions(
@@ -199,9 +195,6 @@ namespace :startgg do
                 stream_name: set.stream.stream_name,
                 startgg_set_id: set.id
               )
-
-              # TODO: uncomment
-              # next unless player.discord_notification_channel.present?
 
               previous_notification = Notification.where(
                 notifiable: player,

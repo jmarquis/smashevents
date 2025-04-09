@@ -147,7 +147,7 @@ class Discord < Api
     end
 
     def player_set_live(event:, player:, opponent:, stream_name:)
-      # post(player.discord_notification_channel) do |builder|
+      # TODO: should we graduate this to a public channel?
       post('1358137925346398398') do |builder|
         builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"
 

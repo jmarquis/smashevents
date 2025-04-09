@@ -38,6 +38,8 @@ class Tournament < ApplicationRecord
 
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
   scope :live, -> { where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now)}
+  scope :reasonable_duration, -> { where("end_at - start_at < interval '7 days'") }
+  scope :has_streams, -> { where.not(stream_data: nil) }
   scope :should_display, ->(games: Game.all.map(&:slug)) {
     includes(:override, events: [:game, winner_entrant: :player])
     .where(events: { game: games })
