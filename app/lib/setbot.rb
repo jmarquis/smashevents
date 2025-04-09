@@ -14,7 +14,7 @@ class Setbot < Api
 
       bot.modal_submit custom_id: custom_id('add_connection_modal') do |event|
         StatsD.increment('setbot.modal_submit.add_connection_modal')
-        input_value = event.value('player_input')
+        input_value = event.value(custom_id('player_input'))
         return unless input_value.present?
 
         players = Player.tag_similar_to(input_value).limit(10).uniq
