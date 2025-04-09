@@ -9,8 +9,8 @@ class Setbot < Api
         bot.stop
       end
 
-      bot.register_application_command(:connect, 'Add a SetBot connection', server_id: '1260259175586467840')
-      bot.register_application_command(:disconnect, 'Remove a SetBot connection', server_id: '1260259175586467840')
+      bot.register_application_command(:connect, 'Add a SetBot connection')
+      bot.register_application_command(:disconnect, 'Remove a SetBot connection')
 
       bot.application_command :connect do |event|
         event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
@@ -39,6 +39,17 @@ class Setbot < Api
             ephemeral: true
           )
         elsif players.count == 1
+          if PlayerSubscription.find_by(
+            id: players.first,
+            discord_server_id: event.server_id,
+            discord_channel_id: event.channel_id
+          ).present?
+            event.respond(
+              content: "Connection for #{player.first.tag} already exists in this channel.",
+              ephemeral: true
+            )
+          end
+
           PlayerSubscription.create!(
             player: players.first,
             discord_server_id: event.server_id,
@@ -71,6 +82,17 @@ class Setbot < Api
             ephemeral: true
           )
           break
+        end
+
+        if PlayerSubscription.find_by(
+          id: players.first,
+          discord_server_id: event.server_id,
+          discord_channel_id: event.channel_id
+        ).present?
+          event.respond(
+            content: "Connection for #{player.tag} already exists in this channel.",
+            ephemeral: true
+          )
         end
 
         if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
