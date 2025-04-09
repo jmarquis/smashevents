@@ -175,38 +175,42 @@ class Setbot < Api
           metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
           metadata[:startgg_set_id]&.to_s == startgg_set_id
 
-        Notification.send_notification(
-          subscription,
-          type: Notification::TYPE_SETBOT_SET_LIVE,
-          platform: Notification::PLATFORM_DISCORD,
-          metadata: {
-            discord_server_id: subscription.discord_server_id,
-            discord_channel_id: subscription.discord_channel_id,
-            startgg_set_id:
-          }
-        ) do |subscription|
-          instrument('post') do
-            builder = Discordrb::Webhooks::Builder.new
+        begin
+          Notification.send_notification(
+            subscription,
+            type: Notification::TYPE_SETBOT_SET_LIVE,
+            platform: Notification::PLATFORM_DISCORD,
+            metadata: {
+              discord_server_id: subscription.discord_server_id,
+              discord_channel_id: subscription.discord_channel_id,
+              startgg_set_id:
+            }
+          ) do |subscription|
+            instrument('post') do
+              builder = Discordrb::Webhooks::Builder.new
 
-            builder.content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
-            builder.add_embed do |embed|
-              embed.title = stream_name
-              embed.url = "https://twitch.tv/#{stream_name}"
+              builder.content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
+              builder.add_embed do |embed|
+                embed.title = stream_name
+                embed.url = "https://twitch.tv/#{stream_name}"
 
-              embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
+                embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
 
-              embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
-              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+                embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+                embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
-              embed.footer = Discord::DEFAULT_FOOTER
+                embed.footer = Discord::DEFAULT_FOOTER
+              end
+
+              bot.send_message(
+                subscription.discord_channel_id,
+                builder.content,
+                false, # tts
+                builder.embeds
+              )
             end
-
-            bot.send_message(
-              subscription.discord_channel_id,
-              builder.content,
-              false, # tts
-              builder.embeds
-            )
+          rescue => e
+            Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
           end
         end
       end
