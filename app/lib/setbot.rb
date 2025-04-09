@@ -1,17 +1,9 @@
 class Setbot < Api
+  @@bot = nil
 
   class << self
 
     def run
-      bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
-
-      at_exit do
-        bot.stop
-      end
-
-      bot.register_application_command(:connect, 'Add a SetBot connection')
-      bot.register_application_command(:disconnect, 'Remove a SetBot connection')
-
       bot.application_command :connect do |event|
         event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
           modal.row do |row|
@@ -153,6 +145,10 @@ class Setbot < Api
         )
       end
 
+      at_exit do
+        bot.stop
+      end
+
       bot.run
     end
 
@@ -214,6 +210,25 @@ class Setbot < Api
           end
         end
       end
+    end
+
+    def register_commands
+      bot.get_application_commands.each(&:delete)
+      bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5)
+      bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
+    end
+
+    def register_test_commands
+      server_id = '1260259175586467840'
+      bot.get_application_commands(server_id:).each(&:delete)
+      bot.register_application_command(:connect, 'Add a SetBot connection', server_id:, default_permission: 1 << 5)
+      bot.register_application_command(:disconnect, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
+    end
+
+    def bot
+      return @@bot if @@bot.present?
+
+      @@bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
     end
 
   end
