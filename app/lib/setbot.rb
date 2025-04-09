@@ -4,20 +4,12 @@ class Setbot < Api
   class << self
 
     def run
-      bot.application_command :connect do |event|
-        StatsD.increment('setbot.command.connect')
-        event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
-          modal.row do |row|
-            row.text_input(
-              style: :short,
-              custom_id: 'player_input',
-              label: 'Player tag',
-              required: true,
-              min_length: 2,
-              placeholder: 'Type exact player tag'
-            )
-          end
-        end
+      if Rails.env.production?
+        bot.application_command(:connect) { |event| handle_connect_command(event) }
+        bot.application_command(:disconnect) { |event| handle_disconnect_command(event) }
+      else
+        bot.application_command(:connect_local) { |event| handle_connect_command(event) }
+        bot.application_command(:disconnect_local) { |event| handle_disconnect_command(event) }
       end
 
       bot.modal_submit custom_id: 'add_connection_modal' do |event|
@@ -33,27 +25,7 @@ class Setbot < Api
             ephemeral: true
           )
         elsif players.count == 1
-          if PlayerSubscription.find_by(
-            id: players.first,
-            discord_server_id: event.server_id,
-            discord_channel_id: event.channel_id
-          ).present?
-            event.respond(
-              content: "Connection for #{player.first.tag} already exists in this channel.",
-              ephemeral: true
-            )
-          end
-
-          PlayerSubscription.create!(
-            player: players.first,
-            discord_server_id: event.server_id,
-            discord_channel_id: event.channel_id
-          )
-
-          event.respond(
-            content: "Connection added. All streamed sets for #{players.first.tag} will be announced in this channel. Use `/disconnect` to remove the connection.",
-            ephemeral: true
-          )
+          add_player_subscription(players.first, event:)
         else
           event.respond(ephemeral: true) do |builder, view|
             view.row do |r|
@@ -69,7 +41,7 @@ class Setbot < Api
 
       bot.string_select custom_id: 'player_select' do |event|
         StatsD.increment('setbot.string_select.player_select')
-        player = Player.find(event.values.first)
+        player = Player.find_by(id: event.values.first)
 
         if player.blank?
           event.respond(
@@ -79,61 +51,7 @@ class Setbot < Api
           break
         end
 
-        if PlayerSubscription.find_by(
-          id: players.first,
-          discord_server_id: event.server_id,
-          discord_channel_id: event.channel_id
-        ).present?
-          event.respond(
-            content: "Connection for #{player.tag} already exists in this channel.",
-            ephemeral: true
-          )
-        end
-
-        if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
-          event.respond(
-            content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.',
-            ephemeral: true
-          )
-          break
-        end
-
-        PlayerSubscription.create!(
-          player:,
-          discord_server_id: event.server_id,
-          discord_channel_id: event.channel_id
-        )
-
-        event.respond(
-          content: "Connection added. All streamed sets for #{player.tag} will be announced in this channel. Use `/disconnect` to remove the connection.",
-          ephemeral: true
-        )
-      end
-
-      bot.application_command :disconnect do |event|
-        StatsD.increment('setbot.command.disconnect')
-        subscriptions = PlayerSubscription.where(
-          discord_server_id: event.server_id,
-          discord_channel_id: event.channel_id
-        )
-
-        if subscriptions.empty?
-          event.respond(
-            content: 'No connections found for this channel. Use `/connect` to add one.',
-            ephemeral: true
-          )
-          break
-        end
-
-        event.respond(ephemeral: true) do |builder, view|
-          view.row do |r|
-            r.string_select(custom_id: 'connection_select', placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
-              subscriptions.each do |subscription|
-                ss.option(label: subscription.player.tag, value: subscription.id, description: subscription.player.name, emoji: { name: '👤' })
-              end
-            end
-          end
-        end
+        add_player_subscription(player, event:)
       end
 
       bot.string_select custom_id: 'connection_select' do |event|
@@ -150,11 +68,98 @@ class Setbot < Api
         )
       end
 
+      bot.role_select custom_id: 'role_ping_select' do |event|
+        event.respond(
+          content: "Selection: #{event.values.map(&:name)}",
+          ephemeral: true
+        )
+      end
+
       at_exit do
         bot.stop
       end
 
       bot.run
+    end
+
+    def handle_connect_command(event)
+      StatsD.increment('setbot.command.connect')
+      event.show_modal(title: 'Add SetBot connection', custom_id: 'add_connection_modal') do |modal|
+        modal.row do |row|
+          row.text_input(
+            style: :short,
+            custom_id: 'player_input',
+            label: 'Player tag',
+            required: true,
+            min_length: 2,
+            placeholder: 'Type exact player tag'
+          )
+        end
+      end
+    end
+
+    def handle_disconnect_command(event)
+      StatsD.increment('setbot.command.disconnect')
+      subscriptions = PlayerSubscription.where(
+        discord_server_id: event.server_id,
+        discord_channel_id: event.channel_id
+      )
+
+      if subscriptions.empty?
+        event.respond(
+          content: 'No connections found for this channel. Use `/connect` to add one.',
+          ephemeral: true
+        )
+        return
+      end
+
+      event.respond(ephemeral: true) do |builder, view|
+        view.row do |r|
+          r.string_select(custom_id: 'connection_select', placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
+            subscriptions.each do |subscription|
+              ss.option(label: subscription.player.tag, value: subscription.id, description: subscription.player.name, emoji: { name: '👤' })
+            end
+          end
+        end
+      end
+    end
+
+    def add_player_subscription(player, event:)
+      if PlayerSubscription.find_by(
+        player:,
+        discord_server_id: event.server_id,
+        discord_channel_id: event.channel_id
+      ).present?
+        event.respond(
+          content: "Connection for #{player.tag} already exists in this channel.",
+          ephemeral: true
+        )
+      end
+
+      if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
+        event.respond(
+          content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.',
+          ephemeral: true
+        )
+        return
+      end
+
+      PlayerSubscription.create!(
+        player:,
+        discord_server_id: event.server_id,
+        discord_channel_id: event.channel_id
+      )
+
+      event.respond(
+        content: "Connection added. All streamed sets for #{player.tag} will be announced in this channel. Use `/disconnect` to remove the connection. Optionally, add a role to ping for set notifications below.",
+        ephemeral: true
+      )
+
+      event.respond(ephemeral: true) do |builder, view|
+        view.row do |r|
+          r.role_select(custom_id: 'role_ping_select', placeholder: 'Choose a role to ping', max_values: 1)
+        end
+      end
     end
 
     def notify_subscriptions(event:, player:, opponent:, stream_name:, startgg_set_id:)
@@ -170,8 +175,7 @@ class Setbot < Api
 
         metadata = previous_notification&.metadata&.with_indifferent_access
 
-        next if
-          previous_notification.present? &&
+        next if previous_notification.present? &&
           metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
           metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
           metadata[:startgg_set_id]&.to_s == startgg_set_id
@@ -218,18 +222,18 @@ class Setbot < Api
     end
 
     def register_commands
-      bot.get_application_commands.each(&:delete)
-      bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5)
-      bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
-      Rails.logger.info 'Global commands successfully registered.'
-    end
-
-    def register_test_commands
-      server_id = '1260259175586467840'
-      bot.get_application_commands(server_id:).each(&:delete)
-      bot.register_application_command(:connect, 'Add a SetBot connection', server_id:, default_permission: 1 << 5)
-      bot.register_application_command(:disconnect, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
-      Rails.logger.info 'Server-specific commands successfully registered.'
+      if Rails.env.production?
+        bot.get_application_commands.each(&:delete)
+        bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5)
+        bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
+        Rails.logger.info 'Global commands successfully registered.'
+      else
+        server_id = '1260259175586467840'
+        bot.get_application_commands(server_id:).each(&:delete)
+        bot.register_application_command(:connect_local, 'Add a SetBot connection', server_id:, default_permission: 1 << 5)
+        bot.register_application_command(:disconnect_local, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
+        Rails.logger.info 'Server-specific commands successfully registered.'
+      end
     end
 
     def bot
