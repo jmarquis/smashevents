@@ -145,11 +145,13 @@ class Setbot < Api
           success: true
         ).order(sent_at: :desc).first
 
+        metadata = previous_notification&.metadata&.with_indifferent_access
+
         next if
           previous_notification.present? &&
-          previous_notification.metadata[:discord_server_id] == subscription.discord_server_id && 
-          previous_notification.metadata[:discord_channel_id] == subscription.discord_channel_id && 
-          previous_notification.metadata[:startgg_set_id] == startgg_set_id 
+          metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
+          metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
+          metadata[:startgg_set_id]&.to_s == startgg_set_id
 
         Notification.send_notification(
           subscription,
