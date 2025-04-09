@@ -2,15 +2,14 @@
 #
 # Table name: players
 #
-#  id                           :integer          not null, primary key
-#  startgg_player_id            :integer
-#  startgg_user_id              :integer
-#  tag                          :string
-#  twitter_username             :string
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  discord_notification_channel :string
-#  name                         :string
+#  id                :integer          not null, primary key
+#  startgg_player_id :integer
+#  startgg_user_id   :integer
+#  tag               :string
+#  twitter_username  :string
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  name              :string
 #
 # Indexes
 #
