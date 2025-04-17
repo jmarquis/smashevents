@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_015233) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_17_025038) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -87,6 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_015233) do
     t.string "discord_channel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "discord_role_id"
     t.index ["discord_server_id", "discord_channel_id"], name: "idx_on_discord_server_id_discord_channel_id_569c7cf4d2"
     t.index ["player_id"], name: "index_player_subscriptions_on_player_id"
   end
