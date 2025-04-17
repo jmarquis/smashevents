@@ -187,11 +187,13 @@ namespace :startgg do
             ])
 
             players.each do |player|
+              opponent = (players = [player]).first
+              next unless opponent.present?
 
               Setbot.notify_subscriptions(
                 event:,
                 player:,
-                opponent: (players - [player]).first,
+                opponent:,
                 stream_name: set.stream.stream_name,
                 startgg_set_id: set.id
               )
@@ -214,7 +216,7 @@ namespace :startgg do
                 Discord.player_set_live(
                   event:,
                   player:,
-                  opponent: (players - [player]).first,
+                  opponent:,
                   stream_name: set.stream.stream_name
                 )
               end
