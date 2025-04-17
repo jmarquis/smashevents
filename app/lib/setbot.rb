@@ -247,7 +247,9 @@ class Setbot < Api
     def register_commands
       if Rails.env.production?
         bot.get_application_commands.each(&:delete)
-        bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5)
+        bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5) do |cmd|
+          cmd.string('player_tag', 'The tag of the player to notify this channel about.', required: true)
+        end
         bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
         Rails.logger.info 'Global commands successfully registered.'
       else
