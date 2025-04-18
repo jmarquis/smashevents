@@ -1,10 +1,16 @@
 $stdout.sync = true
 using RubyClock::DSL
 
+# Noisy logs we don't really need
+MUTED_JOB_LOGS = [
+  'setbot:run',
+  'startgg:scan_stream_sets'
+]
+
 around_action do |job_proc, job_info|
-  Rails.logger.info "Starting job: #{job_info[:task]}" unless job_info[:task] == 'setbot:run'
+  Rails.logger.info "Starting job: #{job_info[:task]}" unless job_info[:task].in? MUTED_JOB_LOGS
   job_proc.call
-  Rails.logger.info "Job finished: #{job_info[:task]}" unless job_info[:task] == 'setbot:run'
+  Rails.logger.info "Job finished: #{job_info[:task]}" unless job_info[:task].in? MUTED_JOB_LOGS
   STDOUT.flush
 end
 
