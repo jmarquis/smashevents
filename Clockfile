@@ -77,5 +77,6 @@ end
 
 # Every minute
 cron '* * * * *', locals: { task: 'setbot:run' }, overlap: false do
+  Rails.logger.info('Starting Setbot...')
   rake_async('setbot:run')
 end
