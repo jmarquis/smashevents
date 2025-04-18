@@ -1,24 +1,35 @@
-# README
+# Smash Events
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Run locally
 
-Things you may want to cover:
+### Initialize the database (first run)
 
-* Ruby version
+```
+docker compose run web sh
+rails db:setup
+```
 
-* System dependencies
+### Run the app
 
-* Configuration
+```
+docker compose up
+```
 
-* Database creation
+or
 
-* Database initialization
+```
+docker compose run --service-ports web sh
+rails s -b0
+```
 
-* How to run the test suite
+### Console
 
-* Services (job queues, cache servers, search engines, etc.)
+```
+docker compose exec web rails c
+```
 
-* Deployment instructions
+### Populate the database
 
-* ...
+```
+rails startgg:sync
+```
