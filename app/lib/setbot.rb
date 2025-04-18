@@ -175,7 +175,7 @@ class Setbot < Api
       subscription.save!
 
       event.interaction.update_message(
-        content: "<@&#{event.values.first.id}> will be pinged for all set notifications.",
+        content: "<@&#{event.values.first.id}> will be pinged for all set notifications for #{subscription.player.tag}.",
       )
     end
 
