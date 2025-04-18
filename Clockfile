@@ -3,7 +3,6 @@ using RubyClock::DSL
 
 # Noisy logs we don't really need
 MUTED_JOB_LOGS = [
-  'setbot:run',
   'startgg:scan_stream_sets'
 ]
 
@@ -27,46 +26,46 @@ end
 ### DAILY JOBS
 
 # 8:00am UTC
-cron '0 8 * * *', locals: { task: 'cleanup:delete_old_tournaments' } do
+cron '0 8 * * *', locals: { task: 'cleanup:delete_old_tournaments' }, overlap: false do
   rake_async('cleanup:delete_old_tournaments')
 end
 
 # 2:00pm UTC
-cron '0 14 * * *', locals: { task: 'notifications:happening_today' } do
+cron '0 14 * * *', locals: { task: 'notifications:happening_today' }, overlap: false do
   rake_async('notifications:happening_today')
 end
 
 # 3:00pm UTC
-cron '0 15 * * *', locals: { task: 'notifications:congratulations' } do
+cron '0 15 * * *', locals: { task: 'notifications:congratulations' }, overlap: false do
   rake_async('notifications:congratulations')
 end
 
 # 4:00pm UTC
-cron '0 16 * * *', locals: { task: 'notifications:weekend_briefing' } do
+cron '0 16 * * *', locals: { task: 'notifications:weekend_briefing' }, overlap: false do
   rake_async('notifications:weekend_briefing')
 end
 
 ### HOURLY JOBS
 
 # Every hour at :10
-cron '10 * * * *', locals: { task: 'youtube:fetch_stream_urls' } do
+cron '10 * * * *', locals: { task: 'youtube:fetch_stream_urls' }, overlap: false do
   rake_async('youtube:fetch_stream_urls')
 end
 
 # Every hour at :40
-cron '40 * * * *', locals: { task: 'startgg:sync' } do
+cron '40 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end
 
 ### MORE FREQUENT JOBS
 
 # Every 10 minutes
-cron '*/10 * * * *', locals: { task: 'notifications:new_events' } do
+cron '*/10 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
   rake_async('notifications:new_events')
 end
 
 # Every 10 minutes (5 minute offset)
-cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' } do
+cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' }, overlap: false do
   rake_async('twitch:sync_streams')
 end
 
@@ -77,6 +76,5 @@ end
 
 # Every minute
 cron '* * * * *', locals: { task: 'setbot:run' }, overlap: false do
-  Rails.logger.info('Starting Setbot...')
   rake_async('setbot:run')
 end

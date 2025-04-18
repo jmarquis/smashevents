@@ -4,6 +4,8 @@ class Setbot < Api
   class << self
 
     def run
+      Rails.logger.info 'Starting Setbot...'
+
       if Rails.env.production?
         bot.application_command(:connect) do |event|
           StatsD.increment('setbot.command.connect')
