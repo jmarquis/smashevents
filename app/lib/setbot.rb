@@ -81,7 +81,6 @@ class Setbot < Api
     end
 
     def handle_disconnect_command(event:)
-      StatsD.increment('setbot.command.disconnect')
       subscriptions = PlayerSubscription.where(
         discord_server_id: event.server_id,
         discord_channel_id: event.channel_id
