@@ -74,7 +74,7 @@ every '10 seconds', locals: { task: 'startgg:scan_stream_sets' }, overlap: false
   rake_async('startgg:scan_stream_sets')
 end
 
-# Every minute
-cron '* * * * *', locals: { task: 'setbot:run' }, overlap: false do
+# Every 10 seconds
+every '10 seconds', locals: { task: 'setbot:run' }, overlap: false do
   rake_async('setbot:run')
 end
