@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   root 'application#index'
   get 'past' => 'application#past', as: :past_events
 
+  get 'setbot' => 'application#setbot', as: :setbot
+
   get 'players/search' => 'players#search'
   get 'players/:player' => 'application#index', as: :player
   get 'players/:player/past' => 'application#past', as: :player_past

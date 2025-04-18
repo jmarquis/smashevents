@@ -23,33 +23,55 @@ a {
   text-decoration: underline;
   color: inherit;
   text-decoration-color: var(--color-bg-2);
+
+  &:hover {
+    color: #fff;
+    text-decoration-color: #fff;
+  }
+
+  &.button {
+    display: inline-block;
+    background-color: var(--color-bg-2);
+    padding: 8px 16px 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    margin-top: 16px;
+
+    &:hover {
+      background-color: var(--color-bg-3);
+    }
+  }
 }
 
-a:hover {
-  color: #fff;
-  text-decoration-color: #fff;
-}
-
-.social {
+.links {
   display: flex;
   justify-content: center;
   margin: 64px 0 0;
   gap: 24px;
-}
+  text-transform: uppercase;
 
-.social a {
-  color: var(--color-text);
-  padding: 8px;
-  display: flex;
-}
+  a {
+    color: var(--color-text);
+    padding: 8px;
+    display: flex;
+    font-weight: bold;
 
-.social a:hover {
-  color: #fff;
-}
+    &.text-link {
+      position: relative;
+      top: -2px;
+    }
 
-.social a svg {
-  width: 24px;
-  height: 24px;
+    &:hover {
+      color: #fff;
+    }
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
 }
 
 h1 {
@@ -251,6 +273,15 @@ h3.game-heading {
   margin-bottom: 4px;
 }
 
+p {
+  margin: 0;
+  line-height: 1.5;
+
+  & + p {
+    margin-top: 1em;
+  }
+}
+
 time {
   font-weight: bold;
   text-transform: uppercase;
@@ -314,6 +345,10 @@ article > .streams .live {
   position: relative;
   top: 1px;
   pointer-events: none;
+}
+
+section + section {
+  margin-top: 40px;
 }
 
 footer {

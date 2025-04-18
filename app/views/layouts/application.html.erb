@@ -23,56 +23,7 @@
 
   <body style="<%= colors_css(action_name) %>"<%= " data-current-tag=\"#{params[:player]}\"".html_safe if params[:player] %>>
 
-    <div class="social">
-      <a href="https://twitter.com/smasheventsgg" target="_blank"><%= inline_svg_tag "twitter.svg" %></a>
-      <a href="https://discord.gg/x7E38ygc42" target="_blank"><%= inline_svg_tag "discord.svg" %></a>
-    </div>
-
-    <h1>Smash Events</h1>
-
-    <nav class="pages">
-      <% if action_name == 'index' %>
-        Upcoming events
-      <% elsif params[:player].present? %>
-        <%= link_to "Upcoming events", player_path(player: params[:player], game: params[:game], games: params[:games]) %>
-      <% else %>
-        <%= link_to "Upcoming events", root_path(game: params[:game], games: params[:games]) %>
-      <% end %>
-      <span>/</span>
-      <% if action_name == 'past' %>
-        Past events
-      <% elsif params[:player].present? %>
-        <%= link_to "Past events", player_past_path(player: params[:player], game: params[:game], games: params[:games]) %>
-      <% else %>
-        <%= link_to "Past events", past_events_path(game: params[:game], games: params[:games]) %>
-      <% end %>
-    </nav>
-
-    <nav class="game-selector">
-      <% @games.each do |game| %>
-        <div class="selected-game"><%= game.name %>
-          <%= remove_game_link(game, @games) if @games.count > 1 %></div>
-      <% end %>
-      <% if @unselected_games.any? %>
-        <div class="menu-container">
-          <input id="menu-toggle" type="checkbox">
-          <label for="menu-toggle" class="menu-toggle">+</label>
-          <ul class="unselected-games">
-            <% @unselected_games.each do |game| %>
-              <li><%= add_game_link(game, @games) %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-    </nav>
-
-    <nav class="player-selector">
-      <%= react_component "PlayerSelector" %>
-    </nav>
-
-    <main>
-      <%= yield %>
-    </main>
+    <%= content_for?(:content) ? yield(:content) : yield %>
 
     <footer>
       <p>Made with ♥ by

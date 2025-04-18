@@ -1,4 +1,7 @@
 class ApplicationController < BaseController
+  layout 'events'
+
+  @title = 'Smash Events'
 
   def index
     @games = selected_games
@@ -49,6 +52,11 @@ class ApplicationController < BaseController
     end
 
     render :index
+  end
+
+  def setbot
+    @title = 'Setbot'
+    render layout: 'minimal'
   end
 
   private
