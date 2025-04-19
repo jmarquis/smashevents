@@ -187,7 +187,7 @@ namespace :startgg do
             ])
 
             players.each do |player|
-              opponent = (players = [player]).first
+              opponent = (players - [player]).first
               next unless opponent.present?
 
               Setbot.notify_subscriptions(
