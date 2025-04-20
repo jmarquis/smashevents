@@ -47,7 +47,8 @@ class Event < ApplicationRecord
 
   def should_display?
     # Pseudo-cache of this, to keep events from falling off the radar after
-    # we've sent notifications and stuff for them.
+    # we've sent notifications and stuff for them. This value can safely be set
+    # to nil if we want to regenerate it based on new logic below.
     return should_display unless should_display.nil?
 
     return false unless game&.display_threshold.present?
