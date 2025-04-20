@@ -49,6 +49,12 @@ namespace :notifications do
           Discord.event_added(event)
         end
 
+        # Also set should_display here so this becomes perpetual.
+        unless event.should_display
+          event.should_display = true
+          event.save
+        end
+
         # Avoid rate limits
         sleep 1
       end

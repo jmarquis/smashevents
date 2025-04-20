@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_17_025038) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_20_000251) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -47,6 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_17_025038) do
     t.bigint "winner_entrant_id"
     t.string "state"
     t.datetime "sets_synced_at"
+    t.boolean "should_display"
     t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
     t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"

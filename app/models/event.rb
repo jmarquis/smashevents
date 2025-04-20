@@ -17,6 +17,7 @@
 #  winner_entrant_id   :integer
 #  state               :string
 #  sets_synced_at      :datetime
+#  should_display      :boolean
 #
 # Indexes
 #
@@ -45,6 +46,10 @@ class Event < ApplicationRecord
   end
 
   def should_display?
+    # Pseudo-cache of this, to keep events from falling off the radar after
+    # we've sent notifications and stuff for them.
+    return should_display unless should_display.nil?
+
     return false unless game&.display_threshold.present?
     return true if tournament.override.present? && tournament.override.include
     return false unless player_count.present?
