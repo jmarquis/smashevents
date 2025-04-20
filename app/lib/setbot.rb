@@ -180,7 +180,6 @@ class Setbot < Api
     end
 
     def notify_subscriptions(event:, player:, opponent:, stream_name:, startgg_set_id:)
-      StatsD.increment('setbot.notification.set_live')
       bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
 
       PlayerSubscription.where(player:).each do |subscription|
@@ -197,6 +196,8 @@ class Setbot < Api
           metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
           metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
           metadata[:startgg_set_id]&.to_s == startgg_set_id
+
+        StatsD.increment('setbot.notification.set_live')
 
         begin
           Notification.send_notification(
