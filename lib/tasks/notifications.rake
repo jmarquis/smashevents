@@ -8,10 +8,9 @@ namespace :notifications do
     # list all the games regardless of player count as soon as one event has
     # crossed the display threshold.
     Tournament
-      .includes(:events)
+      .should_display
       .where('start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
-      .filter(&:should_display?)
       .each do |tournament|
         begin
           Notification.send_notification(
@@ -33,12 +32,11 @@ namespace :notifications do
     # For Discord we want to notify per event since there are separate channels
     # for each game.
     Tournament
-      .includes(:events)
+      .should_display
       .where('start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter(&:should_display?)
       .each do |event|
         Notification.send_notification(
           event,
@@ -65,13 +63,12 @@ namespace :notifications do
     next unless Time.now.strftime('%a') == 'Wed' || Rails.env.development?
 
     Tournament
-      .includes(:events)
+      .should_display
       .where('end_at > ?', Time.now + 1.day)
       .where('start_at < ?', Time.now + 5.days)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter(&:should_display?)
       .group_by(&:game)
       .each do |game, events|
 
@@ -104,12 +101,11 @@ namespace :notifications do
     effective_time = Time.now
 
     Tournament
-      .includes(:events)
+      .should_display
       .where('end_at between ? and ?', effective_time - 1.day, effective_time)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
-      .filter(&:should_display?)
       .filter { |event| event.winner_entrant.present? }
       .group_by(&:game)
       .each do |game, events|
@@ -130,12 +126,11 @@ namespace :notifications do
     effective_time = Time.now
 
     Tournament
-      .includes(:events)
+      .should_display
       .where('end_at > ?', effective_time)
       .where('start_at < ?', effective_time + 2.days)
       .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
-      .filter(&:should_display?)
       .filter { |t|
 
         # Custom idempotency logic since a multi-day tournament is supposed to
