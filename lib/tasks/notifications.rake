@@ -9,7 +9,7 @@ namespace :notifications do
     # crossed the display threshold.
     Tournament
       .should_display
-      .where('start_at > ?', Time.now)
+      .where('tournament.start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .each do |tournament|
         begin
@@ -33,7 +33,7 @@ namespace :notifications do
     # for each game.
     Tournament
       .should_display
-      .where('start_at > ?', Time.now)
+      .where('tournament.start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -65,7 +65,7 @@ namespace :notifications do
     Tournament
       .should_display
       .where('end_at > ?', Time.now + 1.day)
-      .where('start_at < ?', Time.now + 5.days)
+      .where('tournament.start_at < ?', Time.now + 5.days)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -128,7 +128,7 @@ namespace :notifications do
     Tournament
       .should_display
       .where('end_at > ?', effective_time)
-      .where('start_at < ?', effective_time + 2.days)
+      .where('tournament.start_at < ?', effective_time + 2.days)
       .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t|
