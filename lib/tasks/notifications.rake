@@ -20,13 +20,13 @@ namespace :notifications do
             idempotent: true
           ) do |tournament|
             Twitter.tournament_added(tournament)
+
+            # Avoid rate limits
+            sleep 1
           end
         rescue X::Error
           # Swallow errors, they got logged from the Twitter class
         end
-
-        # Avoid rate limits
-        sleep 1
       end
 
     # For Discord we want to notify per event since there are separate channels
@@ -45,6 +45,9 @@ namespace :notifications do
           idempotent: true
         ) do |event|
           Discord.event_added(event)
+
+          # Avoid rate limits
+          sleep 1
         end
 
         # Also set should_display here so this becomes perpetual.
@@ -52,9 +55,6 @@ namespace :notifications do
           event.should_display = true
           event.save
         end
-
-        # Avoid rate limits
-        sleep 1
       end
 
   end
