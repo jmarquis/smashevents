@@ -48,7 +48,7 @@ class ApplicationController < BaseController
     end
 
     @tournaments = @tournaments.filter do |tournament|
-      tournament.events.any?(&:completed?)
+      tournament.events.all?(&:completed?)
     end
 
     render :index
