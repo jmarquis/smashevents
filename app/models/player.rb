@@ -60,7 +60,7 @@ class Player < ApplicationRecord
     p.startgg_user_id = data.user&.id
     p.tag = data.gamer_tag
     p.twitter_username = data&.user&.authorizations&.first&.external_username
-    p.slug = data.user&.slug
+    p.startgg_user_slug = data.user&.discriminator
     p.name = data.user&.name
 
     p

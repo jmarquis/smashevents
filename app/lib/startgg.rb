@@ -145,7 +145,7 @@ class Startgg < Api
                     }
                     user {
                       id
-                      slug
+                      discriminator
                       name
                       authorizations(types: [TWITTER]) {
                         externalUsername
