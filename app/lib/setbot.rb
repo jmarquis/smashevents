@@ -60,7 +60,12 @@ class Setbot < Api
       input_value = event.options['player_tag']
       return unless input_value.present?
 
-      players = Player.tag_similar_to(input_value).limit(10).uniq
+      slug = input_value.match(/\/user\/([^\/]+)/)
+      if slug.present?
+        players = Player.where(startgg_player_slug: slug[1])
+      else
+        players = Player.tag_similar_to(input_value).limit(10).uniq
+      end
 
       if players.empty?
         event.respond(
@@ -252,7 +257,7 @@ class Setbot < Api
       if Rails.env.production?
         bot.get_application_commands.each(&:delete)
         bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5) do |cmd|
-          cmd.string('player_tag', 'The tag of the player to notify this channel about.', required: true)
+          cmd.string('player_tag', 'The tag of the player to notify this channel about, or a link to their start.gg profile.', required: true)
         end
         bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
         Rails.logger.info 'Global commands successfully registered.'
