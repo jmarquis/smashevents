@@ -72,7 +72,8 @@ class Setbot < Api
           view.row do |r|
             r.string_select(custom_id: custom_id('player_select'), placeholder: 'Choose a player', max_values: 1) do |ss|
               players.each do |player|
-                ss.option(label: player.tag, value: player.id, description: player.name, emoji: { name: '👤' })
+                description = player.name || (player.twitter_username.present? ? "@#{player.twitter_username}" : nil)
+                ss.option(label: player.tag, value: player.id, description:, emoji: { name: '👤' })
               end
             end
           end
