@@ -90,10 +90,10 @@ namespace :notifications do
           idempotent: true
         ) do |events|
           Discord.weekend_briefing(game:, events:)
-        end
 
-        # Avoid rate limits
-        sleep 1
+          # Avoid rate limits
+          sleep 1
+        end
       end
   end
 
@@ -166,10 +166,10 @@ namespace :notifications do
           platform: Notification::PLATFORM_DISCORD
         ) do |tournament|
           Discord.happening_today(tournament)
-        end
 
-        # Avoid rate limits
-        sleep 1
+          # Avoid rate limits
+          sleep 1
+        end
       end
   end
 
