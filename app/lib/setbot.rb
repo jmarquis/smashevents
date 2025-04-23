@@ -269,7 +269,7 @@ class Setbot < Api
       end
 
       if existing_commands[name]
-        existing_commands[name].edit(description:, default_member_permissions:) do |cmd|
+        bot.edit_application_command(existing_commands[name].id, description:, default_member_permissions:) do |cmd|
           yield(cmd) if block_given?
         end
       else
