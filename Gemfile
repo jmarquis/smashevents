@@ -44,7 +44,7 @@ gem 'twitch-api'
 
 gem 'lograge'
 
-gem 'discordrb'
+gem 'discordrb', github: 'shardlab/discordrb', branch: 'main'
 
 gem 'ffi', force_ruby_platform: true
 

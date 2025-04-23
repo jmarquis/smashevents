@@ -246,7 +246,7 @@ class Setbot < Api
       register_or_edit_application_command(
         Rails.env.production? ? :connect : :connect_dev,
         description: 'Add a Setbot connection',
-        default_permission: (1 << 5).to_s,
+        default_member_permissions: 1 << 5,
         server_id: Rails.env.production? ? nil : '1260259175586467840'
       ) do |cmd|
         cmd.string('player_tag', 'The tag of the player to notify this channel about, or a link to their start.gg profile.', required: true)
@@ -255,25 +255,25 @@ class Setbot < Api
       register_or_edit_application_command(
         Rails.env.production? ? :disconnect : :disconnect_dev,
         description: 'Remove a Setbot connection',
-        default_permission: (1 << 5).to_s,
+        default_member_permissions: 1 << 5,
         server_id: Rails.env.production? ? nil : '1260259175586467840'
       )
 
       Rails.logger.info 'Global commands successfully registered.'
     end
 
-    def register_or_edit_application_command(name, description:, default_permission:, server_id:)
+    def register_or_edit_application_command(name, description:, default_member_permissions:, server_id:)
       existing_commands = bot.get_application_commands(server_id:).reduce({}.with_indifferent_access) do |commands, command|
         commands[command.name] = command
         commands
       end
 
       if existing_commands[name]
-        existing_commands[name].edit(description:, default_permission:) do |cmd|
+        existing_commands[name].edit(description:, default_member_permissions:) do |cmd|
           yield(cmd) if block_given?
         end
       else
-        bot.register_application_command(name, description, default_permission:) do |cmd|
+        bot.register_application_command(name, description, default_member_permissions:) do |cmd|
           yield(cmd) if block_given?
         end
       end
