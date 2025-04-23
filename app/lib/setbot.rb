@@ -6,24 +6,13 @@ class Setbot < Api
     def run
       Rails.logger.info 'Starting Setbot...'
 
-      if Rails.env.production?
-        bot.application_command(:connect) do |event|
-          StatsD.increment('setbot.command.connect')
-          handle_connect_command(event:)
-        end
-        bot.application_command(:disconnect) do |event|
-          StatsD.increment('setbot.command.disconnect')
-          handle_disconnect_command(event:)
-        end
-      else
-        bot.application_command(:connect_local) do |event|
-          StatsD.increment('setbot.command.connect')
-          handle_connect_command(event:)
-        end
-        bot.application_command(:disconnect_local) do |event|
-          StatsD.increment('setbot.command.disconnect')
-          handle_disconnect_command(event:)
-        end
+      bot.application_command(Rails.env.production? ? :connect : :connect_dev) do |event|
+        StatsD.increment('setbot.command.connect')
+        handle_connect_command(event:)
+      end
+      bot.application_command(Rails.env.production? ? :disconnect : :disconnect_dev) do |event|
+        StatsD.increment('setbot.command.disconnect')
+        handle_disconnect_command(event:)
       end
 
       bot.string_select custom_id: custom_id('player_select') do |event|
@@ -254,21 +243,39 @@ class Setbot < Api
     end
 
     def register_commands
-      if Rails.env.production?
-        bot.get_application_commands.each(&:delete)
-        bot.register_application_command(:connect, 'Add a SetBot connection', default_permission: 1 << 5) do |cmd|
-          cmd.string('player_tag', 'The tag of the player to notify this channel about, or a link to their start.gg profile.', required: true)
+      register_or_edit_application_command(
+        Rails.env.production? ? :connect : :connect_dev,
+        description: 'Add a Setbot connection',
+        default_permission: (1 << 5).to_s,
+        server_id: Rails.env.production? ? nil : '1260259175586467840'
+      ) do |cmd|
+        cmd.string('player_tag', 'The tag of the player to notify this channel about, or a link to their start.gg profile.', required: true)
+      end
+
+      register_or_edit_application_command(
+        Rails.env.production? ? :disconnect : :disconnect_dev,
+        description: 'Remove a Setbot connection',
+        default_permission: (1 << 5).to_s,
+        server_id: Rails.env.production? ? nil : '1260259175586467840'
+      )
+
+      Rails.logger.info 'Global commands successfully registered.'
+    end
+
+    def register_or_edit_application_command(name, description:, default_permission:, server_id:)
+      existing_commands = bot.get_application_commands(server_id:).reduce({}.with_indifferent_access) do |commands, command|
+        commands[command.name] = command
+        commands
+      end
+
+      if existing_commands[name]
+        existing_commands[name].edit(description:, default_permission:) do |cmd|
+          yield(cmd) if block_given?
         end
-        bot.register_application_command(:disconnect, 'Remove a SetBot connection', default_permission: 1 << 5)
-        Rails.logger.info 'Global commands successfully registered.'
       else
-        server_id = '1260259175586467840'
-        bot.get_application_commands(server_id:).each(&:delete)
-        bot.register_application_command(:connect_local, 'Add a SetBot connection', server_id:, default_permission: 1 << 5) do |cmd|
-          cmd.string('player_tag', 'The tag of the player to notify this channel about.', required: true)
+        bot.register_application_command(name, description, default_permission:) do |cmd|
+          yield(cmd) if block_given?
         end
-        bot.register_application_command(:disconnect_local, 'Remove a SetBot connection', server_id:, default_permission: 1 << 5)
-        Rails.logger.info 'Server-specific commands successfully registered.'
       end
     end
 
