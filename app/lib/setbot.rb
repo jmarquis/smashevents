@@ -62,7 +62,7 @@ class Setbot < Api
 
       slug = input_value.match(/\/user\/([^\/]+)/)
       if slug.present?
-        players = Player.where(startgg_player_slug: slug[1])
+        players = Player.where(startgg_user_slug: slug[1])
       else
         players = Player.tag_similar_to(input_value).limit(10).uniq
       end
