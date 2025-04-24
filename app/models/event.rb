@@ -127,7 +127,7 @@ class Event < ApplicationRecord
         Startgg.event_entrants(
           id: startgg_id,
           game: game,
-          batch_size: 100,
+          batch_size: 60,
           page:
         )
       end
