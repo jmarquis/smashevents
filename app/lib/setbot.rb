@@ -130,6 +130,7 @@ class Setbot < Api
       PlayerSubscription.create!(
         player:,
         discord_server_id: event.server_id,
+        discord_server_name: event.server.name,
         discord_channel_id: event.channel_id
       )
 

@@ -2,13 +2,14 @@
 #
 # Table name: player_subscriptions
 #
-#  id                 :integer          not null, primary key
-#  player_id          :integer          not null
-#  discord_server_id  :string
-#  discord_channel_id :string
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  discord_role_id    :string
+#  id                  :integer          not null, primary key
+#  player_id           :integer          not null
+#  discord_server_id   :string
+#  discord_channel_id  :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  discord_role_id     :string
+#  discord_server_name :string
 #
 # Indexes
 #
