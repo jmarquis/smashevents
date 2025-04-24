@@ -1,9 +1,11 @@
 class ApplicationController < BaseController
   layout 'events'
 
-  @title = 'Smash Events'
-
   def index
+    @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
+    @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
+    @h1 = 'Smash Events'
+
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
 
@@ -28,6 +30,10 @@ class ApplicationController < BaseController
   end
 
   def past
+    @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
+    @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
+    @h1 = 'Smash Events'
+
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
 
@@ -55,7 +61,10 @@ class ApplicationController < BaseController
   end
 
   def setbot
-    @title = 'Setbot'
+    @title = 'Setbot: a Discord bot for Smash & Rivals streams'
+    @description = 'A Discord bot that notifies when a Smash/Rivals player is on a tournament stream.'
+    @h1 = 'Setbot'
+
     render layout: 'minimal'
   end
 
