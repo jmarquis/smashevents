@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_24_014843) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_25_211138) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -42,7 +42,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_24_014843) do
     t.integer "ranked_player_count"
     t.datetime "start_at"
     t.boolean "is_seeded"
-    t.datetime "synced_at"
+    t.datetime "entrants_synced_at"
     t.string "slug"
     t.bigint "winner_entrant_id"
     t.string "state"

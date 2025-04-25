@@ -12,7 +12,7 @@
 #  ranked_player_count :integer
 #  start_at            :datetime
 #  is_seeded           :boolean
-#  synced_at           :datetime
+#  entrants_synced_at  :datetime
 #  slug                :string
 #  winner_entrant_id   :integer
 #  state               :string
@@ -38,7 +38,7 @@ class Event < ApplicationRecord
   belongs_to :game, foreign_key: :game_slug, primary_key: :slug
   has_many :notifications, as: :notifiable
 
-  scope :should_sync, -> { where("coalesce(synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
+  scope :should_sync_entrants, -> { where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
 
   def should_ingest?
     return false unless game&.ingestion_threshold.present?
@@ -190,7 +190,7 @@ class Event < ApplicationRecord
     # Denormalize ranked entrant count
     self.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
 
-    self.synced_at = Time.now
+    self.entrants_synced_at = Time.now
     save!
 
     stats
