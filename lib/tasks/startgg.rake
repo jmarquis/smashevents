@@ -134,7 +134,7 @@ namespace :startgg do
     tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.upcoming
 
     tournaments.each do |tournament|
-      events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync
+      events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
 
       events.each do |event|
         stats = event.sync_entrants.reduce(stats) do |stats, (key, total)|
