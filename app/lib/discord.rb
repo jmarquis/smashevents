@@ -147,8 +147,7 @@ class Discord < Api
     end
 
     def player_set_live(event:, player:, opponent:, stream_name:)
-      # TODO: should we graduate this to a public channel?
-      post('1358137925346398398') do |builder|
+      post(sets_channel_id(event.game.slug)) do |builder|
         builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"
 
         builder.add_embed do |embed|
@@ -167,6 +166,10 @@ class Discord < Api
 
     def game_channel_id(game_slug)
       Rails.application.credentials.dig(:discord, :channel_ids, game_slug)
+    end
+
+    def sets_channel_id(game_slug)
+      Rails.application.credentials.dig(:discord, :channel_ids, :sets, game_slug)
     end
 
     def post(channel_id)
