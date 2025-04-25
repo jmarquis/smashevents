@@ -152,8 +152,8 @@ namespace :startgg do
     Rails.logger.info "Entrant sync complete. #{stats.to_json}"
   end
 
-  task scan_stream_sets: [:environment] do
-    Tournament.should_display.live.has_streams.each do |tournament|
+  task scan_sets: [:environment] do
+    Tournament.should_display.live.each do |tournament|
       tournament.events.each do |event|
         next if event.completed?
 
@@ -165,62 +165,66 @@ namespace :startgg do
           end
 
           break if sets.count.zero?
-          Rails.logger.info "Found #{sets.count} sets. Analyzing..."
+          Rails.logger.info "Found #{sets.count} updated sets. Analyzing..."
 
           sets.each do |set|
 
-            # Most sets don't have a stream, so this filters a ton.
-            next unless set.stream.present?
-            next unless set.stream.stream_source.downcase == Tournament::STREAM_SOURCE_TWITCH
+            if set.state == Event::SET_STATE_IN_PROGRESS
+              # Most sets don't have a stream, so this filters a ton.
+              next unless set.stream.present?
+              next unless set.stream.stream_source.downcase == Tournament::STREAM_SOURCE_TWITCH
 
-            # We only care about currently ongoing sets.
-            next unless set.started_at.present?
-            next unless set.completed_at.blank?
+              # We only care about currently ongoing sets.
+              next unless set.started_at.present?
+              next unless set.completed_at.blank?
 
-            # If the player records aren't set, we can't do anything.
-            next unless set.slots&.first&.entrant&.participants&.first&.player&.present?
-            next unless set.slots&.second&.entrant&.participants&.first&.player&.present?
+              # If the player records aren't set, we can't do anything.
+              next unless set.slots&.first&.entrant&.participants&.first&.player&.present?
+              next unless set.slots&.second&.entrant&.participants&.first&.player&.present?
 
-            players = Player.where(startgg_player_id: [
-              set.slots.first.entrant.participants.first.player.id,
-              set.slots.second.entrant.participants.first.player.id
-            ])
+              players = Player.where(startgg_player_id: [
+                set.slots.first.entrant.participants.first.player.id,
+                set.slots.second.entrant.participants.first.player.id
+              ])
 
-            players.each do |player|
-              opponent = (players - [player]).first
-              next unless opponent.present?
+              players.each do |player|
+                opponent = (players - [player]).first
+                next unless opponent.present?
 
-              Setbot.notify_subscriptions(
-                event:,
-                player:,
-                opponent:,
-                stream_name: set.stream.stream_name,
-                startgg_set_id: set.id
-              )
-
-              previous_notification = Notification.where(
-                notifiable: player,
-                notification_type: Notification::TYPE_PLAYER_SET_LIVE,
-                platform: Notification::PLATFORM_DISCORD,
-                success: true
-              ).order(sent_at: :desc).first
-
-              next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
-
-              Notification.send_notification(
-                player,
-                type: Notification::TYPE_PLAYER_SET_LIVE,
-                platform: Notification::PLATFORM_DISCORD,
-                metadata: { startgg_set_id: set.id }
-              ) do |player|
-                Discord.player_set_live(
+                Setbot.notify_subscriptions(
                   event:,
                   player:,
                   opponent:,
-                  stream_name: set.stream.stream_name
+                  stream_name: set.stream.stream_name,
+                  startgg_set_id: set.id
                 )
-              end
 
+                previous_notification = Notification.where(
+                  notifiable: player,
+                  notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+                  platform: Notification::PLATFORM_DISCORD,
+                  success: true
+                ).order(sent_at: :desc).first
+
+                next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+
+                Notification.send_notification(
+                  player,
+                  type: Notification::TYPE_PLAYER_SET_LIVE,
+                  platform: Notification::PLATFORM_DISCORD,
+                  metadata: { startgg_set_id: set.id }
+                ) do |player|
+                  Discord.player_set_live(
+                    event:,
+                    player:,
+                    opponent:,
+                    stream_name: set.stream.stream_name
+                  )
+                end
+
+              end
+            elsif set.state == Event::SET_STATE_COMPLETED
+              # TODO: check for upsets
             end
 
           end

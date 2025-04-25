@@ -238,4 +238,8 @@ class Tournament < ApplicationRecord
     events.each(&:sync_entrants)
   end
 
+  def has_streams?
+    stream_data.present?
+  end
+
 end

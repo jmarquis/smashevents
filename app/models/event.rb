@@ -30,6 +30,9 @@
 class Event < ApplicationRecord
   STATE_COMPLETED = 'COMPLETED'
 
+  SET_STATE_IN_PROGRESS = 2
+  SET_STATE_COMPLETED = 3
+
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants

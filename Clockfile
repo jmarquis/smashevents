@@ -3,7 +3,7 @@ using RubyClock::DSL
 
 # Noisy logs we don't really need
 MUTED_JOB_LOGS = [
-  'startgg:scan_stream_sets'
+  'startgg:scan_sets'
 ]
 
 around_action do |job_proc, job_info|
@@ -72,8 +72,8 @@ cron '* * * * *', locals: { task: 'twitch:sync_streams' }, overlap: false do
 end
 
 # Every 10 seconds
-every '10 seconds', locals: { task: 'startgg:scan_stream_sets' }, overlap: false do
-  rake_async('startgg:scan_stream_sets')
+every '10 seconds', locals: { task: 'startgg:scan_sets' }, overlap: false do
+  rake_async('startgg:scan_sets')
 end
 
 # Every 10 seconds
