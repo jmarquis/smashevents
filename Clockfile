@@ -54,20 +54,20 @@ cron '10 * * * *', locals: { task: 'youtube:fetch_stream_urls' }, overlap: false
   rake_async('youtube:fetch_stream_urls')
 end
 
-# Every hour at :40
-cron '40 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
+### MORE FREQUENT JOBS
+
+# Every 10 minutes (5 minute offset)
+cron '5/10 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end
-
-### MORE FREQUENT JOBS
 
 # Every 10 minutes
 cron '*/10 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
   rake_async('notifications:new_events')
 end
 
-# Every 10 minutes (5 minute offset)
-cron '5/10 * * * *', locals: { task: 'twitch:sync_streams' }, overlap: false do
+# Every minute
+cron '* * * * *', locals: { task: 'twitch:sync_streams' }, overlap: false do
   rake_async('twitch:sync_streams')
 end
 
@@ -77,6 +77,8 @@ every '10 seconds', locals: { task: 'startgg:scan_stream_sets' }, overlap: false
 end
 
 # Every 10 seconds
+# This is an "eternal" process so the interval is short just to make sure it
+# starts up quickly after a deploy.
 every '10 seconds', locals: { task: 'setbot:run' }, overlap: false do
   rake_async('setbot:run')
 end
