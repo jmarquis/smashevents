@@ -154,7 +154,10 @@ class Discord < Api
           embed.title = stream_name
           embed.url = "https://twitch.tv/#{stream_name}"
 
-          embed.description = "#{event.tournament.name} (#{event.game.name})"
+          embed.description = <<~TEXT
+            #{event.tournament.name}
+            #{event.game.twitch_name}
+          TEXT
 
           embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
           embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
