@@ -3,7 +3,7 @@ class Startgg < Api
 
   class << self
 
-    def tournaments(batch_size:, page:, after_date: Time.now, updated_after: Time.now - 6.hours)
+    def tournaments(batch_size:, page:, after_date: Time.now, updated_after: 6.hours.ago)
       query = <<~GRAPHQL
         query($perPage: Int, $page: Int, $afterDate: Timestamp, $updatedAfter: Timestamp) {
           tournaments(query: {
@@ -164,15 +164,16 @@ class Startgg < Api
       end
     end
 
-    def sets(event_id, batch_size: 50, page: 1, states: [Event::SET_STATE_IN_PROGRESS, Event::SET_STATE_COMPLETED])
+    def sets(event_id, batch_size: 50, page: 1, states: [Event::SET_STATE_IN_PROGRESS, Event::SET_STATE_COMPLETED], updated_after: 1.hour.ago)
       query = <<~GRAPHQL
-        query($id: ID, $perPage: Int, $page: Int) {
+        query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
           event(id: $id) {
             sets(
               perPage: $perPage,
               page: $page,
               filters: {
-                state: [#{states.join(', ')}]
+                state: [#{states.join(', ')}],
+                updatedAfter: $updatedAfter
               }
             ) {
               nodes {
@@ -201,7 +202,7 @@ class Startgg < Api
       GRAPHQL
 
       instrument('sets') do
-        client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
+        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
       end
     end
 
