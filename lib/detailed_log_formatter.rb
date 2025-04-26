@@ -2,14 +2,9 @@ class DetailedLogFormatter < Logger::Formatter
   @entrypoint = nil
   @uuid = nil
 
-  def initialize
-    super
-
-    @uuid = SecureRandom.uuid_v4
-  end
-
   def set_entrypoint(entrypoint)
     @entrypoint = entrypoint
+    @uuid = SecureRandom.uuid_v4
   end
 
   def call(severity, time, progname, msg)
