@@ -188,7 +188,6 @@ class Startgg < Api
                         id
                       }
                     }
-                    winnerId
                   }
                 }
                 startedAt
@@ -197,6 +196,7 @@ class Startgg < Api
                   streamName
                   streamSource
                 }
+                winnerId
               }
             }
           }
