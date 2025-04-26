@@ -1,18 +1,13 @@
 $stdout.sync = true
 using RubyClock::DSL
 
-# Noisy logs we don't really need
-MUTED_JOB_LOGS = [
-  'startgg:scan_sets'
-]
-
 around_action do |job_proc, job_info|
   Rails.logger.formatter.set_entrypoint(job_info[:task])
-  Rails.logger.info "Starting task" unless job_info[:task].in? MUTED_JOB_LOGS
+  Rails.logger.debug "Starting task"
   StatsD.measure("cron.total_time.#{job_info[:task].gsub(':', '_')}") do
     job_proc.call
   end
-  Rails.logger.info "Task finished" unless job_info[:task].in? MUTED_JOB_LOGS
+  Rails.logger.debug "Task finished"
   STDOUT.flush
 end
 
