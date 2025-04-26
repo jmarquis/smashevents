@@ -157,6 +157,7 @@ namespace :startgg do
       tournament.events.each do |event|
         next if event.completed?
 
+        start_time = Time.now
         (1..1000).each do |page|
           sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
             Rails.logger.debug "Fetching sets for #{tournament.slug} #{event.game.slug}..."
@@ -245,6 +246,7 @@ namespace :startgg do
                 loser_seed: loser_entrant.seed
               )
 
+              # TODO: tweet
               Rails.logger.info("Set #{set.id} complete, #{winner_entrant.tag} (seed #{winner_entrant.seed}) beat #{loser_entrant.tag} (seed #{loser_entrant.seed}), upset factor: #{upset_factor}")
             end
 
@@ -255,7 +257,8 @@ namespace :startgg do
           sleep 1
         end
 
-        event.sets_synced_at = Time.now
+        Rails.logger.info("Updating sets_synced_at to #{start_time}")
+        event.sets_synced_at = start_time
         event.save!
       end
     end
