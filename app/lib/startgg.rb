@@ -181,12 +181,14 @@ class Startgg < Api
                 id
                 slots {
                   entrant {
+                    id
                     name
                     participants {
                       player {
                         id
                       }
                     }
+                    winnerId
                   }
                 }
                 startedAt

@@ -161,7 +161,7 @@ namespace :startgg do
           sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
             Rails.logger.debug "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
-            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.minutes : 1.hour.ago)
+            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago)
           end
 
           break if sets.count.zero?
@@ -224,7 +224,12 @@ namespace :startgg do
 
               end
             elsif set.state == Event::SET_STATE_COMPLETED
-              # TODO: check for upsets
+              entrants = Entrant.where(startgg_entrant_id: [
+                set.slots.first.entrant.id,
+                set.slots.second.entrant.id
+              ])
+
+              Rails.logger.info("Set #{set.id} complete, entrants: #{entrants.map(&:startgg_entrant_id).join(', ')}, winner: #{set.winner_id}")
             end
 
           end
