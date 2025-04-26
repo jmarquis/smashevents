@@ -238,7 +238,7 @@ namespace :startgg do
               winner_entrant = event.entrants.find_by(startgg_entrant_id: set.winner_id)
               next unless winner_entrant.present? && winner_entrant.seed.present?
 
-              loser_entrant = event.entrants.find_by(startgg_entrant_id: entrant_startgg_ids - [winner_entrant.startgg_entrant_id])
+              loser_entrant = event.entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id]).first)
               next unless loser_entrant.present? && loser_entrant.seed.present?
 
               upset_factor = Event.upset_factor(
