@@ -35,6 +35,8 @@ class Event < ApplicationRecord
 
   PLACEMENTS = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025]
 
+  BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
+
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants

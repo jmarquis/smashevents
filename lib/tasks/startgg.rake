@@ -225,6 +225,7 @@ namespace :startgg do
               end
             elsif set.state == Event::SET_STATE_COMPLETED
               next unless set.winner_id.present?
+              next unless set.phase_group&.bracket_type == Event::BRACKET_TYPE_DOUBLE_ELIMINATION
 
               entrant_startgg_ids = set.slots.map(&:entrant).map(&:id)
               next unless entrant_startgg_ids.count == 2
@@ -240,7 +241,7 @@ namespace :startgg do
                 loser_seed: loser_entrant.seed
               )
 
-              Rails.logger.info("Set #{set.id} complete, seed #{winner_entrant.seed} beat seed #{loser_entrant.seed}, out of #{event.player_count} total entrants, bracket type: #{set.phase_group.bracket_type}, upset factor: #{upset_factor}")
+              Rails.logger.info("Set #{set.id} complete, #{winner_entrant.tag} (seed #{winner_entrant.seed}) beat #{loser_entrant.tag} (seed #{loser_entrant.seed}), upset factor: #{upset_factor}")
             end
 
           end
