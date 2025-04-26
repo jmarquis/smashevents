@@ -33,6 +33,8 @@ class Event < ApplicationRecord
   SET_STATE_IN_PROGRESS = 2
   SET_STATE_COMPLETED = 3
 
+  PLACEMENTS = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025]
+
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
@@ -42,6 +44,13 @@ class Event < ApplicationRecord
   has_many :notifications, as: :notifiable
 
   scope :should_sync_entrants, -> { where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
+
+  # TODO: Put this somewhere else?
+  def self.upset_factor(winner_seed:, loser_seed:)
+    winner_seed_placement_index = PLACEMENTS.count { |placement| winner_seed >= placement } - 1
+    loser_seed_placement_index = PLACEMENTS.count { |placement| loser_seed >= placement } - 1
+    return winner_seed_placement_index - loser_seed_placement_index
+  end
 
   def should_ingest?
     return false unless game&.ingestion_threshold.present?

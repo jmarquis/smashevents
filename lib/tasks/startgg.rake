@@ -224,12 +224,23 @@ namespace :startgg do
 
               end
             elsif set.state == Event::SET_STATE_COMPLETED
-              entrants = Entrant.where(startgg_entrant_id: [
-                set.slots.first.entrant.id,
-                set.slots.second.entrant.id
-              ])
+              next unless set.winner_id.present?
 
-              Rails.logger.info("Set #{set.id} complete, entrants: #{entrants.map(&:startgg_entrant_id).join(', ')}, seeds: #{entrants.map(&:seed).join(', ')}, winner: #{set.winner_id}")
+              entrant_startgg_ids = set.slots.map(&:entrant).map(&:id)
+              next unless entrant_startgg_ids.count == 2
+
+              winner_entrant = event.entrants.find_by(startgg_entrant_id: set.winner_id)
+              next unless winner_entrant.present? && winner_entrant.seed.present?
+
+              loser_entrant = event.entrants.find_by(startgg_entrant_id: entrant_startgg_ids - [winner_entrant.startgg_entrant_id])
+              next unless loser_entrant.present? && loser_entrant.seed.present?
+
+              upset_factor = Event.upset_factor(
+                winner_seed: winner_entrant.seed,
+                loser_seed: loser_entrant.seed
+              )
+
+              Rails.logger.info("Set #{set.id} complete, seed #{winner_entrant.seed} beat seed #{loser_entrant.seed}, out of #{event.player_count} total entrants, bracket type: #{set.phase_group.bracket_type}, upset factor: #{upset_factor}")
             end
 
           end

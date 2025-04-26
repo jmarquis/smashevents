@@ -179,6 +179,9 @@ class Startgg < Api
               nodes {
                 completedAt
                 id
+                phaseGroup {
+                  bracketType
+                }
                 slots {
                   entrant {
                     id
