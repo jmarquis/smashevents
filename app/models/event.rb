@@ -37,6 +37,8 @@ class Event < ApplicationRecord
 
   BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
 
+  ENTRANT_SYNC_BATCH_SIZE = 60
+
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
@@ -141,7 +143,7 @@ class Event < ApplicationRecord
         Startgg.event_entrants(
           id: startgg_id,
           game: game,
-          batch_size: 60,
+          batch_size: ENTRANT_SYNC_BATCH_SIZE,
           page:
         )
       end
@@ -163,7 +165,7 @@ class Event < ApplicationRecord
       entrants = [*entrants, *event_entrants]
 
       # If we don't have a full batch, this is the last page.
-      break if event_entrants.count != 100
+      break if event_entrants.count != ENTRANT_SYNC_BATCH_SIZE
     end
 
     return stats if tournament.destroyed?
