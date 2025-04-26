@@ -257,7 +257,6 @@ namespace :startgg do
           sleep 1
         end
 
-        Rails.logger.info("Updating sets_synced_at to #{start_time}")
         event.sets_synced_at = start_time
         event.save!
       end
