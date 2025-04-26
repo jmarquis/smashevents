@@ -229,7 +229,7 @@ namespace :startgg do
                 set.slots.second.entrant.id
               ])
 
-              Rails.logger.info("Set #{set.id} complete, entrants: #{entrants.map(&:startgg_entrant_id).join(', ')}, winner: #{set.winner_id}")
+              Rails.logger.info("Set #{set.id} complete, entrants: #{entrants.map(&:startgg_entrant_id).join(', ')}, seeds: #{entrants.map(&:seed).join(', ')}, winner: #{set.winner_id}")
             end
 
           end
