@@ -201,7 +201,7 @@ namespace :startgg do
                 )
               end
 
-              player = player.first
+              player = players.first
               opponent = (players - [player]).first
               next unless opponent.present?
 
