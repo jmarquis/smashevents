@@ -159,13 +159,13 @@ namespace :startgg do
 
         (1..1000).each do |page|
           sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
-            Rails.logger.info "Fetching sets for #{tournament.slug} #{event.game.slug}..."
+            Rails.logger.debug "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.minutes : 1.hour.ago)
           end
 
           break if sets.count.zero?
-          Rails.logger.info "Found #{sets.count} updated sets. Analyzing..."
+          Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{event.game.slug}. Analyzing..."
 
           sets.each do |set|
 
