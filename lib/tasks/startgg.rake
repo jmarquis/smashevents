@@ -198,31 +198,35 @@ namespace :startgg do
                   stream_name: set.stream.stream_name,
                   startgg_set_id: set.id
                 )
-
-                previous_notification = Notification.where(
-                  notifiable: player,
-                  notification_type: Notification::TYPE_PLAYER_SET_LIVE,
-                  platform: Notification::PLATFORM_DISCORD,
-                  success: true
-                ).order(sent_at: :desc).first
-
-                next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
-
-                Notification.send_notification(
-                  player,
-                  type: Notification::TYPE_PLAYER_SET_LIVE,
-                  platform: Notification::PLATFORM_DISCORD,
-                  metadata: { startgg_set_id: set.id }
-                ) do |player|
-                  Discord.player_set_live(
-                    event:,
-                    player:,
-                    opponent:,
-                    stream_name: set.stream.stream_name
-                  )
-                end
-
               end
+
+              player = player.first
+              opponent = (players - [player]).first
+              next unless opponent.present?
+
+              previous_notification = Notification.where(
+                notifiable: player,
+                notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+                platform: Notification::PLATFORM_DISCORD,
+                success: true
+              ).order(sent_at: :desc).first
+
+              next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+
+              Notification.send_notification(
+                player,
+                type: Notification::TYPE_PLAYER_SET_LIVE,
+                platform: Notification::PLATFORM_DISCORD,
+                metadata: { startgg_set_id: set.id }
+              ) do |player|
+                Discord.player_set_live(
+                  event:,
+                  player:,
+                  opponent:,
+                  stream_name: set.stream.stream_name
+                )
+              end
+
             elsif set.state == Event::SET_STATE_COMPLETED
               next unless set.winner_id.present?
               next unless set.phase_group&.bracket_type == Event::BRACKET_TYPE_DOUBLE_ELIMINATION
