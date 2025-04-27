@@ -15,7 +15,7 @@ namespace :startgg do
     (1..1000).each do |page|
       tournaments = Startgg.with_retries(5, batch_size: 15) do |batch_size|
         Rails.logger.info "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: last_sync.present? ? last_sync - 5.minutes : 1.year.ago)
+        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
       end
 
       break if tournaments.count.zero?
@@ -164,7 +164,7 @@ namespace :startgg do
           sets = Startgg.with_retries(5, batch_size:) do |batch_size|
             Rails.logger.info "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
-            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago)
+            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: (event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago))
           end
 
           Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{event.game.slug}. Analyzing..."
