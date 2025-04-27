@@ -111,6 +111,26 @@ class Twitter < Api
       tweet(text, images: [tournament.banner_image_file])
     end
 
+    def upset_thread_intro(event)
+      text = <<~TEXT
+        LIVE UPSET THREAD for #{event.tournament.name.upcase}
+        #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
+      TEXT
+
+      tweet(text)
+    end
+
+    def upset(event:, winner_entrant:, winner_games:, loser_entrant:, loser_games:)
+      text = <<~TEXT
+        #{winner_entrant.tag} #{winner_games}-#{loser_games} #{loser_entrant.tag}
+        \n\n
+        UPSET FACTOR #{Event.upset_factor(winner_entrant.seed, loser_entrant.seed)}
+        #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
+      TEXT
+
+      tweet(text)
+    end
+
     def tweet(text, images: [])
       text = text.slice(0, 260) if Rails.env.development?
 

@@ -18,6 +18,7 @@
 #  state               :string
 #  sets_synced_at      :datetime
 #  should_display      :boolean
+#  last_upset_tweet_id :string
 #
 # Indexes
 #
@@ -210,5 +211,14 @@ class Event < ApplicationRecord
     save!
 
     stats
+  end
+
+  def initialize_twitter_upset_thread!
+    return if last_upset_tweet_id.present?
+
+    tweet = Twitter.upset_thread_intro(event)
+
+    self.last_upset_tweet_id = tweet['data']['id']
+    save!
   end
 end

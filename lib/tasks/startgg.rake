@@ -159,7 +159,7 @@ namespace :startgg do
 
         start_time = Time.now
         (1..1000).each do |page|
-          sets = Startgg.with_retries(5, batch_size: 50) do |batch_size|
+          sets = Startgg.with_retries(5, batch_size: 20) do |batch_size|
             Rails.logger.debug "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago)
@@ -246,8 +246,39 @@ namespace :startgg do
                 loser_seed: loser_entrant.seed
               )
 
-              # TODO: tweet
-              Rails.logger.info("Set #{set.id} complete, #{winner_entrant.tag} (seed #{winner_entrant.seed}) beat #{loser_entrant.tag} (seed #{loser_entrant.seed}), upset factor: #{upset_factor}")
+              winner_games = set.games.count { |game| game.winner_id.to_s == winner_entrant.startgg_entrant_id.to_s }
+              loser_games = set.games.count { |game| game.winner_id.to_s == loser_entrant.startgg_entrant_id.to_s }
+
+              if upset_factor > 0
+                event.initialize_twitter_upset_thread!
+
+                previous_notification = Notification.where(
+                  notifiable: player,
+                  notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+                  platform: Notification::PLATFORM_DISCORD,
+                  success: true
+                ).order(sent_at: :desc).first
+
+                next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+
+                Notification.send_notification(
+                  player,
+                  type: Notification::TYPE_UPSET,
+                  platform: Notification::PLATFORM_TWITTER,
+                  metadata: { startgg_set_id: set.id }
+                ) do |player|
+                  tweet = Twitter.upset(
+                    event:,
+                    winner_entrant:,
+                    winner_games:,
+                    loser_entrant:,
+                    loser_games:
+                  )
+
+                  event.last_upset_tweet_id = tweet['data']['id']
+                  event.save!
+                end
+              end
             end
 
           end

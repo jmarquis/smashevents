@@ -32,6 +32,7 @@ class Notification < ApplicationRecord
   TYPE_STREAM_LIVE = 'stream_live'
   TYPE_PLAYER_SET_LIVE = 'player_set_live'
   TYPE_SETBOT_SET_LIVE = 'setbot_set_live'
+  TYPE_UPSET = 'upset'
 
   before_create do |notification|
     notification.sent_at ||= Time.now

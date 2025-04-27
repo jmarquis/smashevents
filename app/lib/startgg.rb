@@ -164,7 +164,7 @@ class Startgg < Api
       end
     end
 
-    def sets(event_id, batch_size: 50, page: 1, states: [Event::SET_STATE_IN_PROGRESS, Event::SET_STATE_COMPLETED], updated_after: 1.hour.ago)
+    def sets(event_id, batch_size: 20, page: 1, states: [Event::SET_STATE_IN_PROGRESS, Event::SET_STATE_COMPLETED], updated_after: 1.hour.ago)
       query = <<~GRAPHQL
         query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
           event(id: $id) {
@@ -178,6 +178,9 @@ class Startgg < Api
             ) {
               nodes {
                 completedAt
+                games {
+                  winnerId
+                }
                 id
                 phaseGroup {
                   bracketType
