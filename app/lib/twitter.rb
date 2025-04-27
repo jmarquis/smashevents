@@ -142,7 +142,7 @@ class Twitter < Api
         client.post('tweets', JSON.generate({
           text:,
           media: media_ids.blank? ? nil : { media_ids: },
-          reply: reply_to.blank? ? nil : { in_reply_to_tweet_id: reply_to_tweet_id }
+          reply: reply_to_tweet_id.blank? ? nil : { in_reply_to_tweet_id: reply_to_tweet_id }
         }.compact))
       rescue X::Error => e
         Rails.logger.error "ERROR POSTING TO TWITTER: #{e.message}"
