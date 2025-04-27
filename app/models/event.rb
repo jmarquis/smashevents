@@ -331,6 +331,11 @@ class Event < ApplicationRecord
     loser_entrant = entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
     return unless loser_entrant.present? && loser_entrant.seed.present?
 
+    if set.game.blank?
+      Rails.logger.info("No games?? #{slug} #{winner_entrant.tag} beat #{loser_entrant.tag} somehow?")
+      return
+    end
+
     upset_factor = self.class.upset_factor(
       winner_seed: winner_entrant.seed,
       loser_seed: loser_entrant.seed
