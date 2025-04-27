@@ -350,8 +350,8 @@ class Event < ApplicationRecord
       initialize_twitter_upset_thread!
 
       previous_notification = Notification.where(
-        notifiable: player,
-        notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+        notifiable: self,
+        notification_type: Notification::TYPE_UPSET,
         platform: Notification::PLATFORM_DISCORD,
         success: true
       ).order(sent_at: :desc).first
@@ -361,13 +361,13 @@ class Event < ApplicationRecord
       Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
 
       Notification.send_notification(
-        player,
+        self,
         type: Notification::TYPE_UPSET,
         platform: Notification::PLATFORM_TWITTER,
         metadata: { startgg_set_id: set.id }
-      ) do |player|
+      ) do |event|
         tweet = Twitter.upset(
-          event: self,
+          event: event,
           winner_entrant:,
           winner_games:,
           loser_entrant:,
