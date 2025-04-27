@@ -223,4 +223,120 @@ class Event < ApplicationRecord
     self.last_upset_tweet_id = tweet['data']['id']
     save!
   end
+
+  def process_in_progress_set(set)
+    # Most sets don't have a stream, so this filters a ton.
+    return unless set.stream.present?
+    return unless set.stream.stream_source.downcase == Tournament::STREAM_SOURCE_TWITCH
+
+    # We only care about currently ongoing sets.
+    return unless set.started_at.present?
+    return unless set.completed_at.blank?
+
+    # If the player records aren't set, we can't do anything.
+    return unless set.slots&.first&.entrant&.participants&.first&.player&.present?
+    return unless set.slots&.second&.entrant&.participants&.first&.player&.present?
+
+    players = Player.where(startgg_player_id: [
+      set.slots.first.entrant.participants.first.player.id,
+      set.slots.second.entrant.participants.first.player.id
+    ])
+
+    # Let Setbot do its thing.
+    players.each do |player|
+      opponent = (players - [player]).first
+      next unless opponent.present?
+
+      Setbot.notify_subscriptions(
+        event: self,
+        player:,
+        opponent:,
+        stream_name: set.stream.stream_name,
+        startgg_set_id: set.id
+      )
+    end
+
+    # Now update the set Discord channels.
+    player = players.first
+    opponent = (players - [player]).first
+    return unless opponent.present?
+
+    previous_notification = Notification.where(
+      notifiable: player,
+      notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+      platform: Notification::PLATFORM_DISCORD,
+      success: true
+    ).order(sent_at: :desc).first
+
+    return if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+
+    Notification.send_notification(
+      player,
+      type: Notification::TYPE_PLAYER_SET_LIVE,
+      platform: Notification::PLATFORM_DISCORD,
+      metadata: { startgg_set_id: set.id }
+    ) do |player|
+      Discord.player_set_live(
+        event: self,
+        player:,
+        opponent:,
+        stream_name: set.stream.stream_name
+      )
+    end
+  end
+
+  def process_completed_set(set)
+    return unless set.winner_id.present?
+    return unless set.phase_group&.bracket_type == BRACKET_TYPE_DOUBLE_ELIMINATION
+
+    entrant_startgg_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
+    return unless entrant_startgg_ids.count == 2
+
+    winner_entrant = entrants.find_by(startgg_entrant_id: set.winner_id)
+    return unless winner_entrant.present? && winner_entrant.seed.present?
+
+    loser_entrant = entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
+    return unless loser_entrant.present? && loser_entrant.seed.present?
+
+    upset_factor = self.upset_factor(
+      winner_seed: winner_entrant.seed,
+      loser_seed: loser_entrant.seed
+    )
+
+    winner_games = set.games.count { |game| game.winner_id.to_s == winner_entrant.startgg_entrant_id.to_s }
+    loser_games = set.games.count { |game| game.winner_id.to_s == loser_entrant.startgg_entrant_id.to_s }
+
+    if upset_factor > 0
+      initialize_twitter_upset_thread!
+
+      previous_notification = Notification.where(
+        notifiable: player,
+        notification_type: Notification::TYPE_PLAYER_SET_LIVE,
+        platform: Notification::PLATFORM_DISCORD,
+        success: true
+      ).order(sent_at: :desc).first
+
+      return if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+
+      Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
+
+      Notification.send_notification(
+        player,
+        type: Notification::TYPE_UPSET,
+        platform: Notification::PLATFORM_TWITTER,
+        metadata: { startgg_set_id: set.id }
+      ) do |player|
+        tweet = Twitter.upset(
+          event: self,
+          winner_entrant:,
+          winner_games:,
+          loser_entrant:,
+          loser_games:
+        )
+
+        self.last_upset_tweet_id = tweet['data']['id']
+        save!
+      end
+    end
+  end
 end
