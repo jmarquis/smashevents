@@ -144,7 +144,7 @@ class Twitter < Api
           reply: reply_to_tweet_id.blank? ? nil : { in_reply_to_tweet_id: reply_to_tweet_id }
         }.compact))
       rescue X::Error => e
-        Rails.logger.error "ERROR POSTING TO TWITTER: #{e.message}"
+        Rails.logger.error "ERROR POSTING TO TWITTER: #{e.inspect}"
         raise e
       end
     end
