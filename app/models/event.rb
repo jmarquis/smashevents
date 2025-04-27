@@ -218,7 +218,7 @@ class Event < ApplicationRecord
 
     Rails.logger.info("Starting upset thread for #{slug} (#{game.slug})...")
 
-    tweet = Twitter.upset_thread_intro(event)
+    tweet = Twitter.upset_thread_intro(self)
 
     self.last_upset_tweet_id = tweet['data']['id']
     save!
