@@ -162,13 +162,13 @@ namespace :startgg do
         start_time = Time.now
         (1..1000).each do |page|
           sets = Startgg.with_retries(5, batch_size:) do |batch_size|
-            Rails.logger.debug "Fetching sets for #{tournament.slug} #{event.game.slug}..."
+            Rails.logger.info "Fetching sets for #{tournament.slug} #{event.game.slug}..."
 
             Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago)
           end
 
-          break if sets.count.zero?
           Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{event.game.slug}. Analyzing..."
+          break if sets.count.zero?
 
           sets.each do |set|
             if set.state == Event::SET_STATE_IN_PROGRESS
@@ -178,7 +178,7 @@ namespace :startgg do
             end
           end
 
-          break if sets.count < batch_size
+          # break if sets.count < batch_size
 
           sleep 1
         end
