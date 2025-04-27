@@ -113,7 +113,7 @@ class Twitter < Api
 
     def upset_thread_intro(event)
       text = <<~TEXT
-        LIVE UPSET THREAD for #{event.tournament.name.upcase}
+        LIVE UPSET THREAD for #{event.tournament.name.upcase} (#{event.game.name})
         #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
       TEXT
 
@@ -122,7 +122,7 @@ class Twitter < Api
 
     def upset(event:, winner_entrant:, winner_games:, loser_entrant:, loser_games:)
       text = <<~TEXT
-        #{winner_entrant.tag} #{winner_games}-#{loser_games} #{loser_entrant.tag}
+        #{winner_entrant.tag}#{winner_entrant.player&.twitter_username.present? ? " (@#{winner_entrant.player.twitter_username})" : '' } [seed #{winner_entrant.seed}] #{winner_games}-#{loser_games} #{loser_entrant.tag} [seed #{loser_entrant.seed}]
         \n\n
         UPSET FACTOR #{Event.upset_factor(winner_entrant.seed, loser_entrant.seed)}
         #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}

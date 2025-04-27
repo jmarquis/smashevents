@@ -216,6 +216,8 @@ class Event < ApplicationRecord
   def initialize_twitter_upset_thread!
     return if last_upset_tweet_id.present?
 
+    Rails.logger.info("Starting upset thread for #{slug} (#{game.slug})...")
+
     tweet = Twitter.upset_thread_intro(event)
 
     self.last_upset_tweet_id = tweet['data']['id']

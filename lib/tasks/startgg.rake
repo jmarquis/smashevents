@@ -261,6 +261,8 @@ namespace :startgg do
 
                 next if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
 
+                Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
+
                 Notification.send_notification(
                   player,
                   type: Notification::TYPE_UPSET,
