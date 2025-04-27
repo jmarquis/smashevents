@@ -354,9 +354,9 @@ class Event < ApplicationRecord
         notification_type: Notification::TYPE_UPSET,
         platform: Notification::PLATFORM_TWITTER,
         success: true
-      ).order(sent_at: :desc).first
+      ).filter { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }.first
 
-      return if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+      return if previous_notification.present?
 
       Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
 
