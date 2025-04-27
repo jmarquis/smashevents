@@ -376,6 +376,8 @@ class Event < ApplicationRecord
 
         self.last_upset_tweet_id = tweet['data']['id']
         save!
+
+        sleep 1
       end
     end
   end
