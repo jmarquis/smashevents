@@ -344,7 +344,7 @@ class Event < ApplicationRecord
     winner_games = game_counts[winner_entrant.startgg_entrant_id.to_s]
     loser_games = game_counts[loser_entrant.startgg_entrant_id.to_s]
 
-    return unless winner_games.present? && loser_games.present?
+    return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 
     if upset_factor > 0
       initialize_twitter_upset_thread!
