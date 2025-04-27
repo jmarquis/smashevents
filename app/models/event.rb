@@ -129,7 +129,7 @@ class Event < ApplicationRecord
     state == STATE_COMPLETED
   end
 
-  def sync_entrants
+  def sync_entrants!
     Rails.logger.info "Syncing entrants for #{tournament.slug} (#{game.slug})..."
     entrants = []
     stats = {
@@ -221,6 +221,39 @@ class Event < ApplicationRecord
     tweet = Twitter.upset_thread_intro(event)
 
     self.last_upset_tweet_id = tweet['data']['id']
+    save!
+  end
+
+  def sync_sets!
+    return if completed?
+
+    batch_size = 20
+    start_time = Time.now
+
+    (1..1000).each do |page|
+      sets = Startgg.with_retries(5, batch_size:) do |batch_size|
+        Rails.logger.info "Fetching sets for #{tournament.slug} #{game.slug}..."
+
+        Startgg.sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
+      end
+
+      Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{game.slug}. Analyzing..."
+      break if sets.count.zero?
+
+      sets.each do |set|
+        if set.state == SET_STATE_IN_PROGRESS
+          process_in_progress_set(set)
+        elsif set.state == SET_STATE_COMPLETED
+          process_completed_set(set)
+        end
+      end
+
+      break if sets.count < batch_size
+
+      sleep 1
+    end
+
+    self.sets_synced_at = start_time
     save!
   end
 

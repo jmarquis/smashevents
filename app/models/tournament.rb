@@ -234,8 +234,8 @@ class Tournament < ApplicationRecord
     self
   end
 
-  def sync_entrants
-    events.each(&:sync_entrants)
+  def sync_entrants!
+    events.each(&:sync_entrants!)
   end
 
   def has_streams?

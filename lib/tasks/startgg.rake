@@ -137,7 +137,7 @@ namespace :startgg do
       events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
 
       events.each do |event|
-        stats = event.sync_entrants.reduce(stats) do |stats, (key, total)|
+        stats = event.sync_entrants!.reduce(stats) do |stats, (key, total)|
           stats[key] += total
           stats
         end
@@ -153,38 +153,9 @@ namespace :startgg do
   end
 
   task scan_sets: [:environment] do
-    batch_size = 20
-
     Tournament.should_display.live.each do |tournament|
       tournament.events.each do |event|
-        next if event.completed?
-
-        start_time = Time.now
-        (1..1000).each do |page|
-          sets = Startgg.with_retries(5, batch_size:) do |batch_size|
-            Rails.logger.info "Fetching sets for #{tournament.slug} #{event.game.slug}..."
-
-            Startgg.sets(event.startgg_id, batch_size:, page:, updated_after: (event.sets_synced_at.present? ? event.sets_synced_at - 5.seconds : 1.hour.ago))
-          end
-
-          Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{event.game.slug}. Analyzing..."
-          break if sets.count.zero?
-
-          sets.each do |set|
-            if set.state == Event::SET_STATE_IN_PROGRESS
-              event.process_in_progress_set(set)
-            elsif set.state == Event::SET_STATE_COMPLETED
-              event.process_completed_set(set)
-            end
-          end
-
-          # break if sets.count < batch_size
-
-          sleep 1
-        end
-
-        event.sets_synced_at = start_time
-        event.save!
+        event.sync_sets!
       end
     end
   end
