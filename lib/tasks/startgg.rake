@@ -153,6 +153,8 @@ namespace :startgg do
   end
 
   task scan_sets: [:environment] do
+    batch_size = 20
+
     Tournament.should_display.live.each do |tournament|
       tournament.events.each do |event|
         next if event.completed?
@@ -285,7 +287,7 @@ namespace :startgg do
 
           end
 
-          break if sets.count < 50
+          break if sets.count < batch_size
 
           sleep 1
         end
