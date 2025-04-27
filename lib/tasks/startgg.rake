@@ -233,6 +233,7 @@ namespace :startgg do
               next unless set.phase_group&.bracket_type == Event::BRACKET_TYPE_DOUBLE_ELIMINATION
 
               entrant_startgg_ids = set.slots.map(&:entrant).map(&:id)
+              Rails.logger.info("Entrants: #{entrant_startgg_ids.join(', ')}")
               next unless entrant_startgg_ids.count == 2
 
               winner_entrant = event.entrants.find_by(startgg_entrant_id: set.winner_id)
