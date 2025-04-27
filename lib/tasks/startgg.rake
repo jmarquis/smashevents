@@ -232,14 +232,13 @@ namespace :startgg do
               next unless set.winner_id.present?
               next unless set.phase_group&.bracket_type == Event::BRACKET_TYPE_DOUBLE_ELIMINATION
 
-              entrant_startgg_ids = set.slots.map(&:entrant).map(&:id)
-              Rails.logger.info("Entrants: #{entrant_startgg_ids.join(', ')}")
+              entrant_startgg_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
               next unless entrant_startgg_ids.count == 2
 
               winner_entrant = event.entrants.find_by(startgg_entrant_id: set.winner_id)
               next unless winner_entrant.present? && winner_entrant.seed.present?
 
-              loser_entrant = event.entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id]).first)
+              loser_entrant = event.entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
               next unless loser_entrant.present? && loser_entrant.seed.present?
 
               upset_factor = Event.upset_factor(
