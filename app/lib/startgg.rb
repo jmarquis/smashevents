@@ -178,9 +178,6 @@ class Startgg < Api
             ) {
               nodes {
                 completedAt
-                games {
-                  winnerId
-                }
                 id
                 phaseGroup {
                   bracketType
@@ -192,6 +189,13 @@ class Startgg < Api
                     participants {
                       player {
                         id
+                      }
+                    }
+                  }
+                  standing {
+                    stats {
+                      score {
+                        value
                       }
                     }
                   }

@@ -331,18 +331,20 @@ class Event < ApplicationRecord
     loser_entrant = entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
     return unless loser_entrant.present? && loser_entrant.seed.present?
 
-    if set.games.blank?
-      Rails.logger.info("No games?? #{slug} #{winner_entrant.tag} beat #{loser_entrant.tag} somehow?")
-      return
-    end
-
     upset_factor = self.class.upset_factor(
       winner_seed: winner_entrant.seed,
       loser_seed: loser_entrant.seed
     )
 
-    winner_games = set.games.count { |game| game.winner_id.to_s == winner_entrant.startgg_entrant_id.to_s }
-    loser_games = set.games.count { |game| game.winner_id.to_s == loser_entrant.startgg_entrant_id.to_s }
+    game_counts = set.slots.reduce({}) do |counts, slot|
+      counts[slot.entrant.id.to_s] = slot.standing&.stats&.score&.value&.to_i
+      counts
+    end
+
+    winner_games = game_counts[winner_entrant.startgg_entrant_id.to_s]
+    loser_games = game_counts[loser_entrant.startgg_entrant_id.to_s]
+
+    return unless winner_games.present? && loser_games.present?
 
     if upset_factor > 0
       initialize_twitter_upset_thread!
