@@ -128,7 +128,7 @@ class Twitter < Api
         #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
       TEXT
 
-      tweet(text, reply_to: event.last_upset_tweet_id)
+      tweet(text, reply_to_tweet_id: event.last_upset_tweet_id)
     end
 
     def tweet(text, images: [], reply_to_tweet_id: nil)
