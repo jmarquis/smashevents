@@ -358,27 +358,27 @@ class Event < ApplicationRecord
 
       return if previous_notification.present?
 
-      Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
+      Rails.logger.info("Would post upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
 
-      Notification.send_notification(
-        self,
-        type: Notification::TYPE_UPSET,
-        platform: Notification::PLATFORM_TWITTER,
-        metadata: { startgg_set_id: set.id }
-      ) do |event|
-        tweet = Twitter.upset(
-          event: event,
-          winner_entrant:,
-          winner_games:,
-          loser_entrant:,
-          loser_games:
-        )
-
-        self.last_upset_tweet_id = tweet['data']['id']
-        save!
-
-        sleep 1
-      end
+      # Notification.send_notification(
+      #   self,
+      #   type: Notification::TYPE_UPSET,
+      #   platform: Notification::PLATFORM_TWITTER,
+      #   metadata: { startgg_set_id: set.id }
+      # ) do |event|
+      #   tweet = Twitter.upset(
+      #     event: event,
+      #     winner_entrant:,
+      #     winner_games:,
+      #     loser_entrant:,
+      #     loser_games:
+      #   )
+      #
+      #   self.last_upset_tweet_id = tweet['data']['id']
+      #   save!
+      #
+      #   sleep 1
+      # end
     end
   end
 end
