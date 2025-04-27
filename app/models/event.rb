@@ -352,7 +352,7 @@ class Event < ApplicationRecord
       previous_notification = Notification.where(
         notifiable: self,
         notification_type: Notification::TYPE_UPSET,
-        platform: Notification::PLATFORM_DISCORD,
+        platform: Notification::PLATFORM_TWITTER,
         success: true
       ).order(sent_at: :desc).first
 
