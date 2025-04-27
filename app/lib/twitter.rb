@@ -128,10 +128,10 @@ class Twitter < Api
         #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
       TEXT
 
-      tweet(text)
+      tweet(text, reply_to: event.last_upset_tweet_id)
     end
 
-    def tweet(text, images: [])
+    def tweet(text, images: [], reply_to_tweet_id: nil)
       text = text.slice(0, 260) if Rails.env.development?
 
       media_ids = images.map do |image|
@@ -141,7 +141,8 @@ class Twitter < Api
       instrument('tweet') do
         client.post('tweets', JSON.generate({
           text:,
-          media: media_ids.blank? ? nil : { media_ids: }
+          media: media_ids.blank? ? nil : { media_ids: },
+          reply: reply_to.blank? ? nil : { in_reply_to_tweet_id: reply_to_tweet_id }
         }.compact))
       rescue X::Error => e
         Rails.logger.error "ERROR POSTING TO TWITTER: #{e.message}"
