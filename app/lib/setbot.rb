@@ -1,10 +1,18 @@
 class Setbot < Api
+  SMASHEVENTS_SERVER_ID = '1260259175586467840'
+
   @@bot = nil
 
   class << self
 
     def run
       Rails.logger.info 'Starting Setbot...'
+
+      if Rails.env.development?
+        register_commands
+
+        at_exit { delete_commands(server_id: SMASHEVENTS_SERVER_ID) }
+      end
 
       bot.application_command(Rails.env.production? ? :connect : :connect_dev) do |event|
         StatsD.increment('setbot.command.connect')
@@ -244,11 +252,14 @@ class Setbot < Api
     end
 
     def register_commands
+      server_id = Rails.env.production? ? nil : SMASHEVENTS_SERVER_ID
+      Rails.logger.info("Registering application commands for server #{server_id}...")
+
       register_or_edit_application_command(
         Rails.env.production? ? :connect : :connect_dev,
         description: 'Add a Setbot connection',
         default_member_permissions: 1 << 5,
-        server_id: Rails.env.production? ? nil : '1260259175586467840'
+        server_id:
       ) do |cmd|
         cmd.string('player_tag', 'The tag of the player to notify this channel about, or a link to their start.gg profile.', required: true)
       end
@@ -257,7 +268,7 @@ class Setbot < Api
         Rails.env.production? ? :disconnect : :disconnect_dev,
         description: 'Remove a Setbot connection',
         default_member_permissions: 1 << 5,
-        server_id: Rails.env.production? ? nil : '1260259175586467840'
+        server_id:
       )
 
       Rails.logger.info 'Global commands successfully registered.'
@@ -278,6 +289,11 @@ class Setbot < Api
           yield(cmd) if block_given?
         end
       end
+    end
+
+    def delete_commands(server_id: nil)
+      Rails.logger.info("Deleting application commands for server #{server_id}...")
+      bot.get_application_commands(server_id:).each(&:delete)
     end
 
     def custom_id(str)
