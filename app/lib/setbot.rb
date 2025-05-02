@@ -129,7 +129,7 @@ class Setbot < Api
         )
       end
 
-      if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
+      if PlayerSubscription.where(discord_server_id: event.server_id).count >= player_subscription_limit(event.server_id)
         return event.interaction.edit_response(
           content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.'
         )
@@ -298,6 +298,15 @@ class Setbot < Api
 
     def custom_id(str)
       "#{str}_#{Rails.env}"
+    end
+
+    def player_subscription_limit(server_id)
+      case server_id.to_s
+      when '1260259175586467840'
+        return 100
+      else
+        return 3
+      end
     end
 
     def bot
