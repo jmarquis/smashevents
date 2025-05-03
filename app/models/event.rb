@@ -29,6 +29,7 @@
 #
 
 class Event < ApplicationRecord
+  STATE_ACTIVE = 'ACTIVE'
   STATE_COMPLETED = 'COMPLETED'
 
   SET_STATE_IN_PROGRESS = 2
@@ -49,6 +50,7 @@ class Event < ApplicationRecord
   has_many :notifications, as: :notifiable
 
   scope :should_sync_entrants, -> { where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '100 seconds' <= ?", 1.day.ago) }
+  scope :in_progress, -> { where(state: STATE_ACTIVE) }
 
   # TODO: Put this somewhere else?
   def self.upset_factor(winner_seed:, loser_seed:)

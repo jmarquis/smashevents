@@ -154,7 +154,7 @@ namespace :startgg do
 
   task scan_sets: [:environment] do
     Tournament.should_display.live.each do |tournament|
-      tournament.events.each do |event|
+      tournament.events.in_progress.each do |event|
         event.sync_sets!
       end
     end
