@@ -243,10 +243,10 @@ class Event < ApplicationRecord
 
       sets.each do |set|
         if set.state == SET_STATE_IN_PROGRESS
-          StatsD.inrement('startgg.set_updated.in_progress')
+          StatsD.increment('startgg.set_updated.in_progress')
           process_in_progress_set(set)
         elsif set.state == SET_STATE_COMPLETED
-          StatsD.inrement('startgg.set_updated.completed')
+          StatsD.increment('startgg.set_updated.completed')
           process_completed_set(set)
         end
       end
