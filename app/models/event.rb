@@ -237,6 +237,7 @@ class Event < ApplicationRecord
         Startgg.sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
       end
 
+      break if sets.blank?
       break if sets.count.zero?
       Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
