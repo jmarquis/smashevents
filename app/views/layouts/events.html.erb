@@ -16,24 +16,23 @@
     <% if action_name == 'index' %>
       Upcoming events
     <% elsif params[:player].present? %>
-      <%= link_to "Upcoming events",
+      <%= link_to "Upcoming",
       player_path(player: params[:player], game: params[:game], games: params[:games]) %>
     <% else %>
-      <%= link_to "Upcoming events", root_path(game: params[:game], games: params[:games]) %>
+      <%= link_to "Upcoming", root_path(game: params[:game], games: params[:games]) %>
     <% end %>
     <span>/</span>
     <% if action_name == 'past' %>
       Past events
     <% elsif params[:player].present? %>
-      <%= link_to "Past events",
+      <%= link_to "Past",
       player_past_path(
         player: params[:player],
         game: params[:game],
         games: params[:games],
       ) %>
     <% else %>
-      <%= link_to "Past events",
-      past_events_path(game: params[:game], games: params[:games]) %>
+      <%= link_to "Past", past_events_path(game: params[:game], games: params[:games]) %>
     <% end %>
   </nav>
 
