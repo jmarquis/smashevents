@@ -92,6 +92,13 @@ h1 {
   position: relative;
   left: 24px;
   pointer-events: none;
+
+  @media (max-width: 600px) {
+    font-size: 48px;
+    letter-spacing: 14px;
+    width: calc(100% - 14px);
+    left: 14px;
+  }
 }
 
 nav + nav {
