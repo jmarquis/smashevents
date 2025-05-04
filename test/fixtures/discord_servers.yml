@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: discord_servers
+#
+#  id                        :integer          not null, primary key
+#  discord_server_id         :string
+#  player_subscription_limit :integer
+#  note                      :string
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#
+
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  discord_server_id: MyString
+  player_subscription_limit: 1
+  note: MyString
+
+two:
+  discord_server_id: MyString
+  player_subscription_limit: 1
+  note: MyString

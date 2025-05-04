@@ -300,13 +300,8 @@ class Setbot < Api
       "#{str}_#{Rails.env}"
     end
 
-    def player_subscription_limit(server_id)
-      case server_id.to_s
-      when '1260259175586467840'
-        return 100
-      else
-        return 1
-      end
+    def player_subscription_limit(discord_server_id)
+      return DiscordServer.find_by(discord_server_id:)&.player_subscription_limit || 1
     end
 
     def bot
