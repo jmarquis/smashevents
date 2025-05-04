@@ -305,7 +305,7 @@ class Setbot < Api
       when '1260259175586467840'
         return 100
       else
-        return 3
+        return 1
       end
     end
 
