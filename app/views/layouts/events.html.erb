@@ -14,7 +14,7 @@
 
   <nav class="pages">
     <% if action_name == 'index' %>
-      Upcoming events
+      Upcoming
     <% elsif params[:player].present? %>
       <%= link_to "Upcoming",
       player_path(player: params[:player], game: params[:game], games: params[:games]) %>
@@ -23,7 +23,7 @@
     <% end %>
     <span>/</span>
     <% if action_name == 'past' %>
-      Past events
+      Past
     <% elsif params[:player].present? %>
       <%= link_to "Past",
       player_past_path(
