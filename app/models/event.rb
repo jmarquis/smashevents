@@ -253,6 +253,7 @@ class Event < ApplicationRecord
       Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
+        StatsD.increment('startgg.set_fetched.in_progress')
         process_in_progress_set(set)
       end
 
@@ -274,9 +275,10 @@ class Event < ApplicationRecord
 
       break if sets.blank?
       break if sets.count.zero?
-      Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
+      Rails.logger.debug "Found #{sets.count} updated completed sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
+        StatsD.increment('startgg.set_fetched.completed')
         process_completed_set(set)
       end
 
