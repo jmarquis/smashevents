@@ -243,7 +243,7 @@ class Event < ApplicationRecord
 
     (1..1000).each do |page|
       sets = Startgg.with_retries(5, batch_size:) do |batch_size|
-        Rails.logger.debug "Fetching sets for #{tournament.slug} #{game.slug}..."
+        Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
         Startgg.in_progress_sets(startgg_id, batch_size:, page:)
       end
@@ -268,7 +268,7 @@ class Event < ApplicationRecord
 
     (1..1000).each do |page|
       sets = Startgg.with_retries(5, batch_size:) do |batch_size|
-        Rails.logger.debug "Fetching sets for #{tournament.slug} #{game.slug}..."
+        Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
         Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
       end
