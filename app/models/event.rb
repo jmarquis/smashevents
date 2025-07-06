@@ -245,14 +245,14 @@ class Event < ApplicationRecord
 
       break if sets.blank?
       break if sets.count.zero?
-      Rails.logger.info "Found #{sets.count} updated sets for #{tournament.slug} #{game.slug}. Analyzing..."
+      Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
         if set.state == SET_STATE_IN_PROGRESS
-          StatsD.increment('startgg.set_updated.in_progress')
+          StatsD.increment('startgg.set_fetched.in_progress')
           process_in_progress_set(set)
         elsif set.state == SET_STATE_COMPLETED
-          StatsD.increment('startgg.set_updated.completed')
+          StatsD.increment('startgg.set_fetched.completed')
           process_completed_set(set)
         end
       end
