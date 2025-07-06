@@ -229,16 +229,21 @@ class Event < ApplicationRecord
   def sync_sets!
     return if completed?
 
-    batch_size = 20
     start_time = Time.now
+
+    sync_in_progress_sets!
+    sync_completed_sets!
+
+    self.sets_synced_at = start_time
+    save!
+  end
+
+  def sync_in_progress_sets!
+    batch_size = 20
 
     (1..1000).each do |page|
       sets = Startgg.with_retries(5, batch_size:) do |batch_size|
         Rails.logger.debug "Fetching sets for #{tournament.slug} #{game.slug}..."
-
-        # TODO: Fetch all in progress sets and recently updated historical sets
-        # Turns out startgg doesn't always consider a set going live enough for updated_after
-        # Startgg.sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
 
         Startgg.in_progress_sets(startgg_id, batch_size:, page:)
       end
@@ -248,22 +253,37 @@ class Event < ApplicationRecord
       Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
-        if set.state == SET_STATE_IN_PROGRESS
-          StatsD.increment('startgg.set_fetched.in_progress')
-          process_in_progress_set(set)
-        elsif set.state == SET_STATE_COMPLETED
-          StatsD.increment('startgg.set_fetched.completed')
-          process_completed_set(set)
-        end
+        process_in_progress_set(set)
       end
 
       break if sets.count < batch_size
 
       sleep 1
     end
+  end
 
-    self.sets_synced_at = start_time
-    save!
+  def sync_completed_sets!
+    batch_size = 20
+
+    (1..1000).each do |page|
+      sets = Startgg.with_retries(5, batch_size:) do |batch_size|
+        Rails.logger.debug "Fetching sets for #{tournament.slug} #{game.slug}..."
+
+        Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
+      end
+
+      break if sets.blank?
+      break if sets.count.zero?
+      Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
+
+      sets.each do |set|
+        process_completed_set(set)
+      end
+
+      break if sets.count < batch_size
+
+      sleep 1
+    end
   end
 
   def process_in_progress_set(set)

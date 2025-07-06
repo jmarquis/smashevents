@@ -172,7 +172,7 @@ class Startgg < Api
               perPage: $perPage,
               page: $page,
               filters: {
-                state: [#{Event::SET_STATE_IN_PROGRESS}],
+                state: [#{Event::SET_STATE_IN_PROGRESS}]
               }
             ) {
               nodes {
@@ -212,8 +212,62 @@ class Startgg < Api
         }
       GRAPHQL
 
-      instrument('sets') do
+      instrument('in_progress_sets') do
         client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
+      end
+    end
+
+    def completed_sets(event_id, batch_size: 20, page: 1, updated_after: 1.hour.ago)
+      query = <<~GRAPHQL
+        query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
+          event(id: $id) {
+            sets(
+              perPage: $perPage,
+              page: $page,
+              filters: {
+                state: [#{Event::SET_STATE_COMPLETED}],
+                updatedAfter: $updatedAfter
+              }
+            ) {
+              nodes {
+                completedAt
+                id
+                phaseGroup {
+                  bracketType
+                }
+                slots {
+                  entrant {
+                    id
+                    name
+                    participants {
+                      player {
+                        id
+                      }
+                    }
+                  }
+                  standing {
+                    stats {
+                      score {
+                        value
+                      }
+                    }
+                  }
+                }
+                startedAt
+                state
+                stream {
+                  streamName
+                  streamSource
+                }
+                winnerId
+              }
+            }
+          }
+        }
+      GRAPHQL
+
+      instrument('completed_sets') do
+        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
       end
     end
 
