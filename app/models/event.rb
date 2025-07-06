@@ -236,7 +236,11 @@ class Event < ApplicationRecord
       sets = Startgg.with_retries(5, batch_size:) do |batch_size|
         Rails.logger.debug "Fetching sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg.sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
+        # TODO: Fetch all in progress sets and recently updated historical sets
+        # Turns out startgg doesn't always consider a set going live enough for updated_after
+        # Startgg.sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 5.seconds : 1.hour.ago))
+
+        Startgg.in_progress_sets(startgg_id, batch_size:, page:)
       end
 
       break if sets.blank?
