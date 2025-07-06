@@ -131,45 +131,50 @@ namespace :notifications do
       .where('tournaments.start_at < ?', effective_time + 2.days)
       .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
       .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
-      .filter { |t|
+      .each do |tournament|
 
-        # Custom idempotency logic since a multi-day tournament is supposed to
-        # have more than one of these.
         notification = Notification.where(
-          notifiable: t,
+          notifiable: tournament,
           notification_type: Notification::TYPE_HAPPENING_TODAY,
           platform: Notification::PLATFORM_TWITTER,
           success: true
         ).order(sent_at: :desc).limit(1).first
 
-        notification.blank? || notification.sent_at.day != Time.now.day
+        if notification.blank? || notification.sent_at.day != Time.now.day
+          Rails.logger.info "Sending happening today tweet for #{tournament.slug}..."
+          begin
+            Notification.send_notification(
+              tournament,
+              type: Notification::TYPE_HAPPENING_TODAY,
+              platform: Notification::PLATFORM_TWITTER
+            ) do |tournament|
+              Twitter.happening_today(tournament)
+            end
+          rescue X::Error
+          end
+        end
 
-      }
-      .each do |tournament|
+        notification = Notification.where(
+          notifiable: tournament,
+          notification_type: Notification::TYPE_HAPPENING_TODAY,
+          platform: Notification::PLATFORM_DISCORD,
+          success: true
+        ).order(sent_at: :desc).limit(1).first
 
-        Rails.logger.info "Sending happening today tweet for #{tournament.slug}..."
-        begin
+        if notification.blank? || notification.sent_at.day != Time.now.day
+          Rails.logger.info "Sending happening today Discord notification for #{tournament.slug}..."
           Notification.send_notification(
             tournament,
             type: Notification::TYPE_HAPPENING_TODAY,
-            platform: Notification::PLATFORM_TWITTER
+            platform: Notification::PLATFORM_DISCORD
           ) do |tournament|
-            Twitter.happening_today(tournament)
+            Discord.happening_today(tournament)
           end
-        rescue X::Error
         end
 
-        Rails.logger.info "Sending happening today Discord notification for #{tournament.slug}..."
-        Notification.send_notification(
-          tournament,
-          type: Notification::TYPE_HAPPENING_TODAY,
-          platform: Notification::PLATFORM_DISCORD
-        ) do |tournament|
-          Discord.happening_today(tournament)
+        # Avoid rate limits
+        sleep 1
 
-          # Avoid rate limits
-          sleep 1
-        end
       end
   end
 
