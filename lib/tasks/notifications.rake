@@ -3,6 +3,7 @@ namespace :notifications do
   task new_events: [:environment] do
 
     Rails.logger.info 'Scanning for new event notifications that need to be sent...'
+    notification_count = 0
 
     # We only do this notification once per tournament for Twitter, and just
     # list all the games regardless of player count as soon as one event has
@@ -20,6 +21,8 @@ namespace :notifications do
             idempotent: true
           ) do |tournament|
             Twitter.tournament_added(tournament)
+
+            notification_count += 1
 
             # Avoid rate limits
             sleep 1
@@ -46,6 +49,8 @@ namespace :notifications do
         ) do |event|
           Discord.event_added(event)
 
+          notification_count += 1
+
           # Avoid rate limits
           sleep 1
         end
@@ -57,10 +62,15 @@ namespace :notifications do
         end
       end
 
+    Rails.logger.info "Done, sent #{notification_count} notifications."
+
   end
 
   task weekend_briefing: [:environment] do
     next unless Time.now.strftime('%a') == 'Wed' || Rails.env.development?
+
+    Rails.logger.info 'Sending weekend briefing notifications...'
+    notification_count = 0
 
     Tournament
       .should_display
@@ -81,6 +91,8 @@ namespace :notifications do
           idempotent: true
         ) do |events|
           Twitter.weekend_briefing(game:, events:)
+
+          notification_count += 1
         end
 
         Notification.send_notification(
@@ -91,13 +103,20 @@ namespace :notifications do
         ) do |events|
           Discord.weekend_briefing(game:, events:)
 
+          notification_count += 1
+
           # Avoid rate limits
           sleep 1
         end
       end
+
+    Rails.logger.info "Done, sent #{notification_count} notifications."
   end
 
   task congratulations: [:environment] do
+    Rails.logger.info 'Sending congratulation notifications...'
+    notification_count = 0
+
     effective_time = Time.now
 
     Tournament
@@ -118,11 +137,18 @@ namespace :notifications do
           idempotent: true
         ) do |events|
           Twitter.congratulations(game:, events:)
+
+          notification_count += 1
         end
       end
+
+    Rails.logger.info "Done, sent #{notification_count} notifications."
   end
 
   task happening_today: [:environment] do
+    Rails.logger.info 'Sending happening today notifications...'
+    notification_count = 0
+
     effective_time = Time.now
 
     Tournament
@@ -149,6 +175,8 @@ namespace :notifications do
               platform: Notification::PLATFORM_TWITTER
             ) do |tournament|
               Twitter.happening_today(tournament)
+
+              notification_count += 1
             end
           rescue X::Error
           end
@@ -169,6 +197,8 @@ namespace :notifications do
             platform: Notification::PLATFORM_DISCORD
           ) do |tournament|
             Discord.happening_today(tournament)
+
+            notification_count += 1
           end
         end
 
@@ -176,6 +206,8 @@ namespace :notifications do
         sleep 1
 
       end
+
+    Rails.logger.info "Done, sent #{notification_count} notifications."
   end
 
 end
