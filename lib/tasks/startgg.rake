@@ -9,13 +9,15 @@ namespace :startgg do
     }
     start_time = Time.now
     last_sync = Rails.cache.read('startgg/last_tournament_sync')
+    last_full_sync = Rails.cache.read('startgg/last_full_tournament_sync')
+    full_sync = last_full_sync.blank? || last_full_sync < 24.hours.ago
 
-    Rails.logger.info "Starting tournament sync (last sync: #{last_sync.inspect})..."
+    Rails.logger.info "Starting tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
 
     (1..1000).each do |page|
       tournaments = Startgg.with_retries(5, batch_size: 15) do |batch_size|
         Rails.logger.info "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
+        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
       end
 
       break if tournaments.count.zero?
@@ -54,6 +56,7 @@ namespace :startgg do
     end
 
     Rails.cache.write('startgg/last_tournament_sync', start_time, expires_in: 1.day)
+    Rails.cache.write('startgg/last_full_tournament_sync', start_time, expires_in: 1.day) if full_sync
 
     Rails.logger.info "Tournament sync complete. #{stats.to_json}"
   end
