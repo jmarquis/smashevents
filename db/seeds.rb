@@ -35,7 +35,7 @@ rivals.update!(
   startgg_id: 24,
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
-  display_threshold: 40
+  display_threshold: 20
 )
 
 rivals2 = Game.find_or_create_by!(slug: 'rivals2')
