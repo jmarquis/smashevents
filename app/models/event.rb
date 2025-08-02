@@ -378,7 +378,7 @@ class Event < ApplicationRecord
     return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 
     if upset_factor > 3
-      # initialize_twitter_upset_thread!
+      initialize_twitter_upset_thread!
 
       previous_notification = Notification.where(
         notifiable: self,
@@ -391,25 +391,25 @@ class Event < ApplicationRecord
 
       Rails.logger.info("Would post upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed})")
 
-      # Notification.send_notification(
-      #   self,
-      #   type: Notification::TYPE_UPSET,
-      #   platform: Notification::PLATFORM_TWITTER,
-      #   metadata: { startgg_set_id: set.id }
-      # ) do |event|
-      #   tweet = Twitter.upset(
-      #     event: event,
-      #     winner_entrant:,
-      #     winner_games:,
-      #     loser_entrant:,
-      #     loser_games:
-      #   )
-      #
-      #   self.last_upset_tweet_id = tweet['data']['id']
-      #   save!
-      #
-      #   sleep 1
-      # end
+      Notification.send_notification(
+        self,
+        type: Notification::TYPE_UPSET,
+        platform: Notification::PLATFORM_TWITTER,
+        metadata: { startgg_set_id: set.id }
+      ) do |event|
+        tweet = Twitter.upset(
+          event: event,
+          winner_entrant:,
+          winner_games:,
+          loser_entrant:,
+          loser_games:
+        )
+
+        self.last_upset_tweet_id = tweet['data']['id']
+        save!
+
+        sleep 1
+      end
     end
   end
 end
