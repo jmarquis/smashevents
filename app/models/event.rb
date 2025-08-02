@@ -117,8 +117,13 @@ class Event < ApplicationRecord
 
   def featured_entrants_data
     Rails.cache.fetch("featured_entrants_data_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
-      featured_entrants&.pluck('player.tag', 'player.twitter_username', 'player2.tag', 'player2.twitter_username')&.map do |tag, twitter_username, player2_tag, player2_twitter_username|
-        { tag:, twitter_username:, player2_tag:, player2_twitter_username: }
+      featured_entrants&.map do |entrant|
+        {
+          tag: entrant.player.tag,
+          twitter_username: entrant.player.twitter_username,
+          player2_tag: entrant.player2&.tag,
+          player2_twitter_username: entrant.player2&.twitter_username
+        }
       end
     end
   end
