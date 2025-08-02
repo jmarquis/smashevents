@@ -26,15 +26,16 @@ class Player < ApplicationRecord
   TWITTER_USERNAME_FALLBACKS = {
     'chem' => 'Chemjamin',
     'fiction' => 'FictionIRL',
+    'jmook' => 'jakedirado',
     'junebug' => 'arJunebug',
     'mang0' => 'C9Mang0',
     'mvlvchi' => '_mvlvchi_',
-    'wizzrobe' => 'Wizzrobe',
+    'pewpewu' => '_PewPewU',
     'plup' => 'Plup_Club',
-    'zain' => 'ZainNaghmi',
-    'jmook' => 'jakedirado',
     'soonsay' => 's00nsay',
-    'pewpewu' => '_PewPewU'
+    'stango' => 'StangoSSBM',
+    'wizzrobe' => 'Wizzrobe',
+    'zain' => 'ZainNaghmi',
   }
 
   has_many :entrants
