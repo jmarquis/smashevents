@@ -382,7 +382,7 @@ class Event < ApplicationRecord
 
     return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 
-    if upset_factor > 3
+    if upset_factor > 2
       initialize_twitter_upset_thread!
 
       previous_notification = Notification.where(
