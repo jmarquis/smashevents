@@ -119,8 +119,8 @@ class Event < ApplicationRecord
     Rails.cache.fetch("featured_entrants_data_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.hour) do
       featured_entrants&.map do |entrant|
         {
-          tag: entrant.player.tag,
-          twitter_username: entrant.player.twitter_username,
+          tag: entrant.player&.tag,
+          twitter_username: entrant.player&.twitter_username,
           player2_tag: entrant.player2&.tag,
           player2_twitter_username: entrant.player2&.twitter_username
         }
