@@ -49,7 +49,7 @@ class Event < ApplicationRecord
   belongs_to :game, foreign_key: :game_slug, primary_key: :slug
   has_many :notifications, as: :notifiable
 
-  scope :should_sync_entrants, -> { where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '10 seconds' <= ?", 1.day.ago) }
+  scope :should_sync_entrants, -> { where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(player_count, 0) * interval '30 seconds' <= ?", 1.day.ago) }
   scope :in_progress, -> { where(state: STATE_ACTIVE) }
 
   # TODO: Put this somewhere else?
