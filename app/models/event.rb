@@ -367,6 +367,10 @@ class Event < ApplicationRecord
     loser_entrant = entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
     return unless loser_entrant.present? && loser_entrant.seed.present?
 
+    # Larger events don't really seed beyond top 256 typically, so upsets
+    # beyond that don't really mean anything.
+    return unless loser_entrant.seed >= 256
+
     upset_factor = self.class.upset_factor(
       winner_seed: winner_entrant.seed,
       loser_seed: loser_entrant.seed
