@@ -369,7 +369,7 @@ class Event < ApplicationRecord
 
     # Larger events don't really seed beyond top 256 typically, so upsets
     # beyond that don't really mean anything.
-    return unless loser_entrant.seed >= 256
+    return unless loser_entrant.seed <= 256
 
     upset_factor = self.class.upset_factor(
       winner_seed: winner_entrant.seed,
