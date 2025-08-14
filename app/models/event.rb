@@ -233,6 +233,7 @@ class Event < ApplicationRecord
 
   def sync_sets!
     return if completed?
+    return unless should_display?
 
     start_time = Time.now
 
@@ -355,7 +356,6 @@ class Event < ApplicationRecord
   end
 
   def process_completed_set(set)
-    return unless player_count >= 64
     return unless set.winner_id.present?
     return unless set.phase_group&.bracket_type == BRACKET_TYPE_DOUBLE_ELIMINATION
 
