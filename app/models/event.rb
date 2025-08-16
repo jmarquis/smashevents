@@ -400,7 +400,7 @@ class Event < ApplicationRecord
       return if previous_notification.present?
 
       upset_factor = Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)
-      Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed}) [UF #{upset_factor}")
+      Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed}) [UF #{upset_factor}]")
 
       Notification.send_notification(
         self,
