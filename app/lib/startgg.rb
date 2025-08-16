@@ -271,6 +271,49 @@ class Startgg < Api
       end
     end
 
+    def set(set_id)
+      query = <<~GRAPHQL
+        query($setId: ID!) {
+          set(id: $setId) {
+            completedAt
+            id
+            phaseGroup {
+              bracketType
+            }
+            slots {
+              entrant {
+                id
+                name
+                participants {
+                  player {
+                    id
+                  }
+                }
+              }
+              standing {
+                stats {
+                  score {
+                    value
+                  }
+                }
+              }
+            }
+            startedAt
+            state
+            stream {
+              streamName
+              streamSource
+            }
+            winnerId
+          }
+        }
+      GRAPHQL
+
+      instrument('set') do
+        client.query(query, setId: set_id)&.data&.set
+      end
+    end
+
     def with_retries(num_retries, batch_size: nil)
       retries = 0
       result = nil
