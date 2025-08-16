@@ -276,7 +276,7 @@ class Event < ApplicationRecord
       sets = Startgg.with_retries(5, batch_size:) do |batch_size|
         Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 10.minutes : 1.hour.ago))
+        Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
       end
 
       break if sets.blank?
