@@ -196,6 +196,16 @@ class Event < ApplicationRecord
         entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
           StatsD.increment("startgg.entrant_field_updated.#{field}")
         end
+        if entrant.player.present?
+          entrant.player.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+            StatsD.increment("startgg.player_field_updated.#{field}")
+          end
+        end
+        if entrant.player2.present?
+          entrant.player2.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+            StatsD.increment("startgg.player_field_updated.#{field}")
+          end
+        end
         StatsD.increment('startgg.entrant_updated')
       end
 
