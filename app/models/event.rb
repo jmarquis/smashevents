@@ -187,8 +187,10 @@ class Event < ApplicationRecord
 
         stats[:created] += 1
         StatsD.increment('startgg.entrant_added')
-      elsif entrant.changed? || entrant.player_changed? || entrant.player2_changed?
+      elsif entrant.changed? || entrant.player&.changed? || entrant.player2&.changed?
         entrant.save!
+        entrant.player&.save!
+        entrant.player2&.save!
 
         stats[:updated] += 1
         entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
