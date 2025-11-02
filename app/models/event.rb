@@ -232,6 +232,12 @@ class Event < ApplicationRecord
     stats
   end
 
+  def upset_factor_threshold
+    return 3 if player_count <= 300
+    return 4 if player_count <= 1000
+    return 5
+  end
+
   def initialize_twitter_upset_thread!
     return if last_upset_tweet_id.present?
 
@@ -399,7 +405,7 @@ class Event < ApplicationRecord
 
     return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 
-    if upset_factor > 4
+    if upset_factor >= upset_factor_threshold
       initialize_twitter_upset_thread!
 
       previous_notification = Notification.where(
