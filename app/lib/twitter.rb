@@ -29,7 +29,7 @@ class Twitter < Api
         https://start.gg/#{tournament.slug}
       TEXT
 
-      tweet(text)
+      tweet!(text)
     end
 
     def weekend_briefing(game:, events:)
@@ -51,7 +51,7 @@ class Twitter < Api
 
       banner_images = events.slice(0, 3).map(&:tournament).map(&:banner_image_file)
 
-      tweet(text, images: banner_images)
+      tweet!(text, images: banner_images)
     end
 
     def congratulations(game:, events:)
@@ -65,7 +65,7 @@ class Twitter < Api
         #{blurbs.join("\n\n")}
       TEXT
 
-      tweet(text)
+      tweet!(text)
     end
 
     def happening_today(tournament)
@@ -108,7 +108,7 @@ class Twitter < Api
         #{stream_text}
       TEXT
 
-      tweet(text, images: [tournament.banner_image_file])
+      tweet!(text, images: [tournament.banner_image_file])
     end
 
     def upset_thread_intro(event)
@@ -117,7 +117,7 @@ class Twitter < Api
         #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
       TEXT
 
-      tweet(text)
+      tweet!(text)
     end
 
     def upset(event:, winner_entrant:, winner_games:, loser_entrant:, loser_games:)
@@ -127,21 +127,41 @@ class Twitter < Api
         UPSET FACTOR #{Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)}
       TEXT
 
-      tweet(text, reply_to_tweet_id: event.last_upset_tweet_id)
+      tweet!(text, reply_to_tweet_id: event.last_upset_tweet_id, remove_mentions: true)
     end
 
-    def tweet(text, images: [], reply_to_tweet_id: nil)
+    def tweet(id, fields: nil)
+      if fields.nil?
+        client.get("tweets/#{id}")
+      else
+        client.get("tweets/#{id}?tweet.fields=#{fields.join(',')}")
+      end
+    end
+
+    def tweet!(text, images: [], reply_to_tweet_id: nil, remove_mentions: false)
       text = text.slice(0, 260) if Rails.env.development?
 
       media_ids = images.map do |image|
         image.present? ? upload_image(image)['media_id_string'] : nil
       end.compact
 
+      mentions = nil
+      if reply_to_tweet_id.present? && remove_mentions
+        last_tweet = tweet(reply_to_tweet_id, fields: ['entities'])
+        mentions_data = last_tweet.dig('data', 'entities', 'mentions')
+        if mentions_data.present?
+          mentions = mentions_data.map { |mention| mention['id'] }
+        end
+      end
+
       instrument('tweet') do
         client.post('tweets', JSON.generate({
           text:,
           media: media_ids.blank? ? nil : { media_ids: },
-          reply: reply_to_tweet_id.blank? ? nil : { in_reply_to_tweet_id: reply_to_tweet_id }
+          reply: reply_to_tweet_id.blank? ? nil : {
+            in_reply_to_tweet_id: reply_to_tweet_id,
+            exclude_reply_user_ids: mentions.blank? ? nil : mentions
+          }.compact
         }.compact))
       rescue X::Error => e
         Rails.logger.error "ERROR POSTING TO TWITTER: #{e.inspect}"
