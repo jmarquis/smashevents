@@ -71,6 +71,9 @@ group :development do
   # gem "spring"
 
   gem 'derailed_benchmarks'
+
+  gem 'ruby-lsp'
+  gem 'rubocop'
 end
 
 group :test do
