@@ -39,7 +39,7 @@ class Event < ApplicationRecord
 
   BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
 
-  ENTRANT_SYNC_BATCH_SIZE = 60
+  ENTRANT_SYNC_BATCH_SIZE = 50
 
   belongs_to :tournament
   has_many :entrants
@@ -171,9 +171,6 @@ class Event < ApplicationRecord
       break if event_entrants.count.zero?
 
       entrants = [*entrants, *event_entrants]
-
-      # If we don't have a full batch, this is the last page.
-      break if event_entrants.count != ENTRANT_SYNC_BATCH_SIZE
     end
 
     return stats if tournament.destroyed?
