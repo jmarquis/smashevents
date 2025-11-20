@@ -327,7 +327,8 @@ class Startgg < Api
 
         if retries < num_retries
           Rails.logger.info "Query complexity error, reducing batch size"
-          batch_size -= 1
+          retries += 1
+          batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
           sleep 5 * retries
           next
         else

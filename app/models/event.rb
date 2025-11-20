@@ -147,11 +147,11 @@ class Event < ApplicationRecord
 
     # Get all the entrants, 1 chunk at a time
     (1..100).each do |page|
-      event_entrants = Startgg.with_retries(5) do
+      event_entrants = Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
         Startgg.event_entrants(
           id: startgg_id,
           game: game,
-          batch_size: ENTRANT_SYNC_BATCH_SIZE,
+          batch_size:,
           page:
         )
       end
@@ -167,7 +167,7 @@ class Event < ApplicationRecord
         break
       end
 
-      # This means there are no available entrants.
+      # This means there are no available entrants, or we reached the end of the list.
       break if event_entrants.count.zero?
 
       entrants = [*entrants, *event_entrants]
@@ -260,10 +260,8 @@ class Event < ApplicationRecord
   end
 
   def sync_in_progress_sets!
-    batch_size = 20
-
     (1..1000).each do |page|
-      sets = Startgg.with_retries(5, batch_size:) do |batch_size|
+      sets = Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
         Startgg.in_progress_sets(startgg_id, batch_size:, page:)
@@ -278,17 +276,13 @@ class Event < ApplicationRecord
         process_in_progress_set(set)
       end
 
-      break if sets.count < batch_size
-
       sleep 1
     end
   end
 
   def sync_completed_sets!
-    batch_size = 20
-
     (1..1000).each do |page|
-      sets = Startgg.with_retries(5, batch_size:) do |batch_size|
+      sets = Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
         Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
@@ -302,8 +296,6 @@ class Event < ApplicationRecord
         StatsD.increment('startgg.set_fetched.completed')
         process_completed_set(set)
       end
-
-      break if sets.count < batch_size
 
       sleep 1
     end

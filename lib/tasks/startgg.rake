@@ -50,8 +50,6 @@ namespace :startgg do
         end
       end
 
-      break if tournaments.count < 15
-
       sleep 1
     end
 
