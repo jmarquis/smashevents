@@ -365,6 +365,19 @@ article > .streams ul {
 
 article > .streams li {
   display: flex;
+
+  a {
+    white-space: nowrap;
+  }
+
+  svg {
+    display: inline-block;
+    height: 16px;
+    margin-right: 4px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
 }
 
 article > .streams .live {
