@@ -132,7 +132,7 @@ namespace :startgg do
 
     Rails.logger.info 'Starting entrant sync...'
 
-    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.upcoming
+    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.upcoming.reasonable_duration
 
     tournaments.each do |tournament|
       events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
@@ -154,7 +154,7 @@ namespace :startgg do
   end
 
   task scan_sets: [:environment] do
-    Tournament.should_display.live.each do |tournament|
+    Tournament.should_display.in_progress.each do |tournament|
       tournament.events.in_progress.each do |event|
         event.sync_sets!
       end
