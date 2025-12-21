@@ -303,7 +303,7 @@ class Setbot < Api
     end
 
     def player_subscription_limit(discord_server_id)
-      return DiscordServer.find_by(discord_server_id:)&.player_subscription_limit || 1
+      return DiscordServer.find_by(discord_server_id:)&.player_subscription_limit || 5
     end
 
     def bot
