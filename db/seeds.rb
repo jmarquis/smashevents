@@ -30,7 +30,7 @@ smash64.update!(
 
 rivals = Game.find_or_create_by!(slug: 'rivals')
 rivals.update!(
-  name: 'Rivals',
+  name: 'Rivals 1',
   twitch_name: 'Rivals of Aether',
   startgg_id: 24,
   rankings_regex: /^NA RCS/,
