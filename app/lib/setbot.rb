@@ -187,19 +187,21 @@ class Setbot < Api
       bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
 
       PlayerSubscription.where(player:).each do |subscription|
-        previous_notification = Notification.where(
+        previous_notifications = Notification.where(
           notifiable: subscription,
           notification_type: Notification::TYPE_SETBOT_SET_LIVE,
           platform: Notification::PLATFORM_DISCORD,
           success: true
-        ).order(sent_at: :desc).first
+        ).order(sent_at: :desc)
 
         metadata = previous_notification&.metadata&.with_indifferent_access
 
-        next if previous_notification.present? &&
+        next if previous_notifications.any? do |notification|
+          metadata = notification&.metadata&.with_indifferent_access
           metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
-          metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
-          metadata[:startgg_set_id]&.to_s == startgg_set_id
+            metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
+            metadata[:startgg_set_id]&.to_s == startgg_set_id
+        end
 
         StatsD.increment('setbot.notification.set_live')
 
