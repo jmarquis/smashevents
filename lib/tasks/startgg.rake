@@ -98,6 +98,7 @@ namespace :startgg do
       if tournament.persisted?
         if tournament.changed? || events.any?(&:changed?)
           tournament.save!
+          events.each(&:save!)
 
           StatsD.increment('startgg.tournament_updated')
           updated_log(tournament, events)
