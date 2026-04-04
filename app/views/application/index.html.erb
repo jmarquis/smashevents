@@ -16,7 +16,13 @@
           <h3 class="game-heading">
             <a href="<%= event.startgg_url %>" target="_blank">
               <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
-                <%= event.player_count.round(-1) %>+ players<% end %>
+                <% if event.player_count > 20 %>
+                  <%= event.player_count.round(-1) %>+ players
+                <% else %>
+                  <%= event.player_count %>
+                  players
+                <% end %>
+              <% end %>
             </a>
           </h3>
           <% if event.start_at.present? %>
