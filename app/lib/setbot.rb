@@ -194,8 +194,6 @@ class Setbot < Api
           success: true
         ).order(sent_at: :desc)
 
-        metadata = previous_notifications&.first&.metadata&.with_indifferent_access
-
         next if previous_notifications.any? do |notification|
           metadata = notification&.metadata&.with_indifferent_access
           metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
