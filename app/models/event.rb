@@ -246,6 +246,14 @@ class Event < ApplicationRecord
     save!
   end
 
+  def sync_state!
+    startgg_event = Startgg.event(id: startgg_id)
+    if startgg_event&.state.present?
+      self.state = startgg_event.state
+      save!
+    end
+  end
+
   def sync_sets!
     return if completed?
     return unless should_display?

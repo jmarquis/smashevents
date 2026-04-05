@@ -126,6 +126,20 @@ class Startgg < Api
       end
     end
 
+    def event(id:)
+      query = <<~GRAPHQL
+        query($id: ID) {
+          event(id: $id) {
+            state
+          }
+        }
+      GRAPHQL
+
+      instrument('event') do
+        client.query(query, id:)&.data&.event
+      end
+    end
+
     def event_entrants(id:, game:, batch_size:, page:)
       query = <<~GRAPHQL
         query($id: ID, $perPage: Int, $page: Int) {
