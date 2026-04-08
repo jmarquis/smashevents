@@ -39,7 +39,7 @@ class Tournament < ApplicationRecord
   scope :upcoming, -> { where('end_at >= ?', Date.today) }
   scope :in_progress, -> {
     includes(:events)
-      .where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now + 12.hours)
+      .where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now - 12.hours)
       .where(events: { winner_entrant_id: nil })
   }
   scope :reasonable_duration, -> { where("end_at - start_at < interval '7 days'") }
@@ -247,7 +247,7 @@ class Tournament < ApplicationRecord
   end
 
   def in_progress?
-    return false unless start_at <= Time.now && end_at >= Time.now + 12.hours
+    return false unless start_at <= Time.now && end_at + 12.hours >= Time.now
     return false unless events.any? { |e| e.winner_entrant_id.blank? }
     true
   end
