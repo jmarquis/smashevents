@@ -247,7 +247,10 @@ class Event < ApplicationRecord
   end
 
   def sync_state!
-    startgg_event = Startgg.event(id: startgg_id)
+    startgg_event = Startgg.with_retries(5) do
+      Startgg.event(id: startgg_id)
+    end
+
     if startgg_event&.state.present?
       self.state = startgg_event.state
       save!

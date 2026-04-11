@@ -333,7 +333,11 @@ class Startgg < Api
       result = nil
 
       loop do
-        result = yield batch_size
+        if batch_size.present?
+          result = yield batch_size
+        else
+          result = yield
+        end
         break
       rescue Graphlient::Errors::GraphQLError => e
         raise e unless e.message.match? /query complexity/
@@ -342,7 +346,11 @@ class Startgg < Api
         if retries < num_retries
           Rails.logger.info "Query complexity error, reducing batch size"
           retries += 1
-          batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
+
+          if batch_size.present?
+            batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
+          end
+
           sleep 5 * retries
           next
         else
