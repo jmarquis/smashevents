@@ -52,13 +52,13 @@ end
 
 ### MORE FREQUENT JOBS
 
-# Every 10 minutes (5 minute offset)
-cron '9/10 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
+# Every 20 minutes
+cron '5/20 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end
 
-# Every 10 minutes
-cron '*/10 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
+# Every 20 minutes (19 minute offset)
+cron '19/20 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
   rake_async('notifications:new_events')
 end
 
