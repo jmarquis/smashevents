@@ -13,7 +13,7 @@ ultimate.update!(
   name: 'Ultimate',
   twitch_name: 'Super Smash Bros. Ultimate',
   startgg_id: 1386,
-  rankings_regex: /^UltRank/,
+  rankings_regex: /^UltRank|^LumiRank/,
   ingestion_threshold: 8,
   display_threshold: 200
 )
