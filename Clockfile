@@ -53,7 +53,7 @@ end
 ### MORE FREQUENT JOBS
 
 # Every 10 minutes (5 minute offset)
-cron '5/10 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
+cron '9/10 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end
 
