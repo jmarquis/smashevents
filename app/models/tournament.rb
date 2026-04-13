@@ -106,7 +106,9 @@ class Tournament < ApplicationRecord
         # Some TOs make a single tournament for a weekly for some reason, and
         # just move the tournament's start_at and end_at every week. So make
         # sure we don't consider old events part of the current tournament.
-        .filter { |event| Time.at(event.start_at) >= t.start_at }
+        # NB: Give a couple days of grace because some TOs also mess this up
+        # for legitimate tournaments.
+        .filter { |event| Time.at(event.start_at) >= t.start_at - 2.days }
         .max { |a, b| a.num_entrants <=> b.num_entrants }
 
       if biggest_event.present?
