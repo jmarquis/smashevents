@@ -52,7 +52,7 @@ end
 
 ### MORE FREQUENT JOBS
 
-# Every 20 minutes
+# Every 20 minutes (5 minute offset)
 cron '5/20 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end

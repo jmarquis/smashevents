@@ -133,12 +133,13 @@ namespace :startgg do
 
     Rails.logger.info 'Starting entrant sync...'
 
-    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.upcoming.reasonable_duration
+    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.not_past.reasonable_duration
 
     tournaments.each do |tournament|
+      unseeded_in_progress_events = tournament.events.in_progress.where(is_seeded: false)
       events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
 
-      events.each do |event|
+      [*unseeded_in_progress_events, *events].each do |event|
         stats = event.sync_entrants!.reduce(stats) do |stats, (key, total)|
           stats[key] += total
           stats
