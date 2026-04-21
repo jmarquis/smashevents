@@ -25,23 +25,45 @@ module ApplicationHelper
   def colors_css(action)
     case action
     when 'past' 
-      [
-        '--color-bg: #121212',
-        '--color-bg-2: #353535',
-        '--color-bg-3: #6A6A6A',
-        '--color-text: #9d9d9d',
-        '--color-text-2: #555555',
-        '--color-text-3: #f1f1f1',
-      ].join(';')
+      if Flag.radar?
+        [
+          '--color-bg: #121212',
+          '--color-bg-2: #282828',
+          '--color-bg-3: #555555',
+          '--color-text: #AEAEAE',
+          '--color-text-2: #6B6B6B',
+          '--color-text-3: #DEDEDE',
+        ].join(';')
+      else
+        [
+          '--color-bg: #121212',
+          '--color-bg-2: #353535',
+          '--color-bg-3: #6A6A6A',
+          '--color-text: #9d9d9d',
+          '--color-text-2: #555555',
+          '--color-text-3: #f1f1f1',
+        ].join(';')
+      end
     else
-      [
-        '--color-bg: #081212',
-        '--color-bg-2: #183535',
-        '--color-bg-3: #306A6A',
-        '--color-text: #859d9d',
-        '--color-text-2: #445555',
-        '--color-text-3: #ebf1f1',
-      ].join(';')
+      if Flag.radar?
+        [
+          '--color-bg: #021203',
+          '--color-bg-2: #0A280D',
+          '--color-bg-3: #225527',
+          '--color-text: #AED2B2',
+          '--color-text-2: #669D6B',
+          '--color-text-3: #DCF1DE',
+        ].join(';')
+      else
+        [
+          '--color-bg: #081212',
+          '--color-bg-2: #183535',
+          '--color-bg-3: #306A6A',
+          '--color-text: #859d9d',
+          '--color-text-2: #445555',
+          '--color-text-3: #ebf1f1',
+        ].join(';')
+      end
     end
   end
 
