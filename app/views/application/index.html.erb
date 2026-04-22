@@ -1,7 +1,9 @@
 <% @tournaments.each do |tournament| %>
   <article>
     <% if tournament.in_progress? %>
-      <div class="in-progress"><div>In progress</div></div>
+      <div class="tournament-status in-progress"><div>In progress</div></div>
+    <% elsif tournament.starting_soon? %>
+      <div class="tournament-status starting-soon"><div>Starting soon</div></div>
     <% end %>
     <time><%= tournament.formatted_date_range %></time>
     <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>

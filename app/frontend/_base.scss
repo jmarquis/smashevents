@@ -338,13 +338,12 @@ article + article {
   margin-top: 80px;
 }
 
-article > .in-progress {
+article > .tournament-status {
   display: flex;
   justify-content: center;
   margin-bottom: 8px;
 
   > div {
-    background-color: #30913a;
     color: #fff;
     font-weight: bold;
     text-transform: uppercase;
@@ -355,6 +354,14 @@ article > .in-progress {
     position: relative;
     top: 1px;
     pointer-events: none;
+  }
+
+  &.in-progress > div {
+    background-color: #30913a;
+  }
+
+  &.starting-soon > div {
+    background-color: #306791;
   }
 }
 
@@ -407,7 +414,7 @@ article > .streams li {
 }
 
 article > .streams .live {
-  background-color: #910830;
+  background-color: #913030;
   color: #fff;
   margin-left: 8px;
   font-weight: bold;

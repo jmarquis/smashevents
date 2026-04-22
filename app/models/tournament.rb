@@ -254,4 +254,9 @@ class Tournament < ApplicationRecord
     true
   end
 
+  def starting_soon?
+    return false if in_progress?
+    start_at < Time.now + 8.hours
+  end
+
 end
