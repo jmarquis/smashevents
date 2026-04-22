@@ -363,6 +363,11 @@ article > .tournament-status {
   &.starting-soon > div {
     background-color: #306791;
   }
+
+  &.upcoming > div,
+  &.completed > div {
+    background-color: var(--color-bg-2);
+  }
 }
 
 article > div + div {

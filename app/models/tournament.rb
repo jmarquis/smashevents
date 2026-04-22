@@ -261,4 +261,8 @@ class Tournament < ApplicationRecord
     start_at < Time.now + 8.hours
   end
 
+  def completed?
+    events.all?(&:completed?)
+  end
+
 end
