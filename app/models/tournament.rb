@@ -256,6 +256,8 @@ class Tournament < ApplicationRecord
 
   def starting_soon?
     return false if in_progress?
+    return false if past?
+    return false unless events.any? { |e| e.winner_entrant_id.blank? }
     start_at < Time.now + 8.hours
   end
 
