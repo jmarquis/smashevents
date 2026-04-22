@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_04_182500) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_22_222554) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_04_182500) do
     t.integer "display_threshold"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "hashtag"
     t.index ["slug"], name: "index_games_on_slug"
     t.index ["startgg_id"], name: "index_games_on_startgg_id"
     t.index ["twitch_name"], name: "index_games_on_twitch_name"

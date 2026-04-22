@@ -2,6 +2,7 @@ melee = Game.find_or_create_by!(slug: 'melee')
 melee.update!(
   name: 'Melee',
   twitch_name: 'Super Smash Bros. Melee',
+  hashtag: 'ssbm',
   startgg_id: 1,
   rankings_regex: /^SSBMRank/,
   ingestion_threshold: 8,
@@ -12,6 +13,7 @@ ultimate = Game.find_or_create_by!(slug: 'ultimate')
 ultimate.update!(
   name: 'Ultimate',
   twitch_name: 'Super Smash Bros. Ultimate',
+  hashtag: 'ssbu',
   startgg_id: 1386,
   rankings_regex: /^UltRank|^LumiRank/,
   ingestion_threshold: 8,
@@ -22,6 +24,7 @@ smash64 = Game.find_or_create_by!(slug: 'smash64')
 smash64.update!(
   name: 'Smash 64',
   twitch_name: 'Super Smash Bros.',
+  hashtag: 'ssb64',
   startgg_id: 4,
   rankings_regex: /^The SSB64 League Rankings/,
   ingestion_threshold: 8,
@@ -32,6 +35,7 @@ rivals = Game.find_or_create_by!(slug: 'rivals')
 rivals.update!(
   name: 'Rivals 1',
   twitch_name: 'Rivals of Aether',
+  hashtag: 'RivalsOfAether',
   startgg_id: 24,
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
@@ -42,6 +46,7 @@ rivals2 = Game.find_or_create_by!(slug: 'rivals2')
 rivals2.update!(
   name: 'Rivals 2',
   twitch_name: 'Rivals 2',
+  hashtag: 'RivalsOfAether2',
   startgg_id: 53945,
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,

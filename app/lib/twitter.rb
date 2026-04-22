@@ -114,7 +114,8 @@ class Twitter < Api
     def upset_thread_intro(event)
       text = <<~TEXT
         LIVE UPSET THREAD for #{event.tournament.name.upcase} (#{event.game.name})
-        #{event.tournament.hashtag.present? ? "\n\n##{event.tournament.hashtag}" : nil}
+        \n\n
+        #{event.tournament.hashtag.present? ? "##{event.tournament.hashtag} " : nil}##{event.game.hashtag})
       TEXT
 
       tweet!(text)
