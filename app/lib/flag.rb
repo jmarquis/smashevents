@@ -2,7 +2,7 @@ class Flag
   class << self
 
     def radar?
-      Rails.env.development?
+      true
     end
 
   end
