@@ -119,6 +119,16 @@ h1 {
       margin-right: 30px;
     }
   }
+
+  @media (max-width: 600px) {
+    font-size: 48px;
+    letter-spacing: 8px;
+
+    svg {
+      margin-left: 8px;
+      margin-right: 14px;
+    }
+  }
 }
 
 nav + nav {
