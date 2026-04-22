@@ -1,4 +1,6 @@
 class ApplicationController < BaseController
+  before_action :redirect_smashevents
+
   layout 'events'
 
   def index
@@ -81,6 +83,11 @@ class ApplicationController < BaseController
     game_slugs = ['melee', 'ultimate', 'smash64', 'rivals', 'rivals2'] if game_slugs.blank?
     cookies.permanent[:games] = game_slugs.join(',')
     game_slugs.map { |slug| Game.find_by(slug:) }
+  end
+
+  def redirect_smashevents
+    return if Rails.env.development?
+    redirect_to('https://smashradar.com', allow_other_host: true) unless request.host.in? ['smashradar.com', 'www.smashradar.com']
   end
 
 end
