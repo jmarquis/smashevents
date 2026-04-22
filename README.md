@@ -1,4 +1,4 @@
-# Smash Events
+# Smash Radar
 
 ## Run locally
 

@@ -2,7 +2,7 @@ class ApplicationController < BaseController
   layout 'events'
 
   def index
-    @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
+    @title = 'Smash Radar: Upcoming Smash & Rivals tournaments!'
     @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
 
     @games = selected_games
@@ -29,7 +29,7 @@ class ApplicationController < BaseController
   end
 
   def past
-    @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
+    @title = 'Smash Radar: Upcoming Smash & Rivals tournaments!'
     @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
 
     @games = selected_games
