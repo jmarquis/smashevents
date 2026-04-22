@@ -115,7 +115,7 @@ class Twitter < Api
       text = <<~TEXT
         LIVE UPSET THREAD for #{event.tournament.name.upcase} (#{event.game.name})
         \n\n
-        #{event.tournament.hashtag.present? ? "##{event.tournament.hashtag} " : nil}##{event.game.hashtag})
+        #{event.tournament.hashtag.present? ? "##{event.tournament.hashtag} " : nil}##{event.game.hashtag}
       TEXT
 
       tweet!(text)
