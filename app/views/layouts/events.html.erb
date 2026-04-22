@@ -5,7 +5,11 @@
     <a href="/setbot" class="text-link">Setbot</a>
   </div>
 
-  <h1><%= @h1 %></h1>
+  <% if Flag.radar? %>
+    <h1>Smash<%= inline_svg_tag "logo.svg" %>Radar</h1>
+  <% else %>
+    <h1>Smash Events</h1>
+  <% end %>
 
   <nav class="pages">
     <% if action_name == 'index' %>

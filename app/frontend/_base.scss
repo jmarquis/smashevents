@@ -96,12 +96,28 @@ h1 {
   position: relative;
   left: 24px;
   pointer-events: none;
+  color: var(--color-text-2);
 
-  @media (max-width: 600px) {
+  svg {
+    vertical-align: middle;
+    height: 88px;
+    width: 88px;
+    color: var(--color-text);
+    margin: -10px 40px 0 16px;
+  }
+
+  @media (max-width: 800px) {
     font-size: 52px;
     letter-spacing: 14px;
     width: calc(100% - 14px);
     left: 14px;
+
+    svg {
+      width: 64px;
+      height: 64px;
+      margin-top: -8px;
+      margin-right: 30px;
+    }
   }
 }
 

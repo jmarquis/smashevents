@@ -4,7 +4,6 @@ class ApplicationController < BaseController
   def index
     @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
     @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
-    @h1 = 'Smash Events'
 
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
@@ -32,7 +31,6 @@ class ApplicationController < BaseController
   def past
     @title = 'Smash Events: Upcoming Smash & Rivals tournaments!'
     @description = 'Find out about the biggest upcoming Super Smash Bros. Melee, Ultimate, 64, and Rivals of Aether tournaments!'
-    @h1 = 'Smash Events'
 
     @games = selected_games
     @unselected_games = Game.all_games_except(@games)
