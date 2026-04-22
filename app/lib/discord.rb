@@ -3,8 +3,8 @@ class Discord < Api
   @bot = nil
 
   DEFAULT_FOOTER = Discordrb::Webhooks::EmbedFooter.new(
-    text: 'smashevents.gg',
-    icon_url: 'https://smashevents.gg/favicon.png'
+    text: 'smashradar.com',
+    icon_url: 'https://smashradar.com/favicon.png'
   )
 
   class << self

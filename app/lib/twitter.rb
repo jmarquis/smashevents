@@ -17,7 +17,7 @@ class Twitter < Api
       end
 
       text = <<~TEXT
-        New tournament added to smashevents.gg!
+        New tournament added to Smash Radar!
         \n\n
         #{tournament.name.upcase}
         #{tournament.formatted_date_range}

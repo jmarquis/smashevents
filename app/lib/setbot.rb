@@ -1,5 +1,5 @@
 class Setbot < Api
-  SMASHEVENTS_SERVER_ID = '1260259175586467840'
+  SMASHRADAR_SERVER_ID = '1260259175586467840'
 
   @@bot = nil
 
@@ -11,7 +11,7 @@ class Setbot < Api
       if Rails.env.development?
         register_commands
 
-        at_exit { delete_commands(server_id: SMASHEVENTS_SERVER_ID) }
+        at_exit { delete_commands(server_id: SMASHRADAR_SERVER_ID) }
       end
 
       bot.application_command(Rails.env.production? ? :connect : :connect_dev) do |event|
@@ -252,7 +252,7 @@ class Setbot < Api
     end
 
     def register_commands
-      server_id = Rails.env.production? ? nil : SMASHEVENTS_SERVER_ID
+      server_id = Rails.env.production? ? nil : SMASHRADAR_SERVER_ID
       Rails.logger.info("Registering application commands for server #{server_id}...")
 
       register_or_edit_application_command(
