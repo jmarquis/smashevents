@@ -111,10 +111,11 @@ class Event < ApplicationRecord
   end
 
   def featured_entrants
+    total_featured = player_count == 16 ? 16 : 10
     if is_seeded
-      entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(10)
+      entrants.includes(:player, :player2).where('seed is not null').order(seed: :asc).limit(total_featured)
     elsif ranked_player_count.present? && ranked_player_count > 0
-      entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(10)
+      entrants.includes(:player, :player2).where('rank is not null').order(rank: :asc).limit(total_featured)
     end
   end
 
