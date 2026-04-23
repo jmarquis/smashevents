@@ -123,7 +123,7 @@ class Twitter < Api
 
     def upset(event:, winner_entrant:, winner_games:, loser_entrant:, loser_games:)
       text = <<~TEXT
-        #{winner_entrant.tag}#{winner_entrant.player&.twitter_username.present? ? " (@#{winner_entrant.player.twitter_username})" : '' } [seed #{winner_entrant.seed}] #{winner_games}-#{loser_games} #{loser_entrant.tag} [seed #{loser_entrant.seed}]
+        [#{winner_entrant.seed}] #{winner_entrant.tag}#{winner_entrant.player&.twitter_username.present? ? " (@#{winner_entrant.player.twitter_username})" : '' } #{winner_games}-#{loser_games} #{loser_entrant.tag} [#{loser_entrant.seed}]
         \n\n
         UPSET FACTOR #{Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)}
       TEXT
