@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   git \
   tzdata \
   inotify-tools \
-  libgemalloc2 \
+  libjemalloc2 \
   libprotobuf-dev \
   protobuf-compiler \
   wget \
