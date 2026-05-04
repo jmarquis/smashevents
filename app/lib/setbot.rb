@@ -1,4 +1,6 @@
-class Setbot < Api
+class Setbot
+  extend Api::Instrumentable
+
   SMASHRADAR_SERVER_ID = '1260259175586467840'
 
   @@bot = nil
