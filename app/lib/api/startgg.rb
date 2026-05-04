@@ -1,22 +1,82 @@
-class Startgg < Api
-  @client = nil
+module Api
+  class Startgg
+    extend Instrumentable
 
-  class << self
+    @client = nil
 
-    def tournaments(batch_size:, page:, after_date: Time.now, updated_after: 6.hours.ago)
-      query = <<~GRAPHQL
-        query($perPage: Int, $page: Int, $afterDate: Timestamp, $updatedAfter: Timestamp) {
-          tournaments(query: {
-            perPage: $perPage
-            page: $page
-            sortBy: "startAt asc"
-            filter: {
-              videogameIds: [#{Game.pluck(:startgg_id).join(',')}],
-              afterDate: $afterDate,
-              computedUpdatedAt: $updatedAfter
+    class << self
+
+      def tournaments(batch_size:, page:, after_date: Time.now, updated_after: 6.hours.ago)
+        query = <<~GRAPHQL
+          query($perPage: Int, $page: Int, $afterDate: Timestamp, $updatedAfter: Timestamp) {
+            tournaments(query: {
+              perPage: $perPage
+              page: $page
+              sortBy: "startAt asc"
+              filter: {
+                videogameIds: [#{Game.pluck(:startgg_id).join(',')}],
+                afterDate: $afterDate,
+                computedUpdatedAt: $updatedAfter
+              }
+            }) {
+              nodes {
+                id
+                name
+                slug
+                hashtag
+                startAt
+                endAt
+                timezone
+                city
+                addrState
+                countryCode
+                images {
+                  type
+                  url
+                }
+                events(filter: {
+                  videogameId: [#{Game.pluck(:startgg_id).join(',')}]
+                }) {
+                  id
+                  slug
+                  state
+                  startAt
+                  numEntrants
+                  videogame {
+                    id
+                  }
+                  standings(query: {
+                    sortBy: "placement desc",
+                    page: 1,
+                    perPage: 1
+                  }) {
+                    nodes {
+                      isFinal
+                      entrant {
+                        id
+                      }
+                    }
+                  }
+                }
+                streams {
+                  streamName
+                  streamSource
+                  streamStatus
+                }
+              }
             }
-          }) {
-            nodes {
+          }
+        GRAPHQL
+
+        instrument('tournaments') do
+          client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i, updatedAfter: updated_after.to_i)&.data&.tournaments&.nodes
+        end
+      end
+
+      def tournament(slug:)
+        query = <<~GRAPHQL
+          query($slug: String) {
+            tournament(slug: $slug) {
               id
               name
               slug
@@ -62,343 +122,287 @@ class Startgg < Api
               }
             }
           }
-        }
-      GRAPHQL
+        GRAPHQL
 
-      instrument('tournaments') do
-        client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i, updatedAfter: updated_after.to_i)&.data&.tournaments&.nodes
+        instrument('tournament') do
+          client.query(query, slug:)&.data&.tournament
+        end
       end
-    end
 
-    def tournament(slug:)
-      query = <<~GRAPHQL
-        query($slug: String) {
-          tournament(slug: $slug) {
-            id
-            name
-            slug
-            hashtag
-            startAt
-            endAt
-            timezone
-            city
-            addrState
-            countryCode
-            images {
-              type
-              url
-            }
-            events(filter: {
-              videogameId: [#{Game.pluck(:startgg_id).join(',')}]
-            }) {
-              id
-              slug
+      def event(id:)
+        query = <<~GRAPHQL
+          query($id: ID) {
+            event(id: $id) {
               state
-              startAt
-              numEntrants
-              videogame {
-                id
-              }
-              standings(query: {
-                sortBy: "placement desc",
-                page: 1,
-                perPage: 1
-              }) {
+            }
+          }
+        GRAPHQL
+
+        instrument('event') do
+          client.query(query, id:)&.data&.event
+        end
+      end
+
+      def event_entrants(id:, game:, batch_size:, page:)
+        query = <<~GRAPHQL
+          query($id: ID, $perPage: Int, $page: Int) {
+            event(id: $id) {
+              entrants(query: { page: $page, perPage: $perPage }) {
                 nodes {
-                  isFinal
-                  entrant {
-                    id
-                  }
-                }
-              }
-            }
-            streams {
-              streamName
-              streamSource
-              streamStatus
-            }
-          }
-        }
-      GRAPHQL
-
-      instrument('tournament') do
-        client.query(query, slug:)&.data&.tournament
-      end
-    end
-
-    def event(id:)
-      query = <<~GRAPHQL
-        query($id: ID) {
-          event(id: $id) {
-            state
-          }
-        }
-      GRAPHQL
-
-      instrument('event') do
-        client.query(query, id:)&.data&.event
-      end
-    end
-
-    def event_entrants(id:, game:, batch_size:, page:)
-      query = <<~GRAPHQL
-        query($id: ID, $perPage: Int, $page: Int) {
-          event(id: $id) {
-            entrants(query: { page: $page, perPage: $perPage }) {
-              nodes {
-                id
-                name
-                initialSeedNum
-                participants {
-                  player {
-                    id
-                    gamerTag
-                    #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
-                      rank
-                      title
-                    }
-                    user {
+                  id
+                  name
+                  initialSeedNum
+                  participants {
+                    player {
                       id
-                      discriminator
+                      gamerTag
+                      #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
+                        rank
+                        title
+                      }
+                      user {
+                        id
+                        discriminator
+                        name
+                        authorizations(types: [TWITTER]) {
+                          externalUsername
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        GRAPHQL
+
+        instrument('event_entrants') do
+          client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
+        end
+      end
+
+      def in_progress_sets(event_id, batch_size: 20, page: 1)
+        query = <<~GRAPHQL
+          query($id: ID, $perPage: Int, $page: Int) {
+            event(id: $id) {
+              sets(
+                perPage: $perPage,
+                page: $page,
+                filters: {
+                  state: [#{Event::SET_STATE_IN_PROGRESS}]
+                }
+              ) {
+                nodes {
+                  completedAt
+                  id
+                  phaseGroup {
+                    bracketType
+                  }
+                  slots {
+                    entrant {
+                      id
                       name
-                      authorizations(types: [TWITTER]) {
-                        externalUsername
+                      participants {
+                        player {
+                          id
+                        }
+                      }
+                    }
+                    standing {
+                      stats {
+                        score {
+                          value
+                        }
                       }
                     }
                   }
+                  startedAt
+                  state
+                  stream {
+                    streamName
+                    streamSource
+                  }
+                  winnerId
                 }
               }
             }
           }
-        }
-      GRAPHQL
+        GRAPHQL
 
-      instrument('event_entrants') do
-        client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
-      end
-    end
-
-    def in_progress_sets(event_id, batch_size: 20, page: 1)
-      query = <<~GRAPHQL
-        query($id: ID, $perPage: Int, $page: Int) {
-          event(id: $id) {
-            sets(
-              perPage: $perPage,
-              page: $page,
-              filters: {
-                state: [#{Event::SET_STATE_IN_PROGRESS}]
-              }
-            ) {
-              nodes {
-                completedAt
-                id
-                phaseGroup {
-                  bracketType
-                }
-                slots {
-                  entrant {
-                    id
-                    name
-                    participants {
-                      player {
-                        id
-                      }
-                    }
-                  }
-                  standing {
-                    stats {
-                      score {
-                        value
-                      }
-                    }
-                  }
-                }
-                startedAt
-                state
-                stream {
-                  streamName
-                  streamSource
-                }
-                winnerId
-              }
-            }
-          }
-        }
-      GRAPHQL
-
-      instrument('in_progress_sets') do
-        client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
-      end
-    end
-
-    def completed_sets(event_id, batch_size: 20, page: 1, updated_after: 1.hour.ago)
-      query = <<~GRAPHQL
-        query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
-          event(id: $id) {
-            sets(
-              perPage: $perPage,
-              page: $page,
-              filters: {
-                state: [#{Event::SET_STATE_COMPLETED}],
-                updatedAfter: $updatedAfter
-              }
-            ) {
-              nodes {
-                completedAt
-                id
-                phaseGroup {
-                  bracketType
-                }
-                slots {
-                  entrant {
-                    id
-                    name
-                    participants {
-                      player {
-                        id
-                      }
-                    }
-                  }
-                  standing {
-                    stats {
-                      score {
-                        value
-                      }
-                    }
-                  }
-                }
-                startedAt
-                state
-                stream {
-                  streamName
-                  streamSource
-                }
-                winnerId
-              }
-            }
-          }
-        }
-      GRAPHQL
-
-      instrument('completed_sets') do
-        client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
-      end
-    end
-
-    def set(set_id)
-      query = <<~GRAPHQL
-        query($setId: ID!) {
-          set(id: $setId) {
-            completedAt
-            id
-            phaseGroup {
-              bracketType
-            }
-            slots {
-              entrant {
-                id
-                name
-                participants {
-                  player {
-                    id
-                  }
-                }
-              }
-              standing {
-                stats {
-                  score {
-                    value
-                  }
-                }
-              }
-            }
-            startedAt
-            state
-            stream {
-              streamName
-              streamSource
-            }
-            winnerId
-          }
-        }
-      GRAPHQL
-
-      instrument('set') do
-        client.query(query, setId: set_id)&.data&.set
-      end
-    end
-
-    def with_retries(num_retries, batch_size: nil)
-      retries = 0
-      result = nil
-
-      loop do
-        if batch_size.present?
-          result = yield batch_size
-        else
-          result = yield
+        instrument('in_progress_sets') do
+          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
         end
-        break
-      rescue Graphlient::Errors::GraphQLError => e
-        raise e unless e.message.match? /query complexity/
-        raise e unless batch_size.present?
+      end
 
-        if retries < num_retries
-          Rails.logger.info "Query complexity error, reducing batch size"
-          retries += 1
+      def completed_sets(event_id, batch_size: 20, page: 1, updated_after: 1.hour.ago)
+        query = <<~GRAPHQL
+          query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
+            event(id: $id) {
+              sets(
+                perPage: $perPage,
+                page: $page,
+                filters: {
+                  state: [#{Event::SET_STATE_COMPLETED}],
+                  updatedAfter: $updatedAfter
+                }
+              ) {
+                nodes {
+                  completedAt
+                  id
+                  phaseGroup {
+                    bracketType
+                  }
+                  slots {
+                    entrant {
+                      id
+                      name
+                      participants {
+                        player {
+                          id
+                        }
+                      }
+                    }
+                    standing {
+                      stats {
+                        score {
+                          value
+                        }
+                      }
+                    }
+                  }
+                  startedAt
+                  state
+                  stream {
+                    streamName
+                    streamSource
+                  }
+                  winnerId
+                }
+              }
+            }
+          }
+        GRAPHQL
 
+        instrument('completed_sets') do
+          client.query(query, id: event_id, perPage: batch_size, page:, updatedAfter: updated_after.to_i)&.data&.event&.sets&.nodes
+        end
+      end
+
+      def set(set_id)
+        query = <<~GRAPHQL
+          query($setId: ID!) {
+            set(id: $setId) {
+              completedAt
+              id
+              phaseGroup {
+                bracketType
+              }
+              slots {
+                entrant {
+                  id
+                  name
+                  participants {
+                    player {
+                      id
+                    }
+                  }
+                }
+                standing {
+                  stats {
+                    score {
+                      value
+                    }
+                  }
+                }
+              }
+              startedAt
+              state
+              stream {
+                streamName
+                streamSource
+              }
+              winnerId
+            }
+          }
+        GRAPHQL
+
+        instrument('set') do
+          client.query(query, setId: set_id)&.data&.set
+        end
+      end
+
+      def with_retries(num_retries, batch_size: nil)
+        retries = 0
+        result = nil
+
+        loop do
           if batch_size.present?
-            batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
+            result = yield batch_size
+          else
+            result = yield
           end
+          break
+        rescue Graphlient::Errors::GraphQLError => e
+          raise e unless e.message.match? /query complexity/
+          raise e unless batch_size.present?
 
-          sleep 5 * retries
-          next
-        else
-          Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
+          if retries < num_retries
+            Rails.logger.info "Query complexity error, reducing batch size"
+            retries += 1
+
+            if batch_size.present?
+              batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
+            end
+
+            sleep 5 * retries
+            next
+          else
+            Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
+            raise e
+          end
+        rescue Graphlient::Errors::ExecutionError,
+          Graphlient::Errors::FaradayServerError,
+          Graphlient::Errors::ConnectionFailedError,
+          Graphlient::Errors::TimeoutError,
+          Faraday::ParsingError,
+          Faraday::SSLError,
+          OpenSSL::SSL::SSLError => e
+          StatsD.increment('startgg.request_error')
+
+          if retries < num_retries
+            Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
+            retries += 1
+            sleep 5 * retries
+            next
+          else
+            Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
+            raise e
+          end
+        rescue StandardError => e
+          Rails.logger.error "Unexpected error communicating with startgg: #{e.message}"
           raise e
         end
-      rescue Graphlient::Errors::ExecutionError,
-        Graphlient::Errors::FaradayServerError,
-        Graphlient::Errors::ConnectionFailedError,
-        Graphlient::Errors::TimeoutError,
-        Faraday::ParsingError,
-        Faraday::SSLError,
-        OpenSSL::SSL::SSLError => e
-        StatsD.increment('startgg.request_error')
 
-        if retries < num_retries
-          Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
-          retries += 1
-          sleep 5 * retries
-          next
-        else
-          Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
-          raise e
-        end
-      rescue StandardError => e
-        Rails.logger.error "Unexpected error communicating with startgg: #{e.message}"
-        raise e
+        result
       end
 
-      result
+      private
+
+      def client
+        return @client if @client
+
+        @client = Graphlient::Client.new(
+          'https://api.start.gg/gql/alpha',
+          headers: {
+            'Authorization' => "Bearer #{Rails.application.credentials.dig(:startgg, :token)}"
+          },
+          http_options: {
+            read_timeout: 20,
+            write_timeout: 30
+          }
+        )
+      end
+
     end
-
-    private
-
-    def client
-      return @client if @client
-
-      @client = Graphlient::Client.new(
-        'https://api.start.gg/gql/alpha',
-        headers: {
-          'Authorization' => "Bearer #{Rails.application.credentials.dig(:startgg, :token)}"
-        },
-        http_options: {
-          read_timeout: 20,
-          write_timeout: 30
-        }
-      )
-    end
-
   end
 end

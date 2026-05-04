@@ -227,7 +227,7 @@ class Tournament < ApplicationRecord
   end
 
   def startgg_data
-    Startgg.tournament(slug:)
+    Api::Startgg.tournament(slug:)
   end
 
   def sync

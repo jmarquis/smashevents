@@ -17,7 +17,7 @@ namespace :twitch do
       next unless streams.present?
 
       begin
-        live_streams = Twitchy.live_streams(streams:)
+        live_streams = Api::Twitch.live_streams(streams:)
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
 
@@ -36,7 +36,7 @@ namespace :twitch do
                 type: Notification::TYPE_STREAM_LIVE,
                 platform: Notification::PLATFORM_DISCORD
               ) do |tournament|
-                Discord.stream_live(tournament:, stream:)
+                Api::Discord.stream_live(tournament:, stream:)
               end
             end
           else

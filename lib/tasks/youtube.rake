@@ -14,7 +14,7 @@ namespace :youtube do
         stream = stream.with_indifferent_access
 
         if stream[:source].downcase == Tournament::STREAM_SOURCE_YOUTUBE && stream[:url].blank?
-          url = Youtube.channel_url(stream[:name])
+          url = Api::Youtube.channel_url(stream[:name])
           stream[:url] = url if url.present?
         end
 

@@ -15,9 +15,9 @@ namespace :startgg do
     Rails.logger.info "Starting tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
 
     (1..1000).each do |page|
-      tournaments = Startgg.with_retries(5, batch_size: 15) do |batch_size|
+      tournaments = Api::Startgg.with_retries(5, batch_size: 15) do |batch_size|
         Rails.logger.info "Fetching page #{page} of tournaments..."
-        Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
+        Api::Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
       end
 
       break if tournaments.count.zero?
@@ -88,9 +88,9 @@ namespace :startgg do
 
       stats[:analyzed] += 1
 
-      data = Startgg.with_retries(5) do
+      data = Api::Startgg.with_retries(5) do
         Rails.logger.info "Fetching tournament #{override.slug}..."
-        Startgg.tournament(slug: override.slug)
+        Api::Startgg.tournament(slug: override.slug)
       end
 
       tournament, events = Tournament.from_startgg_tournament(data)

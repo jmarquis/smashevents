@@ -151,8 +151,8 @@ class Event < ApplicationRecord
 
     # Get all the entrants, 1 chunk at a time
     (1..100).each do |page|
-      event_entrants = Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
-        Startgg.event_entrants(
+      event_entrants = Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
+        Api::Startgg.event_entrants(
           id: startgg_id,
           game: game,
           batch_size:,
@@ -244,15 +244,15 @@ class Event < ApplicationRecord
 
     Rails.logger.info("Starting upset thread for #{slug} (#{game.slug})...")
 
-    tweet = Twitter.upset_thread_intro(self)
+    tweet = Api::Twitter.upset_thread_intro(self)
 
     self.last_upset_tweet_id = tweet['data']['id']
     save!
   end
 
   def sync_state!
-    startgg_event = Startgg.with_retries(5) do
-      Startgg.event(id: startgg_id)
+    startgg_event = Api::Startgg.with_retries(5) do
+      Api::Startgg.event(id: startgg_id)
     end
 
     if startgg_event&.state.present?
@@ -276,10 +276,10 @@ class Event < ApplicationRecord
 
   def sync_in_progress_sets!
     (1..1000).each do |page|
-      sets = Startgg.with_retries(5, batch_size: 20) do |batch_size|
+      sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg.in_progress_sets(startgg_id, batch_size:, page:)
+        Api::Startgg.in_progress_sets(startgg_id, batch_size:, page:)
       end
 
       break if sets.blank?
@@ -297,10 +297,10 @@ class Event < ApplicationRecord
 
   def sync_completed_sets!
     (1..1000).each do |page|
-      sets = Startgg.with_retries(5, batch_size: 20) do |batch_size|
+      sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
+        Api::Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
       end
 
       break if sets.blank?
@@ -368,7 +368,7 @@ class Event < ApplicationRecord
       platform: Notification::PLATFORM_DISCORD,
       metadata: { startgg_set_id: set.id }
     ) do |player|
-      Discord.player_set_live(
+      Api::Discord.player_set_live(
         event: self,
         player:,
         opponent:,
@@ -430,7 +430,7 @@ class Event < ApplicationRecord
         platform: Notification::PLATFORM_TWITTER,
         metadata: { startgg_set_id: set.id }
       ) do |event|
-        tweet = Twitter.upset(
+        tweet = Api::Twitter.upset(
           event: event,
           winner_entrant:,
           winner_games:,

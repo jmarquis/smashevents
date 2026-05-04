@@ -1,5 +1,5 @@
-class Api
-  class << self
+module Api
+  module Instrumentable
     def instrument(key)
       begin
         StatsD.increment("api.#{self.name.downcase}.#{key}")

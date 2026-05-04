@@ -20,7 +20,7 @@ namespace :notifications do
             platform: Notification::PLATFORM_TWITTER,
             idempotent: true
           ) do |tournament|
-            Twitter.tournament_added(tournament)
+            Api::Twitter.tournament_added(tournament)
 
             notification_count += 1
 
@@ -47,7 +47,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_DISCORD,
           idempotent: true
         ) do |event|
-          Discord.event_added(event)
+          Api::Discord.event_added(event)
 
           notification_count += 1
 
@@ -90,7 +90,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |events|
-          Twitter.weekend_briefing(game:, events:)
+          Api::Twitter.weekend_briefing(game:, events:)
 
           notification_count += 1
         end
@@ -101,7 +101,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_DISCORD,
           idempotent: true
         ) do |events|
-          Discord.weekend_briefing(game:, events:)
+          Api::Discord.weekend_briefing(game:, events:)
 
           notification_count += 1
 
@@ -136,7 +136,7 @@ namespace :notifications do
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |events|
-          Twitter.congratulations(game:, events:)
+          Api::Twitter.congratulations(game:, events:)
 
           notification_count += 1
         end
@@ -174,7 +174,7 @@ namespace :notifications do
               type: Notification::TYPE_HAPPENING_TODAY,
               platform: Notification::PLATFORM_TWITTER
             ) do |tournament|
-              Twitter.happening_today(tournament)
+              Api::Twitter.happening_today(tournament)
 
               notification_count += 1
             end
@@ -196,7 +196,7 @@ namespace :notifications do
             type: Notification::TYPE_HAPPENING_TODAY,
             platform: Notification::PLATFORM_DISCORD
           ) do |tournament|
-            Discord.happening_today(tournament)
+            Api::Discord.happening_today(tournament)
 
             notification_count += 1
           end
