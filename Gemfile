@@ -102,3 +102,6 @@ gem "vite_rails", "~> 3.0"
 gem "ruby-clock", "~> 2.0", require: false
 
 gem "rack-sanitizer", "~> 2.0"
+
+gem 'faraday'
+gem 'google-protobuf'

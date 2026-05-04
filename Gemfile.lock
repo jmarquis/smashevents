@@ -179,6 +179,27 @@ GEM
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.1.0)
+    google-protobuf (4.33.6)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-aarch64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-aarch64-linux-musl)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-x86-linux-gnu)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-x86_64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.33.6-x86_64-linux-gnu)
+      bigdecimal
+      rake (>= 13)
     googleauth (1.14.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
@@ -492,8 +513,10 @@ DEPENDENCIES
   debug
   derailed_benchmarks
   discordrb!
+  faraday
   ffi
   google-apis-youtube_v3 (~> 0.49)
+  google-protobuf
   graphlient
   importmap-rails
   inline_svg (~> 1.10)
