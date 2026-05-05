@@ -67,6 +67,7 @@ class Player < ApplicationRecord
 
     p = find_by(startgg_player_id: data.id) || new
 
+    p.provider = Provider::Startgg::PROVIDER_NAME
     p.startgg_player_id = data.id
     p.startgg_user_id = data.user&.id
     p.tag = data.gamer_tag
