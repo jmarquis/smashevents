@@ -72,7 +72,7 @@ class Tournament < ApplicationRecord
     # TODO: change to provider_id
     t = find_by(startgg_id: data.id) || new
 
-    t.provider = Ingestor::Startgg::PROVIDER_NAME
+    t.provider = Provider::Startgg::PROVIDER_NAME
     # TODO: change to provider_id
     t.startgg_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]

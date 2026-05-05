@@ -1,4 +1,4 @@
-module Ingestor
+module Provider
   class Base
     class << self
       def sync
@@ -187,6 +187,10 @@ module Ingestor
       end
 
       def tournament(slug:)
+        raise NotImplementedError
+      end
+
+      def event_entrants
         raise NotImplementedError
       end
 

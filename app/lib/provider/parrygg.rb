@@ -1,4 +1,4 @@
-module Ingestor
+module Provider
   class Parrygg < Base
     PROVIDER_NAME = 'parrygg'
 
