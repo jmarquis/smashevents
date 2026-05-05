@@ -69,7 +69,8 @@ class Tournament < ApplicationRecord
   }
 
   def self.from_startgg_tournament(data)
-    t = find_by(provider_id: data.id) || new
+    # TODO: change to provider_id
+    t = find_by(startgg_id: data.id) || new
 
     t.provider = Ingestor::Startgg::PROVIDER_NAME
     # TODO: change to provider_id
