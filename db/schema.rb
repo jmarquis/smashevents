@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_22_222554) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_04_191456) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -113,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_222554) do
     t.datetime "updated_at", null: false
     t.string "name"
     t.string "startgg_user_slug"
+    t.string "provider"
     t.index ["startgg_player_id"], name: "index_players_on_startgg_player_id", unique: true
     t.index ["startgg_user_id"], name: "index_players_on_startgg_user_id", unique: true
     t.index ["startgg_user_slug"], name: "index_players_on_startgg_user_slug"
@@ -125,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_222554) do
     t.boolean "include"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "provider"
     t.index ["include"], name: "index_tournament_overrides_on_include"
     t.index ["slug"], name: "index_tournament_overrides_on_slug", unique: true
   end
@@ -145,6 +147,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_22_222554) do
     t.string "hashtag"
     t.string "banner_image_url"
     t.string "profile_image_url"
+    t.string "provider"
     t.index ["name"], name: "index_tournaments_on_name"
     t.index ["start_at"], name: "index_tournaments_on_start_at"
     t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true

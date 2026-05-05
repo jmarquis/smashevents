@@ -10,7 +10,7 @@ module Api
 
       def tournaments(batch_size:, cursor: nil, updated_after: 6.hours.ago)
         instrument('tournaments') do
-          send_request('parrygg.services.TournamentService/GetTournaments', {
+          execute('parrygg.services.TournamentService/GetTournaments', {
             filter: {
               event_updated_since: Google::Protobuf::Timestamp.new.from_time(updated_after)
             },
@@ -24,7 +24,7 @@ module Api
 
       def tournament(slug:)
         instrument('tournament') do
-          send_request('parrygg.services.TournamentService/GetTournament', {
+          execute('parrygg.services.TournamentService/GetTournament', {
             tournament_slug: slug
           })[:tournament]
         end
@@ -32,7 +32,7 @@ module Api
 
       private
 
-      def send_request(url, body)
+      def execute(url, body)
         client.post(url, body).body.with_indifferent_access
       end
 

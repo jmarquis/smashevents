@@ -18,6 +18,7 @@
 #  hashtag           :string
 #  banner_image_url  :string
 #  profile_image_url :string
+#  provider          :string
 #
 # Indexes
 #

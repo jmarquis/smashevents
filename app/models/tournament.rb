@@ -18,6 +18,7 @@
 #  hashtag           :string
 #  banner_image_url  :string
 #  profile_image_url :string
+#  provider          :string
 #
 # Indexes
 #
@@ -68,8 +69,10 @@ class Tournament < ApplicationRecord
   }
 
   def self.from_startgg_tournament(data)
-    t = find_by(startgg_id: data.id) || new
+    t = find_by(provider_id: data.id) || new
 
+    t.provider = Ingestor::Startgg::PROVIDER_NAME
+    # TODO: change to provider_id
     t.startgg_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
@@ -116,6 +119,7 @@ class Tournament < ApplicationRecord
         # tournament.
         event = t.events.find_by(game:) || t.events.new
 
+        # TODO: change to provider_id
         event.startgg_id = biggest_event.id
         event.slug = biggest_event.slug
         event.state = biggest_event.state

@@ -11,6 +11,7 @@
 #  updated_at        :datetime         not null
 #  name              :string
 #  startgg_user_slug :string
+#  provider          :string
 #
 # Indexes
 #
