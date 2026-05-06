@@ -178,10 +178,6 @@ module Provider
 
       protected
 
-      def provider
-        raise NotImplementedError
-      end
-
       def tournaments(page:, cursor:, after_date:, updated_after:)
         raise NotImplementedError
       end
