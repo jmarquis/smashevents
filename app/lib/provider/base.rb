@@ -101,7 +101,7 @@ module Provider
           stats[:analyzed] += 1
 
           Rails.logger.info "Fetching tournament #{override.slug}..."
-          data = tournament(override.slug)
+          data = tournament(slug: override.slug)
 
           tournament, events = Tournament.send("from_#{provider}_tournament", data)
 
@@ -143,11 +143,11 @@ module Provider
 
         Rails.logger.info 'Starting entrant sync...'
 
-        tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.not_past.reasonable_duration.where(provider:)
+        tournaments = Tournament.not_past.reasonable_duration.where(provider:)
 
         tournaments.each do |tournament|
           unseeded_in_progress_events = tournament.events.in_progress.where(is_seeded: false)
-          events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
+          events = tournament.events.should_sync_entrants
 
           [*unseeded_in_progress_events, *events].each do |event|
             stats = event.sync_entrants!.reduce(stats) do |stats, (key, total)|

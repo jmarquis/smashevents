@@ -9,36 +9,8 @@ namespace :startgg do
     Provider::Startgg.sync_overrides
   end
 
-  task :sync_entrants, [:tournament_id] => [:environment] do |task, args|
-    num_events = 0
-    stats = {
-      created: 0,
-      updated: 0,
-      deleted: 0
-    }
-
-    Rails.logger.info 'Starting entrant sync...'
-
-    tournaments = args[:tournament_id].present? ? [Tournament.find(args[:tournament_id])] : Tournament.not_past.reasonable_duration
-
-    tournaments.each do |tournament|
-      unseeded_in_progress_events = tournament.events.in_progress.where(is_seeded: false)
-      events = args[:tournament_id].present? ? tournament.events : tournament.events.should_sync_entrants
-
-      [*unseeded_in_progress_events, *events].each do |event|
-        stats = event.sync_entrants!.reduce(stats) do |stats, (key, total)|
-          stats[key] += total
-          stats
-        end
-
-        num_events += 1
-        if num_events % 50 == 0
-          Rails.logger.info "Scanned #{num_events} events so far..."
-        end
-      end
-    end
-
-    Rails.logger.info "Entrant sync complete. #{stats.to_json}"
+  task sync_entrants: [:environment] do
+    Provider::Startgg.sync_entrants
   end
 
   task scan_sets: [:environment] do
