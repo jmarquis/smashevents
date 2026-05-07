@@ -2,61 +2,7 @@ namespace :startgg do
   task sync: [:environment, 'startgg:sync_tournaments', 'startgg:sync_overrides', 'startgg:sync_entrants']
 
   task sync_tournaments: [:environment] do
-    stats = {
-      analyzed: 0,
-      imported: 0,
-      updated: 0
-    }
-    start_time = Time.now
-    last_sync = Rails.cache.read('startgg/last_tournament_sync')
-    last_full_sync = Rails.cache.read('startgg/last_full_tournament_sync')
-    full_sync = last_full_sync.blank? || last_full_sync < 24.hours.ago
-
-    Rails.logger.info "Starting tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
-
-    (1..1000).each do |page|
-      tournaments = Api::Startgg.with_retries(5, batch_size: 15) do |batch_size|
-        Rails.logger.info "Fetching page #{page} of tournaments..."
-        Api::Startgg.tournaments(batch_size:, page:, after_date: Time.now - 7.days, updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago))
-      end
-
-      break if tournaments.count.zero?
-      Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
-      stats[:analyzed] += tournaments.count
-
-      tournaments.each do |data|
-        tournament, events = Tournament.from_startgg_tournament(data)
-
-        next if events.blank?
-        next if tournament.exclude?
-        next unless events.any?(&:should_ingest?) || tournament.should_ingest?
-
-        if tournament.persisted?
-          if tournament.changed? || events.any?(&:changed?)
-            tournament.save!
-            events.each(&:save!)
-
-            StatsD.increment('startgg.tournament_updated')
-            updated_log(tournament, events)
-            stats[:updated] += 1
-          end
-        else
-          tournament.save!
-
-          stats[:imported] += 1
-          StatsD.increment('startgg.tournament_added')
-          event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
-          Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
-        end
-      end
-
-      sleep 1
-    end
-
-    Rails.cache.write('startgg/last_tournament_sync', start_time, expires_in: 1.day)
-    Rails.cache.write('startgg/last_full_tournament_sync', start_time, expires_in: 1.day) if full_sync
-
-    Rails.logger.info "Tournament sync complete. #{stats.to_json}"
+    Provider::Startgg.sync_tournaments
   end
 
   task sync_overrides: [:environment] do

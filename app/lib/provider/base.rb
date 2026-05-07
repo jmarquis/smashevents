@@ -39,7 +39,7 @@ module Provider
             tournament, events = Tournament.send("from_#{provider}_tournament", data)
 
             next if events.blank?
-            next if tournament.end_date < 7.days.ago
+            next if tournament.end_at < 7.days.ago
             next if tournament.exclude?
             next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
