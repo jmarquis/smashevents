@@ -39,8 +39,6 @@ class Event < ApplicationRecord
 
   BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
 
-  ENTRANT_SYNC_BATCH_SIZE = 50
-
   belongs_to :tournament
   has_many :entrants
   has_many :players, through: :entrants
@@ -149,16 +147,16 @@ class Event < ApplicationRecord
       deleted: 0
     }
 
+    cursor = nil
+
     # Get all the entrants, 1 chunk at a time
-    (1..100).each do |page|
-      event_entrants = Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
-        Api::Startgg.event_entrants(
-          id: startgg_id,
-          game: game,
-          batch_size:,
-          page:
-        )
-      end
+    (1..1000).each do |page|
+      event_entrants, cursor = provider.event_entrants(
+        provider_id: startgg_id, # TODO: change to provider_id
+        game:,
+        page:,
+        cursor:
+      )
 
       # Respect startgg's rate limits...
       sleep 1
@@ -443,6 +441,15 @@ class Event < ApplicationRecord
 
         sleep 1
       end
+    end
+  end
+
+  def provider
+    case tournament.provider
+    when Provider::Startgg::PROVIDER_NAME
+      Provider::Startgg
+    when Provider::Parrygg::PROVIDER_NAME
+      Provider::Parrygg
     end
   end
 end

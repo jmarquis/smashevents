@@ -1,10 +1,9 @@
 module Provider
   class Startgg < Base
     PROVIDER_NAME = 'startgg'
+    ENTRANT_SYNC_BATCH_SIZE = 50
 
     class << self
-      protected
-
       def tournaments(page:, cursor:, after_date:, updated_after:)
         Api::Startgg.with_retries(5, batch_size: 15) do |batch_size|
           Api::Startgg.tournaments(
@@ -23,14 +22,14 @@ module Provider
       end
 
       def event_entrants(provider_id:, game:, page:, cursor:)
-        Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
+        return Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
           Api::Startgg.event_entrants(
             id: provider_id,
-            game: game,
+            game:,
             batch_size:,
             page:
           )
-        end
+        end, nil
       end
     end
   end

@@ -3,8 +3,6 @@ module Provider
     PROVIDER_NAME = 'parrygg'
 
     class << self
-      protected
-
       def tournaments(page:, cursor:, after_date:, updated_after:)
         # TODO: with_retries
         result = Api::Parrygg.tournaments(

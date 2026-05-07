@@ -176,7 +176,7 @@ module Provider
         end
       end
 
-      protected
+      ##########################################
 
       def tournaments(page:, cursor:, after_date:, updated_after:)
         raise NotImplementedError
@@ -189,6 +189,8 @@ module Provider
       def event_entrants
         raise NotImplementedError
       end
+
+      ##########################################
 
       private
 
