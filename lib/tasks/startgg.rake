@@ -60,67 +60,7 @@ namespace :startgg do
   end
 
   task sync_overrides: [:environment] do
-    stats = {
-      analyzed: 0,
-      imported: 0,
-      updated: 0,
-      deleted: 0
-    }
-
-    Rails.logger.info 'Starting override sync...'
-
-    TournamentOverride.all.each do |override|
-      if !override.include
-        tournament = Tournament.find_by(slug: override.slug)
-        if tournament.present?
-          Rails.logger.info "- #{tournament.slug}"
-
-          StatsD.increment('startgg.tournament_deleted')
-          tournament.destroy
-          stats[:deleted] += 1
-        end
-
-        next
-      end
-
-      tournament = Tournament.find_by(slug: override.slug)
-      next if tournament.present? && tournament.past?
-
-      stats[:analyzed] += 1
-
-      data = Api::Startgg.with_retries(5) do
-        Rails.logger.info "Fetching tournament #{override.slug}..."
-        Api::Startgg.tournament(slug: override.slug)
-      end
-
-      tournament, events = Tournament.from_startgg_tournament(data)
-
-      if tournament.persisted?
-        if tournament.changed? || events.any?(&:changed?)
-          tournament.save!
-          events.each(&:save!)
-
-          StatsD.increment('startgg.tournament_updated')
-          updated_log(tournament, events)
-          stats[:updated] += 1
-        end
-      else
-        tournament.save!
-
-        StatsD.increment('startgg.tournament_added')
-        event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
-        Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(',')}"
-        stats[:imported] += 1
-      end
-
-      # Update override slug to match actual tournament slug
-      override.slug = tournament.slug
-      override.save!
-
-      sleep 1
-    end
-
-    Rails.logger.info "Tournament override sync complete. #{stats.to_json}"
+    Provider::Startgg.sync_overrides
   end
 
   task :sync_entrants, [:tournament_id] => [:environment] do |task, args|

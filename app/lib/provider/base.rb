@@ -100,6 +100,7 @@ module Provider
 
           stats[:analyzed] += 1
 
+          Rails.logger.info "Fetching tournament #{override.slug}..."
           data = tournament(override.slug)
 
           tournament, events = Tournament.send("from_#{provider}_tournament", data)
