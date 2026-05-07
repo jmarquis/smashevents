@@ -2,29 +2,29 @@
 #
 # Table name: tournaments
 #
-#  id                :integer          not null, primary key
-#  startgg_id        :integer
-#  slug              :string
-#  name              :string
-#  start_at          :datetime
-#  end_at            :datetime
-#  city              :string
-#  state             :string
-#  country           :string
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  stream_data       :json
-#  timezone          :string
-#  hashtag           :string
-#  banner_image_url  :string
-#  profile_image_url :string
-#  provider          :string
+#  id                     :integer          not null, primary key
+#  provider_tournament_id :integer
+#  slug                   :string
+#  name                   :string
+#  start_at               :datetime
+#  end_at                 :datetime
+#  city                   :string
+#  state                  :string
+#  country                :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  stream_data            :json
+#  timezone               :string
+#  hashtag                :string
+#  banner_image_url       :string
+#  profile_image_url      :string
+#  provider               :string
 #
 # Indexes
 #
-#  index_tournaments_on_name        (name)
-#  index_tournaments_on_start_at    (start_at)
-#  index_tournaments_on_startgg_id  (startgg_id) UNIQUE
+#  index_tournaments_on_name                    (name)
+#  index_tournaments_on_provider_tournament_id  (provider_tournament_id) UNIQUE
+#  index_tournaments_on_start_at                (start_at)
 #
 
 class Tournament < ApplicationRecord
@@ -69,12 +69,10 @@ class Tournament < ApplicationRecord
   }
 
   def self.from_startgg_tournament(data)
-    # TODO: change to provider_id
-    t = find_by(startgg_id: data.id) || new
+    t = find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_tournament_id: data.id) || new
 
     t.provider = Provider::Startgg::PROVIDER_NAME
-    # TODO: change to provider_id
-    t.startgg_id = data.id
+    t.provider_tournament_id = data.id
     t.slug = data.slug.match(/^tournament\/(.*)/)[1]
     t.name = data.name
     t.hashtag = data.hashtag
@@ -120,7 +118,7 @@ class Tournament < ApplicationRecord
         # tournament.
         event = t.events.find_by(game:) || t.events.new
 
-        # TODO: change to provider_id
+        # TODO: change to provider_event_id
         event.startgg_id = biggest_event.id
         event.slug = biggest_event.slug
         event.state = biggest_event.state

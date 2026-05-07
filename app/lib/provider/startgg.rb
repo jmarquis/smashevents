@@ -21,7 +21,7 @@ module Provider
         end
       end
 
-      def event_entrants(provider_id:, game:, page:, cursor:)
+      def event_entrants(provider_event_id:, game:, page:, cursor:)
         return Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
           Api::Startgg.event_entrants(
             id: provider_id,

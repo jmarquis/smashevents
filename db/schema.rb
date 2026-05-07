@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_04_191456) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_07_180812) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -132,7 +132,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_04_191456) do
   end
 
   create_table "tournaments", force: :cascade do |t|
-    t.integer "startgg_id"
+    t.integer "provider_tournament_id"
     t.string "slug"
     t.string "name"
     t.datetime "start_at"
@@ -149,7 +149,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_04_191456) do
     t.string "profile_image_url"
     t.string "provider"
     t.index ["name"], name: "index_tournaments_on_name"
+    t.index ["provider_tournament_id"], name: "index_tournaments_on_provider_tournament_id", unique: true
     t.index ["start_at"], name: "index_tournaments_on_start_at"
-    t.index ["startgg_id"], name: "index_tournaments_on_startgg_id", unique: true
   end
 end

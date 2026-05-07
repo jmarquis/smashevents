@@ -152,7 +152,7 @@ class Event < ApplicationRecord
     # Get all the entrants, 1 chunk at a time
     (1..1000).each do |page|
       event_entrants, cursor = provider.event_entrants(
-        provider_id: startgg_id, # TODO: change to provider_id
+        provider_event_id: startgg_id, # TODO: change to provider_id
         game:,
         page:,
         cursor:
