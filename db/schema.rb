@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_08_024909) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_08_030928) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -105,18 +105,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_024909) do
   end
 
   create_table "players", force: :cascade do |t|
-    t.integer "startgg_player_id"
-    t.integer "startgg_user_id"
+    t.integer "provider_player_id"
+    t.integer "provider_user_id"
     t.string "tag"
     t.string "twitter_username"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
-    t.string "startgg_user_slug"
+    t.string "provider_user_slug"
     t.string "provider"
-    t.index ["startgg_player_id"], name: "index_players_on_startgg_player_id", unique: true
-    t.index ["startgg_user_id"], name: "index_players_on_startgg_user_id", unique: true
-    t.index ["startgg_user_slug"], name: "index_players_on_startgg_user_slug"
+    t.index ["provider_player_id"], name: "index_players_on_provider_player_id", unique: true
+    t.index ["provider_user_id"], name: "index_players_on_provider_user_id", unique: true
+    t.index ["provider_user_slug"], name: "index_players_on_provider_user_slug"
     t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin
     t.index ["tag"], name: "index_players_on_tag"
   end

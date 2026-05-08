@@ -327,7 +327,7 @@ class Event < ApplicationRecord
     return unless set.slots&.first&.entrant&.participants&.first&.player&.present?
     return unless set.slots&.second&.entrant&.participants&.first&.player&.present?
 
-    players = Player.where(startgg_player_id: [
+    players = Player.where(provider_player_id: [
       set.slots.first.entrant.participants.first.player.id,
       set.slots.second.entrant.participants.first.player.id
     ])

@@ -2,24 +2,24 @@
 #
 # Table name: players
 #
-#  id                :integer          not null, primary key
-#  startgg_player_id :integer
-#  startgg_user_id   :integer
-#  tag               :string
-#  twitter_username  :string
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  name              :string
-#  startgg_user_slug :string
-#  provider          :string
+#  id                 :integer          not null, primary key
+#  provider_player_id :integer
+#  provider_user_id   :integer
+#  tag                :string
+#  twitter_username   :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  name               :string
+#  provider_user_slug :string
+#  provider           :string
 #
 # Indexes
 #
-#  gin_index_players_on_tag            (tag)
-#  index_players_on_startgg_player_id  (startgg_player_id) UNIQUE
-#  index_players_on_startgg_user_id    (startgg_user_id) UNIQUE
-#  index_players_on_startgg_user_slug  (startgg_user_slug)
-#  index_players_on_tag                (tag)
+#  gin_index_players_on_tag             (tag)
+#  index_players_on_provider_player_id  (provider_player_id) UNIQUE
+#  index_players_on_provider_user_id    (provider_user_id) UNIQUE
+#  index_players_on_provider_user_slug  (provider_user_slug)
+#  index_players_on_tag                 (tag)
 #
 
 class Player < ApplicationRecord
@@ -65,11 +65,11 @@ class Player < ApplicationRecord
   def self.from_startgg_player(data, tag: nil)
     return new(tag:) if data.blank?
 
-    p = find_by(startgg_player_id: data.id) || new
+    p = find_by(provider_player_id: data.id) || new
 
     p.provider = Provider::Startgg::PROVIDER_NAME
-    p.startgg_player_id = data.id
-    p.startgg_user_id = data.user&.id
+    p.provider_player_id = data.id
+    p.provider_user_id = data.user&.id
     p.tag = data.gamer_tag
     p.twitter_username = data&.user&.authorizations&.first&.external_username
     p.startgg_user_slug = data.user&.discriminator
