@@ -11,15 +11,16 @@
 #  seed                :integer
 #  rank                :integer
 #  player2_id          :integer
+#  provider            :string
 #
 # Indexes
 #
-#  index_entrants_on_event_id             (event_id)
-#  index_entrants_on_event_id_and_rank    (event_id,rank)
-#  index_entrants_on_event_id_and_seed    (event_id,seed)
-#  index_entrants_on_player2_id           (player2_id)
-#  index_entrants_on_player_id            (player_id)
-#  index_entrants_on_provider_entrant_id  (provider_entrant_id) UNIQUE
+#  index_entrants_on_event_id                          (event_id)
+#  index_entrants_on_event_id_and_rank                 (event_id,rank)
+#  index_entrants_on_event_id_and_seed                 (event_id,seed)
+#  index_entrants_on_player2_id                        (player2_id)
+#  index_entrants_on_player_id                         (player_id)
+#  index_entrants_on_provider_and_provider_entrant_id  (provider,provider_entrant_id) UNIQUE
 #
 
 class Entrant < ApplicationRecord
@@ -31,6 +32,7 @@ class Entrant < ApplicationRecord
     e = find_by(provider_entrant_id: data.id) || new
 
     e.event = event
+    e.provider = Provider::Startgg::PROVIDER_NAME
     e.provider_entrant_id = data.id
     e.seed = data.initial_seed_num
 

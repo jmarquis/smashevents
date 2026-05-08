@@ -22,9 +22,9 @@
 #
 # Indexes
 #
-#  index_tournaments_on_name                    (name)
-#  index_tournaments_on_provider_tournament_id  (provider_tournament_id) UNIQUE
-#  index_tournaments_on_start_at                (start_at)
+#  index_tournaments_on_name                                 (name)
+#  index_tournaments_on_provider_and_provider_tournament_id  (provider,provider_tournament_id) UNIQUE
+#  index_tournaments_on_start_at                             (start_at)
 #
 
 class Tournament < ApplicationRecord
@@ -118,7 +118,6 @@ class Tournament < ApplicationRecord
         # tournament.
         event = t.events.find_by(game:) || t.events.new
 
-        # TODO: change to provider_event_id
         event.provider_event_id = biggest_event.id
         event.slug = biggest_event.slug
         event.state = biggest_event.state

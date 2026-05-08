@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_08_030928) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_08_202029) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -32,12 +32,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_030928) do
     t.integer "seed"
     t.integer "rank"
     t.bigint "player2_id"
+    t.string "provider"
     t.index ["event_id", "rank"], name: "index_entrants_on_event_id_and_rank"
     t.index ["event_id", "seed"], name: "index_entrants_on_event_id_and_seed"
     t.index ["event_id"], name: "index_entrants_on_event_id"
     t.index ["player2_id"], name: "index_entrants_on_player2_id"
     t.index ["player_id"], name: "index_entrants_on_player_id"
-    t.index ["provider_entrant_id"], name: "index_entrants_on_provider_entrant_id", unique: true
+    t.index ["provider", "provider_entrant_id"], name: "index_entrants_on_provider_and_provider_entrant_id", unique: true
   end
 
   create_table "events", force: :cascade do |t|
@@ -114,8 +115,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_030928) do
     t.string "name"
     t.string "provider_user_slug"
     t.string "provider"
-    t.index ["provider_player_id"], name: "index_players_on_provider_player_id", unique: true
-    t.index ["provider_user_id"], name: "index_players_on_provider_user_id", unique: true
+    t.index ["provider", "provider_player_id"], name: "index_players_on_provider_and_provider_player_id", unique: true
+    t.index ["provider", "provider_user_id"], name: "index_players_on_provider_and_provider_user_id", unique: true
     t.index ["provider_user_slug"], name: "index_players_on_provider_user_slug"
     t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin
     t.index ["tag"], name: "index_players_on_tag"
@@ -149,7 +150,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_030928) do
     t.string "profile_image_url"
     t.string "provider"
     t.index ["name"], name: "index_tournaments_on_name"
-    t.index ["provider_tournament_id"], name: "index_tournaments_on_provider_tournament_id", unique: true
+    t.index ["provider", "provider_tournament_id"], name: "index_tournaments_on_provider_and_provider_tournament_id", unique: true
     t.index ["start_at"], name: "index_tournaments_on_start_at"
   end
 end

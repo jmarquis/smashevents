@@ -15,11 +15,11 @@
 #
 # Indexes
 #
-#  gin_index_players_on_tag             (tag)
-#  index_players_on_provider_player_id  (provider_player_id) UNIQUE
-#  index_players_on_provider_user_id    (provider_user_id) UNIQUE
-#  index_players_on_provider_user_slug  (provider_user_slug)
-#  index_players_on_tag                 (tag)
+#  gin_index_players_on_tag                          (tag)
+#  index_players_on_provider_and_provider_player_id  (provider,provider_player_id) UNIQUE
+#  index_players_on_provider_and_provider_user_id    (provider,provider_user_id) UNIQUE
+#  index_players_on_provider_user_slug               (provider_user_slug)
+#  index_players_on_tag                              (tag)
 #
 
 require "test_helper"
