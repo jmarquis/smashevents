@@ -379,13 +379,13 @@ class Event < ApplicationRecord
     return unless set.winner_id.present?
     return unless set.phase_group&.bracket_type == BRACKET_TYPE_DOUBLE_ELIMINATION
 
-    entrant_startgg_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
-    return unless entrant_startgg_ids.count == 2
+    entrant_provider_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
+    return unless entrant_provider_ids.count == 2
 
-    winner_entrant = entrants.find_by(startgg_entrant_id: set.winner_id)
+    winner_entrant = entrants.find_by(provider_entrant_id: set.winner_id)
     return unless winner_entrant.present? && winner_entrant.seed.present?
 
-    loser_entrant = entrants.find_by(startgg_entrant_id: (entrant_startgg_ids - [set.winner_id.to_s]).first)
+    loser_entrant = entrants.find_by(provider_entrant_id: (entrant_provider_ids - [set.winner_id.to_s]).first)
     return unless loser_entrant.present? && loser_entrant.seed.present?
 
     # Larger events don't really seed beyond top 256 typically, so upsets
@@ -402,8 +402,8 @@ class Event < ApplicationRecord
       counts
     end
 
-    winner_games = game_counts[winner_entrant.startgg_entrant_id.to_s]
-    loser_games = game_counts[loser_entrant.startgg_entrant_id.to_s]
+    winner_games = game_counts[winner_entrant.provider_entrant_id.to_s]
+    loser_games = game_counts[loser_entrant.provider_entrant_id.to_s]
 
     return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 

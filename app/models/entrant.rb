@@ -2,24 +2,24 @@
 #
 # Table name: entrants
 #
-#  id                 :integer          not null, primary key
-#  player_id          :integer          not null
-#  event_id           :integer          not null
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  startgg_entrant_id :integer
-#  seed               :integer
-#  rank               :integer
-#  player2_id         :integer
+#  id                  :integer          not null, primary key
+#  player_id           :integer          not null
+#  event_id            :integer          not null
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  provider_entrant_id :integer
+#  seed                :integer
+#  rank                :integer
+#  player2_id          :integer
 #
 # Indexes
 #
-#  index_entrants_on_event_id            (event_id)
-#  index_entrants_on_event_id_and_rank   (event_id,rank)
-#  index_entrants_on_event_id_and_seed   (event_id,seed)
-#  index_entrants_on_player2_id          (player2_id)
-#  index_entrants_on_player_id           (player_id)
-#  index_entrants_on_startgg_entrant_id  (startgg_entrant_id) UNIQUE
+#  index_entrants_on_event_id             (event_id)
+#  index_entrants_on_event_id_and_rank    (event_id,rank)
+#  index_entrants_on_event_id_and_seed    (event_id,seed)
+#  index_entrants_on_player2_id           (player2_id)
+#  index_entrants_on_player_id            (player_id)
+#  index_entrants_on_provider_entrant_id  (provider_entrant_id) UNIQUE
 #
 
 class Entrant < ApplicationRecord
@@ -28,10 +28,10 @@ class Entrant < ApplicationRecord
   belongs_to :event
 
   def self.from_startgg_entrant(data, event:)
-    e = find_by(startgg_entrant_id: data.id) || new
+    e = find_by(provider_entrant_id: data.id) || new
 
     e.event = event
-    e.startgg_entrant_id = data.id
+    e.provider_entrant_id = data.id
     e.seed = data.initial_seed_num
 
     rankings_key = event.game.rankings_key

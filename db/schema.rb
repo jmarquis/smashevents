@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_08_021340) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_08_024909) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -28,7 +28,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_021340) do
     t.bigint "event_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "startgg_entrant_id"
+    t.integer "provider_entrant_id"
     t.integer "seed"
     t.integer "rank"
     t.bigint "player2_id"
@@ -37,7 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_021340) do
     t.index ["event_id"], name: "index_entrants_on_event_id"
     t.index ["player2_id"], name: "index_entrants_on_player2_id"
     t.index ["player_id"], name: "index_entrants_on_player_id"
-    t.index ["startgg_entrant_id"], name: "index_entrants_on_startgg_entrant_id", unique: true
+    t.index ["provider_entrant_id"], name: "index_entrants_on_provider_entrant_id", unique: true
   end
 
   create_table "events", force: :cascade do |t|
