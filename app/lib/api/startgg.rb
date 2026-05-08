@@ -230,7 +230,7 @@ module Api
         GRAPHQL
 
         instrument('in_progress_sets') do
-          client.query(query, event_id:, perPage: batch_size, page:)&.data&.event&.sets&.nodes
+          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
         end
       end
 
