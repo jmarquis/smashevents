@@ -70,9 +70,9 @@ class Player < ApplicationRecord
     p.provider = Provider::Startgg::PROVIDER_NAME
     p.provider_player_id = data.id
     p.provider_user_id = data.user&.id
+    p.provider_user_slug = data.user&.discriminator
     p.tag = data.gamer_tag
     p.twitter_username = data&.user&.authorizations&.first&.external_username
-    p.startgg_user_slug = data.user&.discriminator
     p.name = data.user&.name
 
     p
