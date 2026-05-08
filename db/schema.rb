@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_07_180812) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_08_021340) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -42,7 +42,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_180812) do
 
   create_table "events", force: :cascade do |t|
     t.bigint "tournament_id", null: false
-    t.integer "startgg_id", null: false
+    t.integer "provider_event_id", null: false
     t.string "game_slug", null: false
     t.integer "player_count"
     t.datetime "created_at", null: false
@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_180812) do
     t.datetime "sets_synced_at"
     t.boolean "should_display"
     t.string "last_upset_tweet_id"
-    t.index ["startgg_id"], name: "index_events_on_startgg_id", unique: true
+    t.index ["provider_event_id"], name: "index_events_on_provider_event_id", unique: true
     t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"
     t.index ["winner_entrant_id"], name: "index_events_on_winner_entrant_id"

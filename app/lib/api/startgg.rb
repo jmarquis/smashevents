@@ -181,7 +181,7 @@ module Api
         end
       end
 
-      def in_progress_sets(event_id, batch_size: 20, page: 1)
+      def in_progress_sets(event_id:, batch_size: 20, page: 1)
         query = <<~GRAPHQL
           query($id: ID, $perPage: Int, $page: Int) {
             event(id: $id) {
@@ -230,11 +230,11 @@ module Api
         GRAPHQL
 
         instrument('in_progress_sets') do
-          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
+          client.query(query, event_id:, perPage: batch_size, page:)&.data&.event&.sets&.nodes
         end
       end
 
-      def completed_sets(event_id, batch_size: 20, page: 1, updated_after: 1.hour.ago)
+      def completed_sets(event_id:, batch_size: 20, page: 1, updated_after: 1.hour.ago)
         query = <<~GRAPHQL
           query($id: ID, $perPage: Int, $page: Int, $updatedAfter: Timestamp) {
             event(id: $id) {

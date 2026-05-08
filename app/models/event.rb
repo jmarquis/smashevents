@@ -4,7 +4,7 @@
 #
 #  id                  :integer          not null, primary key
 #  tournament_id       :integer          not null
-#  startgg_id          :integer          not null
+#  provider_event_id   :integer          not null
 #  game_slug           :string           not null
 #  player_count        :integer
 #  created_at          :datetime         not null
@@ -22,7 +22,7 @@
 #
 # Indexes
 #
-#  index_events_on_startgg_id                   (startgg_id) UNIQUE
+#  index_events_on_provider_event_id            (provider_event_id) UNIQUE
 #  index_events_on_tournament_id                (tournament_id)
 #  index_events_on_tournament_id_and_game_slug  (tournament_id,game_slug) UNIQUE
 #  index_events_on_winner_entrant_id            (winner_entrant_id)
@@ -152,7 +152,7 @@ class Event < ApplicationRecord
     # Get all the entrants, 1 chunk at a time
     (1..1000).each do |page|
       event_entrants, cursor = provider.event_entrants(
-        provider_event_id: startgg_id, # TODO: change to provider_id
+        provider_event_id:,
         game:,
         page:,
         cursor:
@@ -250,7 +250,7 @@ class Event < ApplicationRecord
 
   def sync_state!
     startgg_event = Api::Startgg.with_retries(5) do
-      Api::Startgg.event(id: startgg_id)
+      Api::Startgg.event(id: provider_event_id)
     end
 
     if startgg_event&.state.present?
@@ -277,7 +277,7 @@ class Event < ApplicationRecord
       sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
-        Api::Startgg.in_progress_sets(startgg_id, batch_size:, page:)
+        Api::Startgg.in_progress_sets(event_id: provider_event_id, batch_size:, page:)
       end
 
       break if sets.blank?
@@ -298,7 +298,7 @@ class Event < ApplicationRecord
       sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
-        Api::Startgg.completed_sets(startgg_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
+        Api::Startgg.completed_sets(event_id: provider_event_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 20.minutes : 1.hour.ago))
       end
 
       break if sets.blank?
