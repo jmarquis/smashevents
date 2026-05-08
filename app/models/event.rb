@@ -40,7 +40,7 @@ class Event < ApplicationRecord
   BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
 
   belongs_to :tournament
-  has_many :entrants
+  has_many :entrants, dependent: :destroy
   has_many :players, through: :entrants
   belongs_to :winner_entrant, class_name: 'Entrant', optional: true
   has_one :winner_player, class_name: 'Player', through: :winner_entrant, source: :player
