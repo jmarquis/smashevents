@@ -34,8 +34,13 @@ WORKDIR /opt/rails
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
-COPY . ./
+COPY package.json bun.config.js ./
+RUN bun install
+
+COPY app/frontend config/vite.json vite.config.mts ./
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+
+COPY . ./
 
 EXPOSE 3000
 
