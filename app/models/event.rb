@@ -445,11 +445,6 @@ class Event < ApplicationRecord
   end
 
   def provider
-    case tournament.provider
-    when Provider::Startgg::PROVIDER_NAME
-      Provider::Startgg
-    when Provider::Parrygg::PROVIDER_NAME
-      Provider::Parrygg
-    end
+    Provider::Base.provider(tournament.provider)
   end
 end
