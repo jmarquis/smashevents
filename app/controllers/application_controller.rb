@@ -87,7 +87,11 @@ class ApplicationController < BaseController
 
   def redirect_smashevents
     return if Rails.env.development?
-    return if request.host.in? ['smashradar.com', 'www.smashradar.com']
+    return if request.host.in? [
+      'smashradar.com',
+      'www.smashradar.com'
+      'smashevents-production.up.railway.app'
+    ]
     redirect_to 'https://smashradar.com', allow_other_host: true, status: :moved_permanently
   end
 
