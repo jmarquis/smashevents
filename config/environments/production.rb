@@ -81,7 +81,8 @@ Rails.application.configure do
   config.hosts = [
     'smashevents.gg',
     'smashradar.com',
-    'smashevents-production.up.railway.app'
+    'smashevents-production.up.railway.app',
+    'healthcheck.railway.app'
   ]
 
   if ENV["MEMCACHEDCLOUD_SERVERS"]
