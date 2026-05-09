@@ -38,11 +38,8 @@ RUN bundle install
 COPY package.json bun.lock* bun.config.js ./
 RUN bun install --frozen-lockfile
 
-COPY app/frontend ./app/frontend
-COPY config/vite.json vite.config.mts ./
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && rm -rf node_modules
-
 COPY . ./
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && rm -rf node_modules
 
 EXPOSE 3000
 
