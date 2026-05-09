@@ -87,5 +87,7 @@ Rails.application.configure do
 
   if ENV["MEMCACHEDCLOUD_SERVERS"]
     config.cache_store = :mem_cache_store, ENV["MEMCACHEDCLOUD_SERVERS"].split(','), { :username => ENV["MEMCACHEDCLOUD_USERNAME"], :password => ENV["MEMCACHEDCLOUD_PASSWORD"] }
+  elsif ENV['MEMCACHE_PRIVATE_SERVER']
+    config.cache_store = :mem_cache_store, ENV['MEMCACHE_PRIVATE_SERVER']
   end
 end
