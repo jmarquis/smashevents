@@ -31,15 +31,16 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN mkdir -p /opt/rails
 WORKDIR /opt/rails
 
+COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
-COPY package.json bun.config.js ./
-RUN bun install
+COPY package.json bun.lock* bun.config.js ./
+RUN bun install --frozen-lockfile
 
 COPY app/frontend ./app/frontend
 COPY config/vite.json vite.config.mts ./
-RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile && rm -rf node_modules
 
 COPY . ./
 
@@ -51,6 +52,7 @@ ENV DISCORDRB_NONACL=1
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD wget -qO /dev/null http://localhost:3000/up || exit 1
 
-RUN ["chmod", "+x", "deployment-tasks.sh"]
+RUN ["chmod", "+x", "bin/docker-entrypoint"]
+ENTRYPOINT ["bin/docker-entrypoint"]
 
-CMD ["rails", "s", "-b0"]
+CMD ["./bin/rails", "server", "-b0"]

@@ -6,7 +6,6 @@
     "buildEnvironment": "V3"
   },
   "deploy": {
-    "preDeployCommand": ["./deployment-tasks.sh"],
     "runtime": "V2",
     "numReplicas": 1,
     "sleepApplication": false,
