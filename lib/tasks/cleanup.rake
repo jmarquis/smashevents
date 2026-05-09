@@ -1,14 +1,20 @@
 namespace :cleanup do
 
   task delete_old_tournaments: [:environment] do
-    tournaments = Tournament
+    Tournament
       .where('end_at < ?', Date.today - 30.days)
       .order(created_at: :asc)
       .filter { |t| !t.should_display? }
+      .find_each do |tournament|
+        Rails.logger.info "Deleting tournament #{tournament.slug}..."
+        tournament.destroy!
+      end
+  end
 
-    tournaments.each do |tournament|
-      Rails.logger.info "Deleting #{tournament.slug}..."
-      tournament.destroy!
+  task delete_orphaned_players: [:environment] do
+    Player.where.missing(:entrants).find_each do |player|
+      Rails.logger.info "Deleting orphaned player #{player.tag}"
+      entrant.destroy!
     end
   end
   

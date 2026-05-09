@@ -23,9 +23,14 @@ end
 
 ### DAILY JOBS
 
-# 8:00am UTC
-cron '0 8 * * *', locals: { task: 'cleanup:delete_old_tournaments' }, overlap: false do
+# 7:00am UTC
+cron '0 7 * * *', locals: { task: 'cleanup:delete_old_tournaments' }, overlap: false do
   rake_async('cleanup:delete_old_tournaments')
+end
+
+# 8:00am UTC
+cron '0 8 * * *', locals: { task: 'cleanup:delete_orphaned_players' }, overlap: false do
+  rake_async('cleanup:delete_orphaned_players')
 end
 
 # 2:00pm UTC
