@@ -92,7 +92,7 @@ class ApplicationController < BaseController
       'www.smashradar.com',
       'smashevents-production.up.railway.app'
     ]
-    redirect_to 'https://smashradar.com', allow_other_host: true, status: :moved_permanently
+    # redirect_to 'https://smashradar.com', allow_other_host: true, status: :moved_permanently
   end
 
 end
