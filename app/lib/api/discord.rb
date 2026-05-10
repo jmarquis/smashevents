@@ -183,9 +183,6 @@ module Api
           builder = Discordrb::Webhooks::Builder.new
           yield builder
 
-          Rails.logger.info "WOULD HAVE POSTED #{builder.content}"
-          return
-
           bot.send_message(
             channel_id,
             builder.content,

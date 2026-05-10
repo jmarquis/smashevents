@@ -143,9 +143,6 @@ module Api
       end
 
       def tweet!(text, images: [], reply_to_tweet_id: nil, remove_mentions: false)
-        Rails.logger.info "WOULD HAVE TWEETED #{text}"
-        return
-
         text = text.slice(0, 260) if Rails.env.development?
 
         media_ids = images.map do |image|
