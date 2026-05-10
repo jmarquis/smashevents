@@ -51,7 +51,7 @@ module Factory
           if biggest_event.present?
             # Look up by game because we only care about one event per game per
             # tournament.
-            event = t.events.find_by(game:) || Event.new
+            event = t.events.find_by(game:) || t.events.new
 
             event.provider_event_id = biggest_event.id
             event.slug = biggest_event.slug
