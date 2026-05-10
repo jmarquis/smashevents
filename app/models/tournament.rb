@@ -233,7 +233,7 @@ class Tournament < ApplicationRecord
   end
 
   def sync
-    tournament, events = Tournament.from_startgg_tournament(startgg_data)
+    tournament, events = factory.tournament(startgg_data)
 
     tournament.save!
     events.each(&:save!)
@@ -265,6 +265,12 @@ class Tournament < ApplicationRecord
 
   def completed?
     events.all?(&:completed?)
+  end
+
+  private
+
+  def factory
+    Factory::Base.factory(provider)
   end
 
 end
