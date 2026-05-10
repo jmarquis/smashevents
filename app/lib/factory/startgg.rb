@@ -35,6 +35,8 @@ module Factory
           stream_data
         end
 
+        events = []
+
         Game.all.each do |game|
           biggest_event = (data.events || [])
             .filter { |event| event.videogame.id.to_i == game.startgg_id }
@@ -49,7 +51,7 @@ module Factory
           if biggest_event.present?
             # Look up by game because we only care about one event per game per
             # tournament.
-            event = t.events.find_by(game:) || t.events.new
+            event = t.events.find_by(game:) || Event.new
 
             event.provider_event_id = biggest_event.id
             event.slug = biggest_event.slug
@@ -65,10 +67,12 @@ module Factory
             else
               event.winner_entrant = nil
             end
+
+            events << event
           end
         end
 
-        t
+        return t, events
       end
 
     end

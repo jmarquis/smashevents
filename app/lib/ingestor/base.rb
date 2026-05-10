@@ -36,28 +36,29 @@ module Ingestor
           stats[:analyzed] += tournaments.count
 
           tournaments.each do |data|
-            tournament = factory.tournament(data)
+            tournament, events = factory.tournament(data)
 
-            next if tournament.events.blank?
+            next if events.blank?
             next if tournament.end_at < 7.days.ago
             next if tournament.exclude?
-            next unless tournament.events.any?(&:should_ingest?) || tournament.should_ingest?
+            next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
             if tournament.persisted?
-              if tournament.changed? || tournament.events.any?(&:changed?)
+              if tournament.changed? || events.any?(&:changed?)
                 tournament.save!
-                tournament.events.each(&:save!)
+                events.each(&:save!)
 
                 StatsD.increment("#{provider_name}.tournament_updated")
-                updated_log(tournament)
+                updated_log(tournament, events)
                 stats[:updated] += 1
               end
             else
               tournament.save!
+              events.each(&:save!)
 
               stats[:imported] += 1
               StatsD.increment("#{provider_name}.tournament_added")
-              event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
+              event_blurbs = events.map { |event| "#{event.game.slug}: #{event.player_count}" }
               Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
             end
           end
@@ -96,29 +97,30 @@ module Ingestor
           end
 
           tournament = Tournament.find_by(slug: override.slug, provider: provider_name)
-          next if tournament.present? && tournament.past?
+          next if tournament.present? && tournament.end_at < 7.days.ago
 
           stats[:analyzed] += 1
 
           Rails.logger.info "Fetching tournament #{override.slug}..."
           data = provider.tournament(slug: override.slug)
 
-          tournament = factory.tournament(data)
+          tournament, events = factory.tournament(data)
 
           if tournament.persisted?
-            if tournament.changed? || tournament.events.any?(&:changed?)
+            if tournament.changed? || events.any?(&:changed?)
               tournament.save!
-              tournament.events.each(&:save!)
+              events.each(&:save!)
 
               StatsD.increment("#{provider_name}.tournament_updated")
-              updated_log(tournament)
+              updated_log(tournament, events)
               stats[:updated] += 1
             end
           else
             tournament.save!
+            events.each(&:save!)
 
             StatsD.increment("#{provider_name}.tournament_added")
-            event_blurbs = tournament.events.map { |event| "#{event.game.slug}: #{event.player_count}" }
+            event_blurbs = events.map { |event| "#{event.game.slug}: #{event.player_count}" }
             Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(',')}"
             stats[:imported] += 1
           end
@@ -191,10 +193,10 @@ module Ingestor
         Factory::Base.factory(self::PROVIDER_NAME)
       end
 
-      def updated_log(tournament)
+      def updated_log(tournament, events)
         tournament_changes = tournament.saved_changes.reject { |k| k == 'updated_at' }
         Rails.logger.info "~ #{tournament.slug}: #{tournament_changes}"
-        tournament.events.each do |event|
+        events.each do |event|
           event_changes = event.saved_changes.reject { |k| k == 'updated_at' }
           next if event_changes.blank?
 
