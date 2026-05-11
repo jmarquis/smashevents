@@ -4,6 +4,7 @@ melee.update!(
   twitch_name: 'Super Smash Bros. Melee',
   hashtag: 'ssbm',
   startgg_id: 1,
+  parrygg_id: '01920676-416e-7838-b6aa-8d4453256f05',
   rankings_regex: /^SSBMRank/,
   ingestion_threshold: 8,
   display_threshold: 100
@@ -15,6 +16,7 @@ ultimate.update!(
   twitch_name: 'Super Smash Bros. Ultimate',
   hashtag: 'ssbu',
   startgg_id: 1386,
+  parrygg_id: '01920676-416e-7b49-a669-7157bd4a6934',
   rankings_regex: /^UltRank|^LumiRank/,
   ingestion_threshold: 8,
   display_threshold: 200
@@ -26,6 +28,7 @@ smash64.update!(
   twitch_name: 'Super Smash Bros.',
   hashtag: 'ssb64',
   startgg_id: 4,
+  parrygg_id: '0199e44b-0626-7b5e-a7ad-088dff8254ad',
   rankings_regex: /^The SSB64 League Rankings/,
   ingestion_threshold: 8,
   display_threshold: 30
@@ -37,6 +40,7 @@ rivals.update!(
   twitch_name: 'Rivals of Aether',
   hashtag: 'RivalsOfAether',
   startgg_id: 24,
+  parrygg_id: '019b422d-e5f2-77a1-9228-ba4163d7c6cc',
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
   display_threshold: 20
@@ -48,6 +52,7 @@ rivals2.update!(
   twitch_name: 'Rivals 2',
   hashtag: 'RivalsOfAether2',
   startgg_id: 53945,
+  parrygg_id: '01951d83-6be9-734e-9533-0db8e881e149',
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
   display_threshold: 60

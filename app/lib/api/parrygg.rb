@@ -30,9 +30,13 @@ module Api
         end
       end
 
+      def games
+        execute('parrygg.services.GameService/GetGames')
+      end
+
       private
 
-      def execute(url, body)
+      def execute(url, body = nil)
         client.post(url, body).body.with_indifferent_access
       end
 

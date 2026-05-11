@@ -13,6 +13,7 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  hashtag             :string
+#  parrygg_id          :string
 #
 # Indexes
 #
