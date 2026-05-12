@@ -16,6 +16,7 @@ module Factory
         t.city = data.city
         t.state = data.addr_state
         t.country = data.country_code
+
         t.banner_image_url = data.images.blank? ? nil : data.images
           .filter { |image| image.type == 'banner' }
           .map { |image| image.url.gsub(/\?.*/, '') }

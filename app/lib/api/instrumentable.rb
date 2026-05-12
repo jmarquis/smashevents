@@ -18,6 +18,10 @@ module Api
         StatsD.increment("api_response.#{class_name}.#{key}.#{error_key}")
 
         raise e
+      rescue => e
+        StatsD.increment("api_response.#{class_name}.#{key}.unknown_error")
+
+        raise e
       end
     end
   end

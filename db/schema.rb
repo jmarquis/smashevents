@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_195510) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_025523) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -28,7 +28,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_195510) do
     t.bigint "event_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "provider_entrant_id"
+    t.string "provider_entrant_id"
     t.integer "seed"
     t.integer "rank"
     t.bigint "player2_id"
@@ -43,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_195510) do
 
   create_table "events", force: :cascade do |t|
     t.bigint "tournament_id", null: false
-    t.integer "provider_event_id", null: false
+    t.string "provider_event_id", null: false
     t.string "game_slug", null: false
     t.integer "player_count"
     t.datetime "created_at", null: false
@@ -107,8 +107,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_195510) do
   end
 
   create_table "players", force: :cascade do |t|
-    t.integer "provider_player_id"
-    t.integer "provider_user_id"
+    t.string "provider_player_id"
+    t.string "provider_user_id"
     t.string "tag"
     t.string "twitter_username"
     t.datetime "created_at", null: false
@@ -134,7 +134,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_195510) do
   end
 
   create_table "tournaments", force: :cascade do |t|
-    t.integer "provider_tournament_id"
+    t.string "provider_tournament_id"
     t.string "slug"
     t.string "name"
     t.datetime "start_at"

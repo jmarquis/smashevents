@@ -7,7 +7,7 @@
 #  event_id            :integer          not null
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  provider_entrant_id :integer
+#  provider_entrant_id :string
 #  seed                :integer
 #  rank                :integer
 #  player2_id          :integer

@@ -3,7 +3,7 @@
 # Table name: tournaments
 #
 #  id                     :integer          not null, primary key
-#  provider_tournament_id :integer
+#  provider_tournament_id :string
 #  slug                   :string
 #  name                   :string
 #  start_at               :datetime

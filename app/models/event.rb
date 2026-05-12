@@ -4,7 +4,7 @@
 #
 #  id                  :integer          not null, primary key
 #  tournament_id       :integer          not null
-#  provider_event_id   :integer          not null
+#  provider_event_id   :string           not null
 #  game_slug           :string           not null
 #  player_count        :integer
 #  created_at          :datetime         not null

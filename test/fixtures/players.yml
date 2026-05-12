@@ -3,8 +3,8 @@
 # Table name: players
 #
 #  id                 :integer          not null, primary key
-#  provider_player_id :integer
-#  provider_user_id   :integer
+#  provider_player_id :string
+#  provider_user_id   :string
 #  tag                :string
 #  twitter_username   :string
 #  created_at         :datetime         not null
