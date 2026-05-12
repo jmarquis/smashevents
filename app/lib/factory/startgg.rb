@@ -102,7 +102,7 @@ module Factory
 
     end
 
-    def player(data, tag:)
+    def player(data, tag: nil)
       return Player.new(provider: Provider::Startgg::PROVIDER_NAME, tag:) if data.blank?
 
       p = Player.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_player_id: data.id) || Player.new

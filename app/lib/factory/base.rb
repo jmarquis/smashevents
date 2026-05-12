@@ -15,11 +15,11 @@ module Factory
         raise NotImplementedError
       end
 
-      def entrant(data)
+      def entrant(data, event:)
         raise NotImplementedError
       end
 
-      def player(data)
+      def player(data, tag: nil)
         raise NotImplementedError
       end
 
