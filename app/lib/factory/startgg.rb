@@ -88,18 +88,35 @@ module Factory
         rankings_regex = event.game.rankings_regex
         e.rank = data.participants[0]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
 
-        e.player = Player.from_startgg_player(data.participants[0]&.player, tag: data.name)
+        e.player = player(data.participants[0]&.player, tag: data.name)
 
         if data.participants.count > 1
           player2_rank = data.participants[1]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
           e.rank = player2_rank if player2_rank.present? && (e.rank.blank? || player2_rank < e.rank)
 
-          e.player2 = Player.from_startgg_player(data.participants[1]&.player)
+          e.player2 = player(data.participants[1]&.player)
         end
 
         e
       end
 
     end
+
+    def player(data, tag:)
+      return Player.new(provider: Provider::Startgg::PROVIDER_NAME, tag:) if data.blank?
+
+      p = Player.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_player_id: data.id) || Player.new
+
+      p.provider = Provider::Startgg::PROVIDER_NAME
+      p.provider_player_id = data.id
+      p.provider_user_id = data.user&.id
+      p.provider_user_slug = data.user&.discriminator
+      p.tag = data.gamer_tag
+      p.twitter_username = data&.user&.authorizations&.first&.external_username
+      p.name = data.user&.name
+
+      p
+    end
+
   end
 end

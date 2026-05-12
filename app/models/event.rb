@@ -185,7 +185,7 @@ class Event < ApplicationRecord
         entrant.save!
 
         stats[:created] += 1
-        StatsD.increment('startgg.entrant_added')
+        StatsD.increment("#{tournament.provider}.entrant_added")
       elsif entrant.changed? || entrant.player&.changed? || entrant.player2&.changed?
         entrant.save!
         entrant.player&.save!
@@ -193,19 +193,19 @@ class Event < ApplicationRecord
 
         stats[:updated] += 1
         entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
-          StatsD.increment("startgg.entrant_field_updated.#{field}")
+          StatsD.increment("#{tournament.provider}.entrant_field_updated.#{field}")
         end
         if entrant.player.present?
           entrant.player.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
-            StatsD.increment("startgg.player_field_updated.#{field}")
+            StatsD.increment("#{tournament.provider}.player_field_updated.#{field}")
           end
         end
         if entrant.player2.present?
           entrant.player2.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
-            StatsD.increment("startgg.player_field_updated.#{field}")
+            StatsD.increment("#{tournament.provider}.player_field_updated.#{field}")
           end
         end
-        StatsD.increment('startgg.entrant_updated')
+        StatsD.increment("#{tournament.provider}.entrant_updated")
       end
 
       entrant
@@ -216,7 +216,7 @@ class Event < ApplicationRecord
       entrant.destroy!
 
       stats[:deleted] += 1
-      StatsD.increment('startgg.entrant_deleted')
+      StatsD.increment("#{tournament.provider}.entrant_deleted")
     end
 
     # Denormalize whether the event is seeded

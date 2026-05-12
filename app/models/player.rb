@@ -56,28 +56,6 @@ class Player < ApplicationRecord
     where('tag % :query', query:).order(Arel.sql("similarity(tag, '#{quoted_query}') desc"))
   }
 
-  def self.from_json(serialized_player)
-    new(JSON.parse(serialized_player).deep_symbolize_keys)
-  rescue JSON::ParserError
-    new(tag: serialized_player)
-  end
-
-  def self.from_startgg_player(data, tag: nil)
-    return new(tag:) if data.blank?
-
-    p = find_by(provider_player_id: data.id) || new
-
-    p.provider = Provider::Startgg::PROVIDER_NAME
-    p.provider_player_id = data.id
-    p.provider_user_id = data.user&.id
-    p.provider_user_slug = data.user&.discriminator
-    p.tag = data.gamer_tag
-    p.twitter_username = data&.user&.authorizations&.first&.external_username
-    p.name = data.user&.name
-
-    p
-  end
-
   def serialize
     {
       tag:,
