@@ -28,30 +28,6 @@ class Entrant < ApplicationRecord
   belongs_to :player2, class_name: 'Player', optional: true
   belongs_to :event
 
-  def self.from_startgg_entrant(data, event:)
-    e = find_by(provider_entrant_id: data.id) || new
-
-    e.event = event
-    e.provider = Provider::Startgg::PROVIDER_NAME
-    e.provider_entrant_id = data.id
-    e.seed = data.initial_seed_num
-
-    rankings_key = event.game.rankings_key
-    rankings_regex = event.game.rankings_regex
-    e.rank = data.participants[0]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
-
-    e.player = Player.from_startgg_player(data.participants[0]&.player, tag: data.name)
-
-    if data.participants.count > 1
-      player2_rank = data.participants[1]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
-      e.rank = player2_rank if player2_rank.present? && (e.rank.blank? || player2_rank < e.rank)
-
-      e.player2 = Player.from_startgg_player(data.participants[1]&.player)
-    end
-
-    e
-  end
-
   def tag(twitter: false)
     player1_tag = if twitter && player.twitter_username.present?
       "#{player.tag} (@#{player.twitter_username})"

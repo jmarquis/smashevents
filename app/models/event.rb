@@ -179,7 +179,7 @@ class Event < ApplicationRecord
 
     # Populate entrants
     entrants = entrants.map do |entrant|
-      entrant = Entrant.from_startgg_entrant(entrant, event: self)
+      entrant = factory.entrant(entrant, event: self)
 
       if !entrant.persisted?
         entrant.save!
@@ -446,5 +446,9 @@ class Event < ApplicationRecord
 
   def provider
     Provider::Base.provider(tournament.provider)
+  end
+
+  def factory
+    Factory::Base.factory(tournament.provider)
   end
 end
