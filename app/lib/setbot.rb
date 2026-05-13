@@ -248,6 +248,7 @@ class Setbot
             end
           rescue => e
             Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
+            Sentry.capture_exception(e)
           end
         end
       end

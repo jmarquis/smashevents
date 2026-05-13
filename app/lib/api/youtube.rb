@@ -16,6 +16,7 @@ module Api
         "https://youtube.com/channel/#{response.items.first.id.channel_id}/live"
       rescue => e
         Rails.logger.error e.message
+        Sentry.capture_exception(e)
         "https://youtube.com/#{channel_name}"
       end
 
