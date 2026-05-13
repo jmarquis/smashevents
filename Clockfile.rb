@@ -82,7 +82,3 @@ end
 every '10 seconds', locals: { task: 'setbot:run' }, overlap: false do
   rake_async('setbot:run')
 end
-
-every '1 minute', locals: { task: 'sentry:test' }, overlap: false do
-  raise Exception
-end

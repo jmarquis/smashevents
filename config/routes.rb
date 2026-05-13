@@ -11,6 +11,4 @@ Rails.application.routes.draw do
 
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  get 'error' => 'application#error_test'
-
 end
