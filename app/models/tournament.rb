@@ -37,7 +37,7 @@ class Tournament < ApplicationRecord
   has_many :notifications, as: :notifiable
   has_one :override, class_name: 'TournamentOverride', foreign_key: :slug, primary_key: :slug
 
-  scope :not_past, -> { where('end_at >= ?', Date.today) }
+  scope :not_past, -> { where('end_at > ?', 6.hours.ago) }
   scope :in_progress, -> {
     includes(:events)
       .where('tournaments.start_at <= ? and end_at >= ?', Time.now, Time.now - 12.hours)

@@ -100,22 +100,22 @@ module Factory
         e
       end
 
-    end
+      def player(data, tag: nil)
+        return Player.new(provider: Provider::Startgg::PROVIDER_NAME, tag:) if data.blank?
 
-    def player(data, tag: nil)
-      return Player.new(provider: Provider::Startgg::PROVIDER_NAME, tag:) if data.blank?
+        p = Player.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_player_id: data.id) || Player.new
 
-      p = Player.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_player_id: data.id) || Player.new
+        p.provider = Provider::Startgg::PROVIDER_NAME
+        p.provider_player_id = data.id
+        p.provider_user_id = data.user&.id
+        p.provider_user_slug = data.user&.discriminator
+        p.tag = data.gamer_tag
+        p.twitter_username = data&.user&.authorizations&.first&.external_username
+        p.name = data.user&.name
 
-      p.provider = Provider::Startgg::PROVIDER_NAME
-      p.provider_player_id = data.id
-      p.provider_user_id = data.user&.id
-      p.provider_user_slug = data.user&.discriminator
-      p.tag = data.gamer_tag
-      p.twitter_username = data&.user&.authorizations&.first&.external_username
-      p.name = data.user&.name
+        p
+      end
 
-      p
     end
 
   end
