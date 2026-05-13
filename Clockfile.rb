@@ -5,18 +5,17 @@ around_action do |job_proc, job_info|
   Rails.logger.formatter.set_entrypoint(job_info[:task])
   Rails.logger.debug "Starting task"
   StatsD.measure("cron.total_time.#{job_info[:task].gsub(':', '_')}") do
-    job_proc.call
+    Sentry.with_exception_captured do
+      job_proc.call
+    end
   end
   Rails.logger.debug "Task finished"
   STDOUT.flush
 end
 
 on_error do |job, error|
-  case job
-  when String # this means there was a problem parsing the Clockfile while starting
+  if job.is_a?(String)
     Sentry.capture_exception(StandardError.new('Error when loading Clockfile'))
-  else
-    Sentry.capture_exception(error)
   end
 end
 
