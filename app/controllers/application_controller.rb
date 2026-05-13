@@ -66,6 +66,10 @@ class ApplicationController < BaseController
     render layout: 'minimal'
   end
 
+  def error_test
+    raise Exception
+  end
+
   private
 
   def selected_games
