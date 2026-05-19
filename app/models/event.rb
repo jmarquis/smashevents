@@ -57,11 +57,12 @@ class Event < ApplicationRecord
   def self.upset_factor(winner_seed:, loser_seed:)
     winner_seed_placement_index = PLACEMENTS.count { |placement| winner_seed >= placement } - 1
     loser_seed_placement_index = PLACEMENTS.count { |placement| loser_seed >= placement } - 1
-    return winner_seed_placement_index - loser_seed_placement_index
+    winner_seed_placement_index - loser_seed_placement_index
   end
 
   def should_ingest?
     return false unless game&.ingestion_threshold.present?
+
     player_count.present? && player_count >= game.ingestion_threshold
   end
 
@@ -99,9 +100,9 @@ class Event < ApplicationRecord
       entrants_tags = entrants.map { |entrant| entrant.tag(twitter:) }
 
       if show_count && remaining_entrant_count >= 10
-        "#{[*entrants_tags, "#{(player_count - entrants.count)} more!"].to_sentence}"
+        [*entrants_tags, "#{player_count - entrants.count} more!"].to_sentence
       else
-        "#{[*entrants_tags, 'more!'].to_sentence}"
+        [*entrants_tags, 'more!'].to_sentence
       end
     elsif show_count
       "#{player_count} players!"
@@ -158,8 +159,8 @@ class Event < ApplicationRecord
         cursor:
       )
 
-      # Respect startgg's rate limits...
-      sleep 1
+      # Respect provider rate limits...
+      sleep provider.sleep_time
 
       # This means the tournament was probably deleted.
       if event_entrants.nil?
@@ -192,16 +193,16 @@ class Event < ApplicationRecord
         entrant.player2&.save!
 
         stats[:updated] += 1
-        entrant.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+        entrant.saved_changes.reject { |field, _value| field == 'updated_at' }.each_key do |field|
           StatsD.increment("#{tournament.provider}.entrant_field_updated.#{field}")
         end
         if entrant.player.present?
-          entrant.player.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+          entrant.player.saved_changes.reject { |field, _value| field == 'updated_at' }.each_key do |field|
             StatsD.increment("#{tournament.provider}.player_field_updated.#{field}")
           end
         end
         if entrant.player2.present?
-          entrant.player2.saved_changes.reject { |field, value| field == 'updated_at' }.each do |field, value|
+          entrant.player2.saved_changes.reject { |field, _value| field == 'updated_at' }.each_key do |field|
             StatsD.increment("#{tournament.provider}.player_field_updated.#{field}")
           end
         end
@@ -234,7 +235,8 @@ class Event < ApplicationRecord
   def upset_factor_threshold
     return 3 if player_count <= 300
     return 4 if player_count <= 1000
-    return 5
+
+    5
   end
 
   def initialize_twitter_upset_thread!
@@ -253,10 +255,10 @@ class Event < ApplicationRecord
       Api::Startgg.event(id: provider_event_id)
     end
 
-    if startgg_event&.state.present?
-      self.state = startgg_event.state
-      save!
-    end
+    return unless startgg_event&.state.present?
+
+    self.state = startgg_event.state
+    save!
   end
 
   def sync_sets!
@@ -282,6 +284,7 @@ class Event < ApplicationRecord
 
       break if sets.blank?
       break if sets.count.zero?
+
       Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
@@ -289,7 +292,7 @@ class Event < ApplicationRecord
         process_in_progress_set(set)
       end
 
-      sleep 1
+      sleep provider.sleep_time
     end
   end
 
@@ -303,6 +306,7 @@ class Event < ApplicationRecord
 
       break if sets.blank?
       break if sets.count.zero?
+
       Rails.logger.debug "Found #{sets.count} updated completed sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
@@ -310,7 +314,7 @@ class Event < ApplicationRecord
         process_completed_set(set)
       end
 
-      sleep 1
+      sleep provider.sleep_time
     end
   end
 
@@ -407,40 +411,40 @@ class Event < ApplicationRecord
 
     return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
 
-    if upset_factor >= upset_factor_threshold
-      initialize_twitter_upset_thread!
+    return unless upset_factor >= upset_factor_threshold
 
-      previous_notification = Notification.where(
-        notifiable: self,
-        notification_type: Notification::TYPE_UPSET,
-        platform: Notification::PLATFORM_TWITTER,
-        success: true
-      ).filter { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }.first
+    initialize_twitter_upset_thread!
 
-      return if previous_notification.present?
+    previous_notification = Notification.where(
+      notifiable: self,
+      notification_type: Notification::TYPE_UPSET,
+      platform: Notification::PLATFORM_TWITTER,
+      success: true
+    ).filter { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }.first
 
-      upset_factor = Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)
-      Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed}) [UF #{upset_factor}]")
+    return if previous_notification.present?
 
-      Notification.send_notification(
-        self,
-        type: Notification::TYPE_UPSET,
-        platform: Notification::PLATFORM_TWITTER,
-        metadata: { startgg_set_id: set.id }
-      ) do |event|
-        tweet = Api::Twitter.upset(
-          event: event,
-          winner_entrant:,
-          winner_games:,
-          loser_entrant:,
-          loser_games:
-        )
+    upset_factor = Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)
+    Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed}) [UF #{upset_factor}]")
 
-        self.last_upset_tweet_id = tweet['data']['id']
-        save!
+    Notification.send_notification(
+      self,
+      type: Notification::TYPE_UPSET,
+      platform: Notification::PLATFORM_TWITTER,
+      metadata: { startgg_set_id: set.id }
+    ) do |event|
+      tweet = Api::Twitter.upset(
+        event: event,
+        winner_entrant:,
+        winner_games:,
+        loser_entrant:,
+        loser_games:
+      )
 
-        sleep 1
-      end
+      self.last_upset_tweet_id = tweet['data']['id']
+      save!
+
+      sleep 1
     end
   end
 

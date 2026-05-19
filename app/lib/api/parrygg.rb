@@ -30,6 +30,16 @@ module Api
         end
       end
 
+      def event_entrants(event_id:)
+        instrument('event_entrants') do
+          execute('parrygg.services.EventService/GetEventEntrants', {
+            event_identifier: {
+              id: event_id
+            }
+          })
+        end
+      end
+
       def games
         execute('parrygg.services.GameService/GetGames')
       end
@@ -37,7 +47,10 @@ module Api
       private
 
       def execute(url, body = nil)
-        client.post(url, body).body.with_indifferent_access
+        response = client.post(url, body).body
+        raise Api::ParryggError, response if response.is_a? String
+
+        response.with_indifferent_access
       end
 
       def client

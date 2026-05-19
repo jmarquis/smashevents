@@ -25,6 +25,10 @@ module Provider
         raise NotImplementedError
       end
 
+      def sleep_time
+        1
+      end
+
     end
   end
 end

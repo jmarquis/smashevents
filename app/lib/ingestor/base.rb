@@ -32,6 +32,7 @@ module Ingestor
           )
 
           break if tournaments.blank?
+
           Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
           stats[:analyzed] += tournaments.count
 
@@ -63,7 +64,7 @@ module Ingestor
             end
           end
 
-          sleep 1
+          sleep provider.sleep_time
         end
 
         Rails.cache.write("#{provider_name}/last_tournament_sync", start_time, expires_in: 1.day)
@@ -83,7 +84,7 @@ module Ingestor
         Rails.logger.info "Starting #{provider_name} override sync..."
 
         TournamentOverride.where(provider: provider_name).each do |override|
-          if !override.include
+          unless override.include
             tournament = Tournament.find_by(slug: override.slug, provider: provider_name)
             if tournament.present?
               Rails.logger.info "- #{tournament.slug}"
@@ -129,7 +130,7 @@ module Ingestor
           override.slug = tournament.slug
           override.save!
 
-          sleep 1
+          sleep provider.sleep_time
         end
 
         Rails.logger.info "Tournament override sync complete. #{stats.to_json}"
@@ -152,15 +153,12 @@ module Ingestor
           events = tournament.events.should_sync_entrants
 
           [*unseeded_in_progress_events, *events].each do |event|
-            stats = event.sync_entrants!.reduce(stats) do |stats, (key, total)|
+            stats = event.sync_entrants!.each_with_object(stats) do |(key, total), stats|
               stats[key] += total
-              stats
             end
 
             num_events += 1
-            if num_events % 50 == 0
-              Rails.logger.info "Scanned #{num_events} events so far..."
-            end
+            Rails.logger.info "Scanned #{num_events} events so far..." if num_events % 50 == 0
           end
         end
 
