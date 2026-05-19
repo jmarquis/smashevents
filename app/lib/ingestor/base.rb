@@ -31,7 +31,7 @@ module Ingestor
             updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago)
           )
 
-          break if tournaments.count.zero?
+          break if tournaments.blank?
           Rails.logger.info "#{tournaments.count} tournaments found. Analyzing..."
           stats[:analyzed] += tournaments.count
 

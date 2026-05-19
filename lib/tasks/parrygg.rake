@@ -10,7 +10,7 @@ namespace :parrygg do
     Ingestor::Parrygg.sync_overrides
   end
 
-  task sync_entrants: [:environemnt] do
+  task sync_entrants: [:environment] do
     Ingestor::Parrygg.sync_entrants
   end
 
