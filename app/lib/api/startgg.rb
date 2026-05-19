@@ -143,7 +143,7 @@ module Api
         end
       end
 
-      def event_entrants(id:, game:, batch_size:, page:)
+      def event_entrants(event_id:, game:, batch_size:, page:)
         query = <<~GRAPHQL
           query($id: ID, $perPage: Int, $page: Int) {
             event(id: $id) {
@@ -177,7 +177,7 @@ module Api
         GRAPHQL
 
         instrument('event_entrants') do
-          client.query(query, id:, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
+          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
         end
       end
 
