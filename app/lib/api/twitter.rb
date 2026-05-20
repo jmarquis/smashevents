@@ -29,7 +29,7 @@ module Api
           #{event_blurbs.join("\n")}
           #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
           \n\n
-          https://start.gg/#{tournament.slug}
+          #{tournament.url}
         TEXT
 
         tweet!(text)
@@ -40,7 +40,7 @@ module Api
           blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
           blurb += " featuring #{event.entrants_sentence(twitter: true)}"
 
-          blurb += "\nhttps://start.gg/#{event.tournament.slug}"
+          blurb += "\n#{event.tournament.url}"
           blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
 
           blurb
@@ -105,7 +105,7 @@ module Api
           HAPPENING TODAY (#{Time.now.strftime('%A')})
           #{tournament.name.upcase}
           #{tournament.formatted_location}
-          https://start.gg/#{tournament.slug}#{tournament.hashtag.present? ? " ##{tournament.hashtag}" : nil}
+          #{tournament.url}#{tournament.hashtag.present? ? " ##{tournament.hashtag}" : nil}
           \n\n
           #{event_blurbs.join("\n\n")}
           #{stream_text}

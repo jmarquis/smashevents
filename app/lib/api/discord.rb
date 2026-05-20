@@ -17,7 +17,7 @@ module Api
           builder.content = '## NEW EVENT ADDED'
           builder.add_embed do |embed|
             embed.title = event.tournament.name
-            embed.url = "https://start.gg/#{event.tournament.slug}"
+            embed.url = event.tournament.url
 
             players_blurb = if event.player_count.present? && event.player_count > 0
               blurb = "#{event.player_count} players"
@@ -53,7 +53,7 @@ module Api
 
             builder.add_embed do |embed|
               embed.title = "#{event.tournament.name} (#{event.tournament.formatted_day_range})"
-              embed.url = "https://start.gg/#{event.tournament.slug}"
+              embed.url = event.tournament.url
 
               embed.description = <<~TEXT
                 #{event.tournament.formatted_date_range}
@@ -107,7 +107,7 @@ module Api
             builder.content = '## HAPPENING TODAY'
             builder.add_embed do |embed|
               embed.title = tournament.name
-              embed.url = "https://start.gg/#{tournament.slug}"
+              embed.url = tournament.url
 
               embed.description = <<~TEXT
                 #{tournament.formatted_location}
