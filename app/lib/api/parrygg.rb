@@ -26,7 +26,15 @@ module Api
         instrument('tournament') do
           execute('parrygg.services.TournamentService/GetTournament', {
             tournament_slug: slug
-          })[:tournament]
+          })
+        end
+      end
+
+      def event(id:)
+        instrument('event') do
+          execute('parrygg.services.EventService/GetEvent', {
+            id:
+          })
         end
       end
 
@@ -49,6 +57,7 @@ module Api
       def execute(url, body = nil)
         response = client.post(url, body).body
         raise Api::ParryggError, response if response.is_a? String
+        raise Api::ParryggError, response if response['code'].present?
 
         response.with_indifferent_access
       end

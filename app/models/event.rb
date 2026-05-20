@@ -29,8 +29,10 @@
 #
 
 class Event < ApplicationRecord
+  STATE_CREATED = 'CREATED'
   STATE_ACTIVE = 'ACTIVE'
   STATE_COMPLETED = 'COMPLETED'
+  STATE_READY = 'READY'
 
   SET_STATE_IN_PROGRESS = 2
   SET_STATE_COMPLETED = 3
@@ -251,13 +253,11 @@ class Event < ApplicationRecord
   end
 
   def sync_state!
-    startgg_event = Api::Startgg.with_retries(5) do
-      Api::Startgg.event(id: provider_event_id)
-    end
+    event_state = provider.event_state(provider_event_id:)
 
-    return unless startgg_event&.state.present?
+    return unless event_state.present?
 
-    self.state = startgg_event.state
+    self.state = event_state
     save!
   end
 

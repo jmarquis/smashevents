@@ -25,6 +25,10 @@ module Provider
         raise NotImplementedError
       end
 
+      def event_state(provider_event_id:)
+        raise NotImplementedError
+      end
+
       def event_entrants(provider_event_id:, game:, page:, cursor:)
         raise NotImplementedError
       end
