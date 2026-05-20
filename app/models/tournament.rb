@@ -195,6 +195,10 @@ class Tournament < ApplicationRecord
     events.all?(&:completed?)
   end
 
+  def url
+    [Provider::Base.provider(provider).base_url, slug].join('/')
+  end
+
   private
 
   def factory

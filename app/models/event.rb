@@ -131,8 +131,8 @@ class Event < ApplicationRecord
     end
   end
 
-  def startgg_url
-    "https://start.gg/#{slug}"
+  def url
+    [provider.base_url, slug].join('/')
   end
 
   def completed?

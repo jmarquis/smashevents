@@ -13,6 +13,10 @@ module Provider
 
       ##########################################
 
+      def base_url
+        raise NotImplementedError
+      end
+
       def tournaments(page:, cursor:, after_date:, updated_after:)
         raise NotImplementedError
       end

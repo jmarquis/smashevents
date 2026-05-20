@@ -31,7 +31,7 @@ module Factory
             .filter { |event| event[:game][:id] == game.parrygg_id }
             # TODO: It seems like most events on Parrygg have an empty start date?
             # .filter { |event| DateTime.parse(event[:startDate]) >= t.start_at - 2.days }
-            .max { |a, b| a[:entrantCount] || 0 <=> b[:entrantCount] || 0 }
+            .max { |a, b| (a[:entrantCount] || 0) <=> (b[:entrantCount] || 0) }
 
           next unless biggest_event.present?
 

@@ -4,6 +4,10 @@ module Provider
 
     class << self
 
+      def base_url
+        'https://parry.gg'
+      end
+
       def tournaments(page:, cursor:, after_date:, updated_after:)
         # TODO: with_retries
         result = Api::Parrygg.tournaments(

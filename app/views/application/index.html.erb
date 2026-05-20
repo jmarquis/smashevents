@@ -10,7 +10,7 @@
       <div class="tournament-status upcoming"><div>Upcoming</div></div>
     <% end %>
     <time><%= tournament.formatted_date_range %></time>
-    <h2><a href="https://start.gg/<%= tournament.slug %>" target="_blank"><%= tournament.name %></a></h2>
+    <h2><a href="<%= tournament.url %>" target="_blank"><%= tournament.name %></a></h2>
     <div>
       <%= tournament.formatted_location %>
     </div>
@@ -20,7 +20,7 @@
       <% if event.present? %>
         <div class="game">
           <h3 class="game-heading">
-            <a href="<%= event.startgg_url %>" target="_blank">
+            <a href="<%= event.url %>" target="_blank">
               <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
                 <% if event.player_count > 20 %>
                   <%= event.player_count.round(-1) %>+ players

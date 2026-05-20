@@ -4,6 +4,11 @@ module Provider
     ENTRANT_SYNC_BATCH_SIZE = 50
 
     class << self
+
+      def base_url
+        'https://start.gg'
+      end
+
       def tournaments(page:, cursor:, after_date:, updated_after:)
         return Api::Startgg.with_retries(5, batch_size: 15) do |batch_size|
           Api::Startgg.tournaments(
@@ -31,6 +36,7 @@ module Provider
           )
         end, nil
       end
+
     end
   end
 end
