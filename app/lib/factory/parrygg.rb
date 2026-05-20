@@ -52,6 +52,41 @@ module Factory
         [t, events]
       end
 
+      def entrant(data, event:)
+        e = Entrant.find_by(provider: Provider::Parrygg::PROVIDER_NAME, provider_entrant_id: data[:id]) || Entrant.new
+
+        e.event = event
+        e.provider = Provider::Parrygg::PROVIDER_NAME
+        e.provider_entrant_id = data[:id]
+        e.seed = data[:seed]
+
+        users = data.dig(:entrant, :users)
+
+        e.player = player(users&.first, tag: data[:name])
+
+        if users.present? && users.count > 1
+          e.player2 = player(users.second)
+        end
+
+        e
+      end
+
+      def player(data, tag: nil)
+        return Player.new(provider: Provider::Parrygg::PROVIDER_NAME, tag:) if data.blank?
+
+        p = Player.find_by(provider: Provider::Parrygg::PROVIDER_NAME, provider_player_id: data[:id]) || Player.new
+
+        p.provider = Provider::Parrygg::PROVIDER_NAME
+        p.provider_player_id = data[:id]
+        p.provider_user_id = data[:id]
+        p.provider_user_slug = nil
+        p.tag = data[:gamerTag]
+        p.twitter_username = nil
+        p.name = [data[:firstName], data[:lastName]].join(' ')
+
+        p
+      end
+
     end
   end
 end
