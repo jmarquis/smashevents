@@ -14,8 +14,8 @@ namespace :parrygg do
     Ingestor::Parrygg.sync_entrants
   end
 
-  task scan_sets: [:environment] do
-    Ingestor::Parrygg.scan_sets
+  task sync_sets: [:environment] do
+    Ingestor::Parrygg.sync_sets
   end
 
 end

@@ -54,3 +54,6 @@ Style/Lambda:
 
 Layout/EmptyLinesAroundBlockBody:
   Enabled: false
+
+Style/Documentation:
+  Enabled: false

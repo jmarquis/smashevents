@@ -14,8 +14,8 @@ namespace :startgg do
     Ingestor::Startgg.sync_entrants
   end
 
-  task scan_sets: [:environment] do
-    Ingestor::Startgg.scan_sets
+  task sync_sets: [:environment] do
+    Ingestor::Startgg.sync_sets
   end
 
 end

@@ -165,7 +165,7 @@ module Ingestor
         Rails.logger.info "Entrant sync complete. #{stats.to_json}"
       end
 
-      def scan_sets
+      def sync_sets
         Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
           tournament.events.each(&:sync_state!)
           tournament.events.in_progress.each(&:sync_sets!)
