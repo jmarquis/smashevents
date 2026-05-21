@@ -167,13 +167,8 @@ module Ingestor
 
       def scan_sets
         Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
-          tournament.events.each do |event|
-            event.sync_state!
-          end
-
-          tournament.events.in_progress.each do |event|
-            event.sync_sets!
-          end
+          tournament.events.each(&:sync_state!)
+          tournament.events.in_progress.each(&:sync_sets!)
         end
       end
 

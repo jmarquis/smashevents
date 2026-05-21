@@ -51,3 +51,6 @@ Style/EachWithObject:
 
 Style/Lambda:
   EnforcedStyle: literal
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
