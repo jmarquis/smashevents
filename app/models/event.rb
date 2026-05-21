@@ -235,10 +235,9 @@ class Event < ApplicationRecord
   end
 
   def upset_factor_threshold
-    return 3 if player_count <= 300
-    return 4 if player_count <= 1000
+    return 3 if player_count <= 1000
 
-    5
+    4
   end
 
   def initialize_twitter_upset_thread!
