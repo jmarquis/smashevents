@@ -20,6 +20,8 @@ gem 'importmap-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder', require: false
 
+gem 'image_processing', '~> 1.2'
+
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '>= 4.0.1'
 
@@ -84,9 +86,9 @@ gem 'dalli', '~> 5.0'
 
 gem 'statsd-instrument', '~> 3.9'
 
-gem 'sentry-rails', '~> 5.21'
-gem 'sentry-ruby', '~> 5.21'
-gem 'stackprof', '~> 0.2.26'
+gem 'sentry-rails', '~> 6.0'
+gem 'sentry-ruby', '~> 6.0'
+gem 'stackprof'
 gem 'vernier'
 
 gem 'vite_rails', '~> 3.0'
@@ -96,4 +98,3 @@ gem 'ruby-clock', '~> 2.0', require: false
 gem 'rack-sanitizer', '~> 2.0'
 
 gem 'faraday'
-gem 'google-protobuf'
