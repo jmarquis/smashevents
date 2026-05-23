@@ -2,23 +2,23 @@
 #
 # Table name: events
 #
-#  id                  :integer          not null, primary key
-#  tournament_id       :integer          not null
-#  provider_event_id   :string           not null
-#  game_slug           :string           not null
-#  player_count        :integer
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  ranked_player_count :integer
-#  start_at            :datetime
-#  is_seeded           :boolean
+#  id                  :bigint           not null, primary key
 #  entrants_synced_at  :datetime
-#  slug                :string
-#  winner_entrant_id   :integer
-#  state               :string
+#  game_slug           :string           not null
+#  is_seeded           :boolean
+#  player_count        :integer
+#  ranked_player_count :integer
 #  sets_synced_at      :datetime
 #  should_display      :boolean
+#  slug                :string
+#  start_at            :datetime
+#  state               :string
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
 #  last_upset_tweet_id :string
+#  provider_event_id   :string           not null
+#  tournament_id       :bigint           not null
+#  winner_entrant_id   :bigint
 #
 # Indexes
 #

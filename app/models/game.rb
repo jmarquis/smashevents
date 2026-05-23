@@ -2,18 +2,18 @@
 #
 # Table name: games
 #
-#  id                  :integer          not null, primary key
-#  slug                :string
-#  name                :string
-#  twitch_name         :string
-#  startgg_id          :integer
-#  rankings_regex      :string
-#  ingestion_threshold :integer
+#  id                  :bigint           not null, primary key
 #  display_threshold   :integer
+#  hashtag             :string
+#  ingestion_threshold :integer
+#  name                :string
+#  rankings_regex      :string
+#  slug                :string
+#  twitch_name         :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
-#  hashtag             :string
 #  parrygg_id          :string
+#  startgg_id          :integer
 #
 # Indexes
 #

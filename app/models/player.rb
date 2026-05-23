@@ -2,20 +2,20 @@
 #
 # Table name: players
 #
-#  id                 :integer          not null, primary key
-#  provider_player_id :string
-#  provider_user_id   :string
+#  id                 :bigint           not null, primary key
+#  name               :string
+#  provider           :string
+#  provider_user_slug :string
 #  tag                :string
 #  twitter_username   :string
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
-#  name               :string
-#  provider_user_slug :string
-#  provider           :string
+#  provider_player_id :string
+#  provider_user_id   :string
 #
 # Indexes
 #
-#  gin_index_players_on_tag                          (tag)
+#  gin_index_players_on_tag                          (tag) USING gin
 #  index_players_on_provider_and_provider_player_id  (provider,provider_player_id) UNIQUE
 #  index_players_on_provider_and_provider_user_id    (provider,provider_user_id) UNIQUE
 #  index_players_on_provider_user_slug               (provider_user_slug)

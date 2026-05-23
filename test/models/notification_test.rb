@@ -2,16 +2,16 @@
 #
 # Table name: notifications
 #
-#  id                :integer          not null, primary key
+#  id                :bigint           not null, primary key
+#  metadata          :json
 #  notifiable_type   :string           not null
-#  notifiable_id     :integer          not null
-#  success           :boolean          not null
-#  platform          :string           not null
 #  notification_type :string           not null
+#  platform          :string           not null
 #  sent_at           :datetime         not null
+#  success           :boolean          not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
-#  metadata          :json
+#  notifiable_id     :bigint           not null
 #
 # Indexes
 #

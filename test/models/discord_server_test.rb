@@ -2,12 +2,12 @@
 #
 # Table name: discord_servers
 #
-#  id                        :integer          not null, primary key
-#  discord_server_id         :string
-#  player_subscription_limit :integer
+#  id                        :bigint           not null, primary key
 #  note                      :string
+#  player_subscription_limit :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  discord_server_id         :string
 #
 
 require "test_helper"

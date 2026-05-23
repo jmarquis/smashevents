@@ -2,12 +2,12 @@
 #
 # Table name: tournament_overrides
 #
-#  id         :integer          not null, primary key
-#  slug       :string
+#  id         :bigint           not null, primary key
 #  include    :boolean
+#  provider   :string
+#  slug       :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  provider   :string
 #
 # Indexes
 #

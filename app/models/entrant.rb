@@ -2,16 +2,16 @@
 #
 # Table name: entrants
 #
-#  id                  :integer          not null, primary key
-#  player_id           :integer          not null
-#  event_id            :integer          not null
+#  id                  :bigint           not null, primary key
+#  provider            :string
+#  rank                :integer
+#  seed                :integer
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  event_id            :bigint           not null
+#  player2_id          :bigint
+#  player_id           :bigint           not null
 #  provider_entrant_id :string
-#  seed                :integer
-#  rank                :integer
-#  player2_id          :integer
-#  provider            :string
 #
 # Indexes
 #
