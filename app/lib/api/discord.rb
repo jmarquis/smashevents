@@ -22,9 +22,9 @@ module Api
             players_blurb = if event.player_count.present? && event.player_count > 0
               blurb = "#{event.player_count} players"
 
-              if event.featured_entrants.present?
-                blurb += " featuring #{event.entrants_sentence(show_count: false)}\n"
-              end
+              blurb += " featuring #{event.entrants_sentence(show_count: false)}\n" if event.featured_entrants.present?
+
+              blurb
             else
               "#{event.game.name}: (player count TBD)"
             end
@@ -39,6 +39,8 @@ module Api
 
             embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
             embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+
+            binding.pry
 
             embed.footer = DEFAULT_FOOTER
           end
