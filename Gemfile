@@ -20,7 +20,7 @@ gem 'importmap-rails'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem 'jbuilder', require: false
 
-gem 'image_processing', '~> 1.2'
+gem 'image_processing', '~> 2.0'
 
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '>= 4.0.1'
