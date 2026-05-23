@@ -48,6 +48,16 @@ module Api
         end
       end
 
+      def tournament_streams(tournament_id:)
+        instrument('event_entrants') do
+          execute('parrygg.services.StreamService/GetTournamentStreams', {
+            tournament_identifier: {
+              id: tournament_id
+            }
+          })
+        end
+      end
+
       def games
         execute('parrygg.services.GameService/GetGames')
       end

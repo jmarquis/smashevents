@@ -22,7 +22,25 @@ module Factory
           t.profile_image_url = data[:images].filter { |image| image[:type] == 'IMAGE_TYPE_AVATAR' }.first
         end
 
-        t.stream_data = nil # TODO: Figure out a way to get this
+        # TODO: Feels pretty bad making API calls in a factory method...
+        stream_data = Api::Parrygg.tournament_streams(tournament_id: data[:id])
+        binding.pry
+
+        t.stream_data = if stream_data.present? && stream_data[:streams].present?
+          stream_data[:streams]&.map do |stream|
+            stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream[:channel].downcase } || {}
+
+            stream_data[:name] = stream[:channel]
+            stream_data[:source] = case stream[:platform]
+            when 'STREAM_PLATFORM_TWITCH'
+              Tournament::STREAM_SOURCE_TWITCH
+            when 'STREAM_PLATFORM_YOUTUBE'
+              Tournament::STREAM_SOURCE_YOUTUBE
+            end
+
+            stream_data
+          end
+        end
 
         events = []
 

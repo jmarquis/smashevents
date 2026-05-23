@@ -57,3 +57,9 @@ Layout/EmptyLinesAroundBlockBody:
 
 Style/Documentation:
   Enabled: false
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
