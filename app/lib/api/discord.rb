@@ -40,8 +40,6 @@ module Api
             embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
             embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
-            binding.pry
-
             embed.footer = DEFAULT_FOOTER
           end
         end

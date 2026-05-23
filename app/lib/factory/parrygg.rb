@@ -24,7 +24,6 @@ module Factory
 
         # TODO: Feels pretty bad making API calls in a factory method...
         stream_data = Api::Parrygg.tournament_streams(tournament_id: data[:id])
-        binding.pry
 
         t.stream_data = if stream_data.present? && stream_data[:streams].present?
           stream_data[:streams]&.map do |stream|
