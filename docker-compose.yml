@@ -11,6 +11,8 @@ services:
     platform: linux/amd64
     command: sh -c "bun install && bin/vite dev"
     tty: true
+    environment:
+      VITE_RUBY_HOST: 0.0.0.0
     ports:
       - "3391:3391"
     volumes:
@@ -23,6 +25,7 @@ services:
     command: sh -c "rm -f tmp/pids/server.pid && bundle exec rails s -b0"
     environment:
       - SECRET_KEY_BASE
+      - VITE_RUBY_HOST=vite
     volumes:
       - .:/opt/rails:delegated
       - bundle_cache:/usr/local/bundle:delegated
