@@ -20,7 +20,9 @@
     <%= vite_typescript_tag "app" %>
     <%= vite_stylesheet_tag "app.scss" %>
 
-    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e3f9f90aa5ad47f5988686c9e25b5029"}'></script>
+    <% if Rails.env.production? %>
+      <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e3f9f90aa5ad47f5988686c9e25b5029"}'></script>
+    <% end %>
   </head>
 
   <body style="<%= colors_css(action_name) %>"<%= " data-current-tag=\"#{params[:player]}\"".html_safe if params[:player] %>>
