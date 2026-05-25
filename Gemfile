@@ -42,7 +42,7 @@ gem 'bootsnap', require: false
 
 gem 'graphlient'
 
-gem 'twitch-api'
+gem 'twitchrb'
 
 gem 'lograge'
 

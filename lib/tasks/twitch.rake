@@ -9,7 +9,7 @@ namespace :twitch do
 
       streams = tournament.stream_data.reduce([]) do |streams, stream|
         stream = stream.with_indifferent_access
-        streams = streams + [stream[:name]] if stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
+        streams += [stream[:name]] if stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
 
         streams
       end
@@ -17,7 +17,7 @@ namespace :twitch do
       next unless streams.present?
 
       begin
-        live_streams = Api::Twitch.live_streams(streams:)
+        live_streams = Api::Twitch.streams(streams:)
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
 
