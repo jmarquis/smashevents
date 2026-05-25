@@ -2,6 +2,6 @@
 
 bundle install
 rails db:seed
-bun install
+npm ci
 
 exec "$@"

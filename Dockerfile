@@ -1,4 +1,4 @@
-FROM ruby:4.0.5-slim
+FROM timbru31/ruby-node:4.0-slim-krypton
 
 ARG RAILS_ENV=development
 
@@ -21,9 +21,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   unzip \
   vim \
   && rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:${PATH}"
 
 ENV LD_PRELOAD=libjemalloc.so.2
 
