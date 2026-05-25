@@ -63,3 +63,6 @@ Layout/CaseIndentation:
 
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
+
+Style/RescueStandardError:
+  Enabled: false
