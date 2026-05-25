@@ -529,7 +529,7 @@ DEPENDENCIES
   x
 
 RUBY VERSION
-   ruby 3.4.1p0
+  ruby 4.0.5p0
 
 BUNDLED WITH
-   2.5.11
+  4.0.12

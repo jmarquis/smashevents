@@ -1,4 +1,4 @@
-FROM ruby:3.4.1-slim
+FROM ruby:4.0.5-slim
 
 ARG RAILS_ENV=production
 
@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   tzdata \
   inotify-tools \
   libjemalloc2 \
+  libyaml-dev \
   libprotobuf-dev \
   protobuf-compiler \
   wget \
