@@ -66,3 +66,6 @@ Layout/EndAlignment:
 
 Style/RescueStandardError:
   Enabled: false
+
+Style/WordArray:
+  Enabled: false

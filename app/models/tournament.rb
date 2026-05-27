@@ -46,7 +46,7 @@ class Tournament < ApplicationRecord
   scope :reasonable_duration, -> { where("end_at - start_at < interval '7 days'") }
   scope :has_streams, -> { where.not(stream_data: nil) }
   scope :should_display, ->(games: Game.all.map(&:slug)) {
-    includes(:override, events: [:game, winner_entrant: :player])
+    includes(:override, events: [:game, {winner_entrant: :player}])
       .where(events: { game: games })
       .merge(
         where(events: { should_display: true })
@@ -134,6 +134,7 @@ class Tournament < ApplicationRecord
 
   def formatted_location
     return 'Online' if city.blank? && state.blank? && country.blank?
+
     [city, state, country.in?(['US', 'GB']) ? nil : country].compact.join(', ')
   end
 
