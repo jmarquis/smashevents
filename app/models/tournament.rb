@@ -58,8 +58,8 @@ class Tournament < ApplicationRecord
                     where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.player_count, 1) = 0 then 1.0 else coalesce(events.player_count, 1)::float end > ?', 0.3).or(
                       where('events.ranked_player_count > ?', 10)
                     ).or(
-                        where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
-                      )
+                      where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
+                    )
                   )
                 )
               )
@@ -181,6 +181,7 @@ class Tournament < ApplicationRecord
   def in_progress?
     return false unless start_at <= Time.now && end_at + 12.hours >= Time.now
     return false unless events.any? { |e| e.winner_entrant_id.blank? }
+
     true
   end
 
@@ -188,6 +189,7 @@ class Tournament < ApplicationRecord
     return false if in_progress?
     return false if past?
     return false unless events.any? { |e| e.winner_entrant_id.blank? }
+
     start_at < Time.now + 8.hours
   end
 
