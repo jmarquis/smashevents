@@ -1,6 +1,8 @@
 import "../react-mounter"
 import moment from "moment-timezone"
 
+const loadedAt = moment()
+
 window.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector("#menu-toggle") as HTMLInputElement
   const menuContainer = document.querySelector(".menu-container")
@@ -18,4 +20,10 @@ window.addEventListener("DOMContentLoaded", () => {
       .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
     startTime.innerHTML = `${time.format("dddd")} @ ${time.format("h:mm a z")}`
   })
+})
+
+window.addEventListener("focus", () => {
+  if (moment().subtract(10, "minute").isAfter(loadedAt)) {
+    location.reload()
+  }
 })
