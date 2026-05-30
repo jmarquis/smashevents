@@ -341,6 +341,7 @@ module Api
           else
             yield
           end
+
           break
         rescue Graphlient::Errors::GraphQLError => e
           raise e unless e.message.match?(/query complexity/)
