@@ -331,7 +331,7 @@ module Api
         end
       end
 
-      def with_retries(num_retries, batch_size: nil)
+      def with_retries(max_retries, batch_size: nil)
         retries = 0
         result = nil
 
@@ -347,20 +347,22 @@ module Api
           raise e unless e.message.match?(/query complexity/)
           raise e unless batch_size.present?
 
-          if retries < num_retries
-            Rails.logger.info 'Query complexity error, reducing batch size'
-            retries += 1
-
-            if batch_size.present?
-              batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
-            end
-
-            sleep 5 * retries
-            next
-          else
+          if retries >= max_retries
             Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
             raise e
           end
+
+          retries += 1
+
+          if batch_size.present?
+            batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
+          end
+
+          Rails.logger.info "Query complexity error, reducing batch size and retrying. New batch size: #{batch_size}. Retry ##{retries}..."
+
+          sleep 5 * retries
+
+          next
         rescue Graphlient::Errors::ExecutionError,
           Graphlient::Errors::FaradayServerError,
           Graphlient::Errors::ConnectionFailedError,
@@ -370,15 +372,17 @@ module Api
           OpenSSL::SSL::SSLError => e
           StatsD.increment('startgg.request_error')
 
-          if retries < num_retries
-            Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
-            retries += 1
-            sleep 5 * retries
-            next
-          else
+          if retries >= max_retries
             Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
             raise e
           end
+
+          Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
+          retries += 1
+
+          sleep 5 * retries
+
+          next
         rescue StandardError => e
           Rails.logger.error "Unexpected error communicating with startgg: #{e.message}"
           raise e
