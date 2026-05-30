@@ -72,3 +72,9 @@ Style/WordArray:
 
 Naming/PredicatePrefix:
   Enabled: false
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Layout/ArrayAlignment:
+  EnforcedStyle: with_fixed_indentation

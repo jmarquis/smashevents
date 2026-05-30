@@ -336,18 +336,18 @@ module Api
         result = nil
 
         loop do
-          if batch_size.present?
-            result = yield batch_size
+          result = if batch_size.present?
+            yield batch_size
           else
-            result = yield
+            yield
           end
           break
         rescue Graphlient::Errors::GraphQLError => e
-          raise e unless e.message.match? /query complexity/
+          raise e unless e.message.match?(/query complexity/)
           raise e unless batch_size.present?
 
           if retries < num_retries
-            Rails.logger.info "Query complexity error, reducing batch size"
+            Rails.logger.info 'Query complexity error, reducing batch size'
             retries += 1
 
             if batch_size.present?
