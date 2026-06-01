@@ -78,3 +78,6 @@ Metrics/BlockNesting:
 
 Layout/ArrayAlignment:
   EnforcedStyle: with_fixed_indentation
+
+Style/NumericLiterals:
+  Enabled: false

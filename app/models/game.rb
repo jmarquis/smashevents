@@ -9,6 +9,7 @@
 #  name                :string
 #  rankings_regex      :string
 #  slug                :string
+#  sort_order          :integer
 #  twitch_name         :string
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
@@ -23,6 +24,8 @@
 #
 
 class Game < ApplicationRecord
+
+  default_scope { order(sort_order: :asc) }
 
   scope :all_games_except, ->(games) { where.not(slug: games.map(&:slug)) }
 

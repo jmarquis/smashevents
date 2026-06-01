@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_025523) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_01_210114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_025523) do
     t.string "parrygg_id"
     t.string "rankings_regex"
     t.string "slug"
+    t.integer "sort_order"
     t.integer "startgg_id"
     t.string "twitch_name"
     t.datetime "updated_at", null: false
