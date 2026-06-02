@@ -78,7 +78,7 @@ class ApplicationController < BaseController
       game_slugs = Game.filter_valid_game_slugs(cookies[:games].split(','))
     end
 
-    game_slugs = ['melee', 'ultimate', 'smash64', 'rivals', 'rivals2'] if game_slugs.blank?
+    game_slugs = ['melee', 'ultimate', 'smash64', 'remix', 'rivals', 'rivals2'] if game_slugs.blank?
     cookies.permanent[:games] = game_slugs.join(',')
     game_slugs.map { |slug| Game.find_by(slug:) }
   end
