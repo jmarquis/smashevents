@@ -9,6 +9,10 @@
 #  updated_at                :datetime         not null
 #  discord_server_id         :string
 #
+# Indexes
+#
+#  index_discord_servers_on_discord_server_id  (discord_server_id) UNIQUE
+#
 
 require "test_helper"
 

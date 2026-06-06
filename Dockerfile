@@ -40,7 +40,7 @@ VOLUME /opt/rails
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=3 CMD wget -qO /dev/null http://localhost:3000/up || exit 1
 
-RUN ["chmod", "+x", "docker-entrypoint.sh"]
-ENTRYPOINT ["/opt/rails/docker-entrypoint.sh"]
+RUN ["chmod", "+x", "bin/docker-entrypoint"]
+ENTRYPOINT ["bin/docker-entrypoint"]
 
 CMD ["rails", "s", "-b0"]
