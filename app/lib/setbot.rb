@@ -271,7 +271,7 @@ class Setbot
         server_id:
       )
 
-      Rails.logger.info 'Global commands successfully registered.'
+      Rails.logger.info 'Commands successfully registered.'
     end
 
     def register_or_edit_application_command(name, description:, default_member_permissions:, server_id:)
