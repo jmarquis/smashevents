@@ -81,3 +81,6 @@ Layout/ArrayAlignment:
 
 Style/NumericLiterals:
   Enabled: false
+
+Style/RegexpLiteral:
+  EnforcedStyle: slashes

@@ -16,13 +16,13 @@ class Setbot
         at_exit { delete_commands(server_id: SMASHRADAR_SERVER_ID) }
       end
 
-      bot.application_command(Rails.env.production? ? :connect : :connect_dev) do |event|
-        StatsD.increment('setbot.command.connect')
-        handle_connect_command(event:)
+      bot.application_command(Rails.env.production? ? :subscribe : :subscribe_dev) do |event|
+        StatsD.increment('setbot.command.subscribe')
+        handle_subscribe_command(event:)
       end
-      bot.application_command(Rails.env.production? ? :disconnect : :disconnect_dev) do |event|
-        StatsD.increment('setbot.command.disconnect')
-        handle_disconnect_command(event:)
+      bot.application_command(Rails.env.production? ? :unsubscribe : :unsubscribe_dev) do |event|
+        StatsD.increment('setbot.command.unsubscribe')
+        handle_unsubscribe_command(event:)
       end
 
       bot.string_select custom_id: custom_id('player_select') do |event|
@@ -30,9 +30,9 @@ class Setbot
         handle_player_select(event:)
       end
 
-      bot.string_select custom_id: custom_id('delete_connection_select') do |event|
-        StatsD.increment('setbot.string_select.delete_connection_select')
-        handle_delete_connection_select(event:)
+      bot.string_select custom_id: custom_id('delete_subscription_select') do |event|
+        StatsD.increment('setbot.string_select.delete_subscription_select')
+        handle_delete_subscription_select(event:)
       end
 
       bot.role_select custom_id: custom_id('role_ping_select') do |event|
@@ -47,10 +47,10 @@ class Setbot
       bot.run
     end
 
-    def handle_connect_command(event:)
+    def handle_subscribe_command(event:)
       if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
         event.respond(
-          content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.',
+          content: 'Unable to create subscription. This server already has the maximum number of subscriptions. Remove some with `/unsubscribe`.',
           ephemeral: true
         )
         return
@@ -59,11 +59,11 @@ class Setbot
       input_value = event.options['player_tag']
       return unless input_value.present?
 
-      slug = input_value.match(/\/user\/([^\/]+)/)
-      if slug.present?
-        players = Player.where(provider_user_slug: slug[1])
+      slug = input_value.match(%r{/user/([^/]+)})
+      players = if slug.present?
+        Player.where(provider_user_slug: slug[1])
       else
-        players = Player.tag_similar_to(input_value).limit(10).uniq
+        Player.tag_similar_to(input_value).limit(10).uniq
       end
 
       if players.empty?
@@ -85,7 +85,7 @@ class Setbot
       end
     end
 
-    def handle_disconnect_command(event:)
+    def handle_unsubscribe_command(event:)
       subscriptions = PlayerSubscription.where(
         discord_server_id: event.server_id,
         discord_channel_id: event.channel_id
@@ -93,7 +93,7 @@ class Setbot
 
       if subscriptions.empty?
         event.respond(
-          content: 'No connections found for this channel. Use `/connect` to add one.',
+          content: 'No subscriptions found for this channel. Use `/subscribe` to add one.',
           ephemeral: true
         )
         return
@@ -101,7 +101,7 @@ class Setbot
 
       event.respond(ephemeral: true) do |builder, view|
         view.row do |r|
-          r.string_select(custom_id: custom_id('delete_connection_select'), placeholder: 'Choose a connection to remove', max_values: 1) do |ss|
+          r.string_select(custom_id: custom_id('delete_subscription_select'), placeholder: 'Choose a subscription to remove', max_values: 1) do |ss|
             subscriptions.each do |subscription|
               ss.option(label: subscription.player.tag, value: subscription.id, description: subscription.player.name, emoji: { name: '👤' })
             end
@@ -115,7 +115,7 @@ class Setbot
 
       if player.blank?
         return event.interaction.update_message(
-          content: 'Unable to create connection. Please try again.',
+          content: 'Unable to create subscription. Please try again.'
         )
       end
 
@@ -127,13 +127,13 @@ class Setbot
         discord_channel_id: event.channel_id
       ).present?
         return event.interaction.edit_response(
-          content: "Connection for #{player.tag} already exists in this channel."
+          content: "Subscription for #{player.tag} already exists in this channel."
         )
       end
 
       if PlayerSubscription.where(discord_server_id: event.server_id).count >= player_subscription_limit(event.server_id)
         return event.interaction.edit_response(
-          content: 'Unable to create connection. This server already has the maximum number of connections. Remove some with `/disconnect`.'
+          content: 'Unable to create subscription. This server already has the maximum number of subscriptions. Remove some with `/unsubscribe`.'
         )
       end
 
@@ -145,7 +145,7 @@ class Setbot
       )
 
       event.interaction.edit_response(
-        content: "Connection added. All streamed sets for #{player.tag} will be announced in this channel. Use `/disconnect` to remove the connection. Optionally, add a role to ping for set notifications below."
+        content: "Subscription added. All streamed sets for #{player.tag} will be announced in this channel. Use `/unsubscribe` to remove the subscription. Optionally, add a role to ping for set notifications below."
       )
 
       event.send_message(
@@ -158,7 +158,7 @@ class Setbot
       end
     end
 
-    def handle_delete_connection_select(event:)
+    def handle_delete_subscription_select(event:)
       PlayerSubscription.find_by(
         id: event.values.first,
         discord_server_id: event.server_id,
@@ -166,7 +166,7 @@ class Setbot
       ).destroy
 
       event.interaction.update_message(
-        content: 'Connection removed.',
+        content: 'Subscription removed.',
         ephemeral: true
       )
     end
@@ -181,7 +181,7 @@ class Setbot
       subscription.save!
 
       event.interaction.update_message(
-        content: "<@&#{event.values.first.id}> will be pinged for all set notifications for #{subscription.player.tag}.",
+        content: "<@&#{event.values.first.id}> will be pinged for all set notifications for #{subscription.player.tag}."
       )
     end
 
@@ -199,68 +199,65 @@ class Setbot
         next if previous_notifications.any? do |notification|
           metadata = notification&.metadata&.with_indifferent_access
           metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
-            metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
-            metadata[:startgg_set_id]&.to_s == startgg_set_id
+          metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
+          metadata[:startgg_set_id]&.to_s == startgg_set_id
         end
 
         StatsD.increment('setbot.notification.set_live')
 
-        begin
-          Notification.send_notification(
-            subscription,
-            type: Notification::TYPE_SETBOT_SET_LIVE,
-            platform: Notification::PLATFORM_DISCORD,
-            metadata: {
-              discord_server_id: subscription.discord_server_id,
-              discord_channel_id: subscription.discord_channel_id,
-              startgg_set_id:
-            }
-          ) do |subscription|
-            instrument('post') do
-              builder = Discordrb::Webhooks::Builder.new
+        Notification.send_notification(
+          subscription,
+          type: Notification::TYPE_SETBOT_SET_LIVE,
+          platform: Notification::PLATFORM_DISCORD,
+          metadata: {
+            discord_server_id: subscription.discord_server_id,
+            discord_channel_id: subscription.discord_channel_id,
+            startgg_set_id:
+          }
+        ) do |subscription|
+          instrument('post') do
+            builder = Discordrb::Webhooks::Builder.new
 
-              content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
+            content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
 
-              if subscription.discord_role_id.present?
-                content += "\n\n<@&#{subscription.discord_role_id}>"
-              end
+            content += "\n\n<@&#{subscription.discord_role_id}>" if subscription.discord_role_id.present?
 
-              builder.content = content
+            builder.content = content
 
-              builder.add_embed do |embed|
-                embed.title = stream_name
-                embed.url = "https://twitch.tv/#{stream_name}"
+            builder.add_embed do |embed|
+              embed.title = stream_name
+              embed.url = "https://twitch.tv/#{stream_name}"
 
-                embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
+              embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
 
-                embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
-                embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+              embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
 
-                embed.footer = Api::Discord::DEFAULT_FOOTER
-              end
-
-              bot.send_message(
-                subscription.discord_channel_id,
-                builder.content,
-                false, # tts
-                builder.embeds
-              )
+              embed.footer = Api::Discord::DEFAULT_FOOTER
             end
-          rescue => e
-            Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
-            Sentry.capture_exception(e)
+
+            bot.send_message(
+              subscription.discord_channel_id,
+              builder.content,
+              false, # tts
+              builder.embeds
+            )
           end
+        rescue => e
+          Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
+          Sentry.capture_exception(e)
         end
+
       end
     end
 
     def register_commands
       server_id = Rails.env.production? ? nil : SMASHRADAR_SERVER_ID
-      Rails.logger.info("Registering application commands for server #{server_id}...")
+      Rails.logger.info('Registering application commands...')
 
       register_or_edit_application_command(
-        Rails.env.production? ? :connect : :connect_dev,
-        description: 'Add a Setbot connection',
+        Rails.env.production? ? :subscribe : :subscribe_dev,
+        description: 'Add a Setbot subscription',
         default_member_permissions: 1 << 5,
         server_id:
       ) do |cmd|
@@ -268,8 +265,8 @@ class Setbot
       end
 
       register_or_edit_application_command(
-        Rails.env.production? ? :disconnect : :disconnect_dev,
-        description: 'Remove a Setbot connection',
+        Rails.env.production? ? :unsubscribe : :unsubscribe_dev,
+        description: 'Remove a Setbot subscription',
         default_member_permissions: 1 << 5,
         server_id:
       )
@@ -284,11 +281,11 @@ class Setbot
       end
 
       if existing_commands[name]
-        bot.edit_application_command(existing_commands[name].id, description:, default_member_permissions:) do |cmd|
+        bot.edit_application_command(existing_commands[name].id, description:, default_member_permissions:, server_id:) do |cmd|
           yield(cmd) if block_given?
         end
       else
-        bot.register_application_command(name, description, default_member_permissions:) do |cmd|
+        bot.register_application_command(name, description, default_member_permissions:, server_id:) do |cmd|
           yield(cmd) if block_given?
         end
       end
@@ -304,7 +301,7 @@ class Setbot
     end
 
     def player_subscription_limit(discord_server_id)
-      return DiscordServer.find_by(discord_server_id:)&.player_subscription_limit || 5
+      DiscordServer.find_by(discord_server_id:)&.player_subscription_limit || 5
     end
 
     def bot
