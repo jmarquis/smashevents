@@ -48,7 +48,7 @@ class Setbot
     end
 
     def handle_subscribe_command(event:)
-      if PlayerSubscription.where(discord_server_id: event.server_id).count >= 5
+      if PlayerSubscription.where(discord_server_id: event.server_id).count >= player_subscription_limit(event.server_id)
         event.respond(
           content: 'Unable to create subscription. This server already has the maximum number of subscriptions. Remove some with `/unsubscribe`.',
           ephemeral: true
