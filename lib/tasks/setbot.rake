@@ -8,8 +8,4 @@ namespace :setbot do
     Setbot.register_commands
   end
 
-  task register_test_commands: [:environment] do
-    Setbot.register_test_commands
-  end
-
 end
