@@ -9,7 +9,7 @@ services:
   vite:
     build: .
     platform: linux/amd64
-    command: sh -c "bun install && bin/vite dev"
+    command: sh -c "npm ci && bin/vite dev"
     tty: true
     environment:
       VITE_RUBY_HOST: 0.0.0.0
