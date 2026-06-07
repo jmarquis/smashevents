@@ -19,7 +19,7 @@ class ApplicationController < BaseController
 
     if params[:player]
       @tournaments = @tournaments
-        .joins(events: { entrants: :player})
+        .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
     end
 

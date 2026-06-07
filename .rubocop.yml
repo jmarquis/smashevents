@@ -84,3 +84,9 @@ Style/NumericLiterals:
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
+
+Style/ExplicitBlockArgument:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false

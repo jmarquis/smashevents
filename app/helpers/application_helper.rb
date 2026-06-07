@@ -6,7 +6,7 @@ module ApplicationHelper
 
   def remove_game_link(game, selected_games)
     new_selected_games = selected_games.reject { |selected_game| selected_game.slug == game.slug }
-    link_to 'X', CGI::unescape(new_selected_games.count == 1 ? url_for(game: new_selected_games.first.slug) : url_for(games: new_selected_games.map(&:slug).join(',')))
+    link_to 'X', CGI.unescape(new_selected_games.count == 1 ? url_for(game: new_selected_games.first.slug) : url_for(games: new_selected_games.map(&:slug).join(',')))
   end
 
   def stream_link(stream)
@@ -14,9 +14,12 @@ module ApplicationHelper
 
     case stream[:source].downcase
     when Tournament::STREAM_SOURCE_TWITCH
-      link_to inline_svg_tag('twitch.svg') + stream[:name], "https://twitch.tv/#{stream[:name]}",
+      link_to(
+        inline_svg_tag('twitch.svg') + stream[:name],
+        "https://twitch.tv/#{stream[:name]}",
         target: '_blank',
         title: stream[:status] == Tournament::STREAM_STATUS_LIVE ? "#{stream[:game]} | #{stream[:title]}" : nil
+      )
     when Tournament::STREAM_SOURCE_YOUTUBE
       link_to inline_svg_tag('youtube.svg') + stream[:name], stream[:url], target: '_blank'
     end
@@ -24,7 +27,7 @@ module ApplicationHelper
 
   def colors_css(action)
     case action
-    when 'past' 
+    when 'past'
       if Flag.radar?
         [
           '--color-bg: #121212',
@@ -32,7 +35,7 @@ module ApplicationHelper
           '--color-bg-3: #555555',
           '--color-text: #AEAEAE',
           '--color-text-2: #6B6B6B',
-          '--color-text-3: #DEDEDE',
+          '--color-text-3: #DEDEDE'
         ].join(';')
       else
         [
@@ -41,7 +44,7 @@ module ApplicationHelper
           '--color-bg-3: #6A6A6A',
           '--color-text: #9d9d9d',
           '--color-text-2: #555555',
-          '--color-text-3: #f1f1f1',
+          '--color-text-3: #f1f1f1'
         ].join(';')
       end
     else
@@ -52,7 +55,7 @@ module ApplicationHelper
           '--color-bg-3: #225527',
           '--color-text: #AED2B2',
           '--color-text-2: #669D6B',
-          '--color-text-3: #DCF1DE',
+          '--color-text-3: #DCF1DE'
         ].join(';')
       else
         [
@@ -61,7 +64,7 @@ module ApplicationHelper
           '--color-bg-3: #306A6A',
           '--color-text: #859d9d',
           '--color-text-2: #445555',
-          '--color-text-3: #ebf1f1',
+          '--color-text-3: #ebf1f1'
         ].join(';')
       end
     end
