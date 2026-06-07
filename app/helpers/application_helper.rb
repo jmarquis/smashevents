@@ -1,7 +1,7 @@
 module ApplicationHelper
 
   def add_game_link(game, selected_games)
-    link_to "+ #{game.name}", CGI::unescape(url_for(games: (selected_games.map(&:slug) + [game.slug]).join(',')))
+    link_to "+ #{game.name}", CGI.unescape(url_for(games: (selected_games.map(&:slug) + [game.slug]).join(',')))
   end
 
   def remove_game_link(game, selected_games)
