@@ -17,15 +17,17 @@ module Factory
         t.state = data.addr_state
         t.country = data.country_code
 
-        t.banner_image_url = data.images.blank? ? nil : data.images
-          .filter { |image| image.type == 'banner' }
-          .map { |image| image.url.gsub(/\?.*/, '') }
-          .first
+        if data.images.present?
+          t.banner_image_url = data.images
+            .filter { |image| image.type == 'banner' }
+            .map { |image| image.url.gsub(/\?.*/, '') }
+            .first
 
-        t.profile_image_url = data.images.blank? ? nil : data.images
-          .filter { |image| image.type == 'profile' }
-          .map { |image| image.url.gsub(/\?.*/, '') }
-          .first
+          t.profile_image_url = data.images
+            .filter { |image| image.type == 'profile' }
+            .map { |image| image.url.gsub(/\?.*/, '') }
+            .first
+        end
 
         t.stream_data = data.streams&.map do |stream|
           stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase } || {}
@@ -49,31 +51,31 @@ module Factory
             .filter { |event| Time.at(event.start_at) >= t.start_at - 2.days }
             .max { |a, b| a.num_entrants <=> b.num_entrants }
 
-          if biggest_event.present?
-            # Look up by game because we only care about one event per game per
-            # tournament.
-            event = t.events.find_by(game:) || t.events.new
+          next unless biggest_event.present?
 
-            event.provider_event_id = biggest_event.id
-            event.slug = biggest_event.slug
-            event.state = biggest_event.state
-            event.start_at = Time.at(biggest_event.start_at)
-            event.game = game
-            event.player_count = biggest_event.num_entrants
+          # Look up by game because we only care about one event per game per
+          # tournament.
+          event = t.events.find_by(game:) || t.events.new
 
-            winner_data = biggest_event.standings&.nodes&.first&.entrant
-            if event.state == Event::STATE_COMPLETED && winner_data.present?
-              winner_entrant = event.entrants&.find_by(provider_entrant_id: winner_data.id)
-              event.winner_entrant = winner_entrant if winner_entrant.present?
-            else
-              event.winner_entrant = nil
-            end
+          event.provider_event_id = biggest_event.id
+          event.slug = biggest_event.slug
+          event.state = biggest_event.state
+          event.start_at = Time.at(biggest_event.start_at)
+          event.game = game
+          event.player_count = biggest_event.num_entrants
 
-            events << event
+          winner_data = biggest_event.standings&.nodes&.first&.entrant
+          if event.state == Event::STATE_COMPLETED && winner_data.present?
+            winner_entrant = event.entrants&.find_by(provider_entrant_id: winner_data.id)
+            event.winner_entrant = winner_entrant if winner_entrant.present?
+          else
+            event.winner_entrant = nil
           end
+
+          events << event
         end
 
-        return t, events
+        [t, events]
       end
 
       def entrant(data, event:)
