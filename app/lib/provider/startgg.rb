@@ -10,7 +10,7 @@ module Provider
       end
 
       def tournaments(page:, cursor:, after_date:, updated_after:)
-        [Api::Startgg.with_retries(5, batch_size: 15) do |batch_size|
+        [Api::Startgg.with_retries(10, batch_size: 15) do |batch_size|
           Api::Startgg.tournaments(
             batch_size:,
             page:,
