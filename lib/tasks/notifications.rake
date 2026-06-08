@@ -13,23 +13,21 @@ namespace :notifications do
       .where('tournaments.start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .each do |tournament|
-        begin
-          Notification.send_notification(
-            tournament,
-            type: Notification::TYPE_TOURNAMENT_ADDED,
-            platform: Notification::PLATFORM_TWITTER,
-            idempotent: true
-          ) do |tournament|
-            Api::Twitter.tournament_added(tournament)
+        Notification.send_notification(
+          tournament,
+          type: Notification::TYPE_TOURNAMENT_ADDED,
+          platform: Notification::PLATFORM_TWITTER,
+          idempotent: true
+        ) do |tournament|
+          Api::Twitter.tournament_added(tournament)
 
-            notification_count += 1
+          notification_count += 1
 
-            # Avoid rate limits
-            sleep 1
-          end
-        rescue X::Error
-          # Swallow errors, they got logged from the Twitter class
+          # Avoid rate limits
+          sleep 1
         end
+      rescue X::Error
+        # Swallow errors, they got logged from the Twitter class
       end
 
     # For Discord we want to notify per event since there are separate channels
