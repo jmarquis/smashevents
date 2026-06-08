@@ -38,6 +38,7 @@ module Api
                   videogameId: [#{Game.pluck(:startgg_id).join(',')}]
                 }) {
                   id
+                  name
                   slug
                   state
                   startAt
@@ -95,6 +96,7 @@ module Api
                 videogameId: [#{Game.pluck(:startgg_id).join(',')}]
               }) {
                 id
+                name
                 slug
                 state
                 startAt

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_06_194449) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_08_033744) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_194449) do
     t.string "game_slug", null: false
     t.boolean "is_seeded"
     t.string "last_upset_tweet_id"
+    t.string "name"
     t.integer "player_count"
     t.string "provider_event_id", null: false
     t.integer "ranked_player_count"
@@ -60,7 +61,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_06_194449) do
     t.datetime "updated_at", null: false
     t.bigint "winner_entrant_id"
     t.index ["provider_event_id"], name: "index_events_on_provider_event_id", unique: true
-    t.index ["tournament_id", "game_slug"], name: "index_events_on_tournament_id_and_game_slug", unique: true
     t.index ["tournament_id"], name: "index_events_on_tournament_id"
     t.index ["winner_entrant_id"], name: "index_events_on_winner_entrant_id"
   end

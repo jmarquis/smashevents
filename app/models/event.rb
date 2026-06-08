@@ -6,6 +6,7 @@
 #  entrants_synced_at  :datetime
 #  game_slug           :string           not null
 #  is_seeded           :boolean
+#  name                :string
 #  player_count        :integer
 #  ranked_player_count :integer
 #  sets_synced_at      :datetime
@@ -22,10 +23,9 @@
 #
 # Indexes
 #
-#  index_events_on_provider_event_id            (provider_event_id) UNIQUE
-#  index_events_on_tournament_id                (tournament_id)
-#  index_events_on_tournament_id_and_game_slug  (tournament_id,game_slug) UNIQUE
-#  index_events_on_winner_entrant_id            (winner_entrant_id)
+#  index_events_on_provider_event_id  (provider_event_id) UNIQUE
+#  index_events_on_tournament_id      (tournament_id)
+#  index_events_on_winner_entrant_id  (winner_entrant_id)
 #
 
 class Event < ApplicationRecord
