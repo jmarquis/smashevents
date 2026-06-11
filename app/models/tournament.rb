@@ -71,16 +71,11 @@ class Tournament < ApplicationRecord
   def should_ingest?
     return override.include unless override&.include.nil?
 
-    Game.all.each do |game|
-      event = events.find_by(game:)
-      return true if event.present? && event.should_ingest?
-    end
-
-    false
+    events.any?(&:should_ingest?)
   end
 
   def should_display?(game_slugs: Game.pluck(:slug))
-    return false if events.find_by(game_slug: game_slugs).blank?
+    return false unless events.where(game_slug: game_slugs).any?
 
     return override.include unless override&.include.blank?
 
@@ -88,9 +83,8 @@ class Tournament < ApplicationRecord
     # weeklies, ladders, etc.
     return false if end_at - start_at > 7.days
 
-    game_slugs.each do |game_slug|
-      event = events.find_by(game_slug:)
-      return true if event.present? && event.should_display?
+    events.where(game_slug: game_slugs).each do |e|
+      return true if e.should_display?
     end
 
     false
@@ -151,6 +145,14 @@ class Tournament < ApplicationRecord
     IO.copy_stream(URI.open(banner_image_url), path)
 
     path
+  end
+
+  def events_for_display(game)
+    events
+      .filter { |event| event.game_slug == game.slug }
+      .filter { |event| event.should_display? }
+      .sort_by { |event| event.player_count || 0 }
+      .reverse
   end
 
   def past?

@@ -16,22 +16,16 @@
     </div>
 
     <% @games.each do |game| %>
-      <% event = tournament.events.filter { |event| event.game_slug == game.slug }.first %>
-      <% if event.present? %>
+      <% tournament.events_for_display(game).each do |event| %>
         <div class="game">
           <h3 class="game-heading">
             <a href="<%= event.url %>" target="_blank">
-              <%= game.name %><% if event.player_count.present? && event.player_count > 0 %>:
-                <% if event.player_count > 20 %>
-                  <%= event.player_count.round(-1) %>+ players
-                <% else %>
-                  <%= event.player_count %>
-                  players
-                <% end %>
+              <%= event.display_name %><% if event.player_count.present? && event.player_count > 0 %>:
+                <%= event.player_count %> players
               <% end %>
             </a>
           </h3>
-          <% if event.start_at.present? %>
+          <% if !event.completed? && event.start_at.present? %>
             <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
               <%= event
                 .start_at
@@ -41,8 +35,7 @@
             </time>
           <% end %>
           <% if event.winner_entrant.present? %>
-            <h4>Winner:
-              <%= event.winner_player.tag %></h4>
+            <h4>Winner: <%= event.winner_player.tag %></h4>
           <% end %>
           <ul class="players">
             <% if event.featured_entrants_data.present? %>

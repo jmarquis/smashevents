@@ -77,6 +77,7 @@ namespace :notifications do
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
+      .filter(&:should_display?)
       .group_by(&:game)
       .each do |game, events|
 

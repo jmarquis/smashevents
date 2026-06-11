@@ -75,7 +75,6 @@ class Event < ApplicationRecord
     return should_display unless should_display.nil?
 
     return false unless game&.display_threshold.present?
-    return true if tournament.override.present? && tournament.override.include
     return false unless player_count.present?
 
     # Ignore long tournaments because some TOs reuse the same tournament for
@@ -91,6 +90,17 @@ class Event < ApplicationRecord
 
     score = player_count + ((ranked_player_count || 0) * 10)
     score > game.display_threshold
+  end
+
+  def tournament_has_other_events_for_game?
+    tournament.events.where(game_slug: game.slug).where.not(id:).filter(&:should_display?).any?
+  end
+
+  def display_name
+    return game.name if name.blank?
+    return name if tournament_has_other_events_for_game?
+
+    game.name
   end
 
   # Meant to be used like: "Featuring #{event.entrants_sentence}"

@@ -7,15 +7,13 @@ module Api
     class << self
 
       def tournament_added(tournament)
-        event_blurbs = tournament.events.sort_by(&:player_count).reverse.map do |event|
+        event_blurbs = tournament.events.filter(&:should_display?).sort_by(&:player_count).reverse.map do |event|
           if event.player_count.present? && event.player_count > 0
-            blurb = "#{event.game.name.upcase}: #{event.player_count} players"
+            blurb = "#{event.display_name}: #{event.player_count} players"
 
-            if event.featured_entrants.present?
-              blurb + " featuring #{event.entrants_sentence(twitter: true, show_count: false)}\n"
-            end
+            blurb + " featuring #{event.entrants_sentence(twitter: true, show_count: false)}\n" if event.featured_entrants.present?
           else
-            "#{event.game.name}: (player count TBD)"
+            "#{event.display_name}: (player count TBD)"
           end
         end
 
@@ -36,12 +34,13 @@ module Api
       end
 
       def weekend_briefing(game:, events:)
-        tournament_blurbs = events.map do |event|
-          blurb = "#{event.tournament.name.upcase} (#{event.tournament.formatted_day_range})"
+        tournament_blurbs = events.group_by(&:tournament).map do |tournament, events|
+          event = events.max_by { |event| event.player_count || 0 }
+          blurb = "#{tournament.name.upcase} (#{tournament.formatted_day_range})"
           blurb += " featuring #{event.entrants_sentence(twitter: true)}"
 
-          blurb += "\n#{event.tournament.url}"
-          blurb += " ##{event.tournament.hashtag}" if event.tournament.hashtag.present?
+          blurb += "\n#{tournament.url}"
+          blurb += " ##{tournament.hashtag}" if tournament.hashtag.present?
 
           blurb
         end.compact
@@ -72,22 +71,26 @@ module Api
       end
 
       def happening_today(tournament)
-        return unless tournament.events.map(&:should_display?).any?
+        return unless tournament.events.any?(&:should_display?)
 
-        streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
-          case stream['source'].downcase
-          when Tournament::STREAM_SOURCE_TWITCH
-            "https://twitch.tv/#{stream['name']}"
-          when Tournament::STREAM_SOURCE_YOUTUBE
-            "#{stream['url']}/live"
-          end
-        end.compact
+        streams = if tournament.stream_data.present?
+          tournament.stream_data.map do |stream|
+            case stream['source'].downcase
+            when Tournament::STREAM_SOURCE_TWITCH
+              "https://twitch.tv/#{stream['name']}"
+            when Tournament::STREAM_SOURCE_YOUTUBE
+              "#{stream['url']}/live"
+            end
+          end.compact
+        end
 
-        stream_text = streams.blank? ? nil : <<~TEXT
-          \n\n
-          Streams:
-          #{streams.join("\n")}
-        TEXT
+        stream_text = if streams.present?
+          <<~TEXT
+            \n\n
+            Streams:
+            #{streams.join("\n")}
+          TEXT
+        end
 
         events = tournament.events
           .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
@@ -98,7 +101,7 @@ module Api
         # Don't filter by should_display?, might as well just show all the events
         # on the day of.
         event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
-          "#{event.game.name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
+          "#{event.display_name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
         end
 
         text = <<~TEXT
@@ -116,7 +119,7 @@ module Api
 
       def upset_thread_intro(event)
         text = <<~TEXT
-          LIVE UPSET THREAD for #{event.tournament.name.upcase} (#{event.game.name})
+          LIVE UPSET THREAD for #{event.tournament.name.upcase} (#{event.display_name})
           \n\n
           #{event.tournament.hashtag.present? ? "##{event.tournament.hashtag} " : nil}##{event.game.hashtag}
         TEXT
@@ -143,8 +146,6 @@ module Api
       end
 
       def tweet!(text, images: [], reply_to_tweet_id: nil, remove_mentions: false)
-        text = text.slice(0, 260) if Rails.env.development?
-
         media_ids = images.map do |image|
           image.present? ? upload_image(image)['media_id_string'] : nil
         end.compact
@@ -153,10 +154,10 @@ module Api
         if reply_to_tweet_id.present? && remove_mentions
           last_tweet = tweet(reply_to_tweet_id, fields: ['entities'])
           mentions_data = last_tweet.dig('data', 'entities', 'mentions')
-          if mentions_data.present?
-            mentions = mentions_data.map { |mention| mention['id'] }
-          end
+          mentions = mentions_data.map { |mention| mention['id'] } if mentions_data.present?
         end
+
+        Rails.logger.info "TWEETING: #{text}"
 
         instrument('tweet') do
           client.post('tweets', JSON.generate({

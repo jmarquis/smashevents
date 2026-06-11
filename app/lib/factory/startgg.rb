@@ -40,32 +40,35 @@ module Factory
 
         events = []
 
-        Game.all.each do |game|
-          biggest_event = (data.events || [])
-            .filter { |event| event.videogame.id.to_i == game.startgg_id }
-            # Some TOs make a single tournament for a weekly for some reason, and
-            # just move the tournament's start_at and end_at every week. So make
-            # sure we don't consider old events part of the current tournament.
-            # NB: Give a couple days of grace because some TOs also mess this up
-            # for legitimate tournaments.
-            .filter { |event| Time.at(event.start_at) >= t.start_at - 2.days }
-            .max { |a, b| a.num_entrants <=> b.num_entrants }
+        return t, events unless data.events.present?
 
-          next unless biggest_event.present?
+        data.events.each do |startgg_event|
+          game = Game.find_by(startgg_id: startgg_event.videogame.id.to_i)
+          next unless game.present?
 
-          # Look up by game because we only care about one event per game per
-          # tournament.
-          event = t.events.find_by(game:) || t.events.new
+          unless t.override&.include
+            next unless startgg_event.num_entrants.present?
+            next unless startgg_event.num_entrants >= game.ingestion_threshold
+          end
 
-          event.provider_event_id = biggest_event.id
-          event.name = biggest_event.name
-          event.slug = biggest_event.slug
-          event.state = biggest_event.state
-          event.start_at = Time.at(biggest_event.start_at)
+          # Some TOs make a single tournament for a weekly for some reason, and
+          # just move the tournament's start_at and end_at every week. So make
+          # sure we don't consider old events part of the current tournament.
+          # NB: Give a couple days of grace because some TOs also mess this up
+          # for legitimate tournaments.
+          next unless Time.at(startgg_event.start_at) >= t.start_at - 2.days
+
+          event = t.events.find_by(provider_event_id: startgg_event.id) || t.events.new
+
+          event.provider_event_id = startgg_event.id
+          event.name = startgg_event.name
+          event.slug = startgg_event.slug
+          event.state = startgg_event.state
+          event.start_at = Time.at(startgg_event.start_at)
           event.game = game
-          event.player_count = biggest_event.num_entrants
+          event.player_count = startgg_event.num_entrants
 
-          winner_data = biggest_event.standings&.nodes&.first&.entrant
+          winner_data = startgg_event.standings&.nodes&.first&.entrant
           if event.state == Event::STATE_COMPLETED && winner_data.present?
             winner_entrant = event.entrants&.find_by(provider_entrant_id: winner_data.id)
             event.winner_entrant = winner_entrant if winner_entrant.present?

@@ -16,7 +16,12 @@ module Api
         post(game_channel_id(event.game_slug)) do |builder|
           builder.content = '## NEW EVENT ADDED'
           builder.add_embed do |embed|
-            embed.title = event.tournament.name
+            embed.title = if event.tournament_has_other_events_for_game?
+              "#{event.tournament.name}: #{event.name}"
+            else
+              event.tournament.name
+            end
+
             embed.url = event.tournament.url
 
             players_blurb = if event.player_count.present? && event.player_count > 0
@@ -29,8 +34,8 @@ module Api
               "#{event.game.name}: (player count TBD)"
             end
 
-            # List all events for the tournament just to give some context.
             embed.description = <<~TEXT
+              #{event.game.twitch_name}
               #{event.tournament.formatted_date_range}
               #{event.tournament.formatted_location}
 
@@ -48,31 +53,34 @@ module Api
       def weekend_briefing(game:, events:)
         post(game_channel_id(game.slug)) do |builder|
           builder.content = "## THIS WEEKEND IN #{game.name.upcase}"
-          events.each do |event|
-            next unless event.should_display?
+          events.group_by(&:tournament).each do |tournament, events|
 
             builder.add_embed do |embed|
-              embed.title = "#{event.tournament.name} (#{event.tournament.formatted_day_range})"
-              embed.url = event.tournament.url
+              embed.title = "#{tournament.name} (#{tournament.formatted_day_range})"
+              embed.url = tournament.url
 
               embed.description = <<~TEXT
-                #{event.tournament.formatted_date_range}
-                #{event.tournament.formatted_location}
+                #{tournament.formatted_date_range}
+                #{tournament.formatted_location}
               TEXT
 
-              embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
-              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+              embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?
+              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: tournament.profile_image_url) if tournament.profile_image_url.present?
 
-              if event.featured_entrants.present?
-                embed.description += <<~TEXT
-
-                  Featuring #{event.entrants_sentence}
-                TEXT
-              else
-                embed.description += <<~TEXT
-                  #{event.player_count} players
-                TEXT
+              event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
+                if event.featured_entrants.present?
+                  prefix = event.tournament_has_other_events_for_game? ? "#{event.name.upcase} featuring" : 'Featuring'
+                  "#{prefix} #{event.entrants_sentence}"
+                else
+                  prefix = event.tournament_has_other_events_for_game? ? "#{event.name.upcase}: " : ''
+                  "#{prefix}#{event.player_count} players"
+                end
               end
+
+              embed.description += <<~TEXT
+
+                #{event_blurbs.join("\n\n")}
+              TEXT
 
               embed.footer = DEFAULT_FOOTER
             end
@@ -97,22 +105,27 @@ module Api
         TEXT
 
         events = tournament.events
-          .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
+          .filter { |e| e.start_at <= Time.now + 12.hours }
           .filter { |e| e.state != Event::STATE_COMPLETED }
+          .filter { |e| e.should_display? }
+          .sort_by { |e| e.player_count || 0 }
+          .reverse
 
         events.group_by(&:game).each do |game, events|
-          next unless events.first.should_display? || (tournament.override.present? && tournament.override.include)
-
           post(game_channel_id(game.slug)) do |builder|
             builder.content = '## HAPPENING TODAY'
             builder.add_embed do |embed|
               embed.title = tournament.name
               embed.url = tournament.url
 
+              event_blurbs = events.map do |event|
+                "#{event.display_name.upcase} featuring #{event.entrants_sentence}"
+              end
+
               embed.description = <<~TEXT
                 #{tournament.formatted_location}
 
-                Featuring #{events.first.entrants_sentence}
+                #{event_blurbs.join("\n\n")}
                 #{stream_text}
               TEXT
 
