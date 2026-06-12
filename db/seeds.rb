@@ -8,7 +8,8 @@ melee.update!(
   parrygg_id: '01920676-416e-7838-b6aa-8d4453256f05',
   rankings_regex: /^SSBMRank/,
   ingestion_threshold: 8,
-  display_threshold: 100
+  display_threshold: 100,
+  doubles_display_threshold: 50
 )
 
 ultimate = Game.find_or_create_by!(slug: 'ultimate')
@@ -21,7 +22,8 @@ ultimate.update!(
   parrygg_id: '01920676-416e-7b49-a669-7157bd4a6934',
   rankings_regex: /^UltRank|^LumiRank/,
   ingestion_threshold: 8,
-  display_threshold: 200
+  display_threshold: 200,
+  doubles_display_threshold: 100
 )
 
 smash64 = Game.find_or_create_by!(slug: 'smash64')
@@ -73,5 +75,6 @@ rivals2.update!(
   parrygg_id: '01951d83-6be9-734e-9533-0db8e881e149',
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
-  display_threshold: 60
+  display_threshold: 60,
+  doubles_display_threshold: 40
 )

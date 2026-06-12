@@ -20,32 +20,25 @@ module Api
               }
             }) {
               nodes {
+                addrState
+                city
+                countryCode
+                endAt
+                hashtag
                 id
                 name
                 slug
-                hashtag
                 startAt
-                endAt
                 timezone
-                city
-                addrState
-                countryCode
-                images {
-                  type
-                  url
-                }
                 events(filter: {
                   videogameId: [#{Game.pluck(:startgg_id).join(',')}]
                 }) {
                   id
                   name
-                  slug
-                  state
-                  startAt
                   numEntrants
-                  videogame {
-                    id
-                  }
+                  slug
+                  startAt
+                  state
                   standings(query: {
                     sortBy: "placement desc",
                     page: 1,
@@ -58,6 +51,10 @@ module Api
                       }
                     }
                   }
+                }
+                images {
+                  type
+                  url
                 }
                 streams {
                   streamName
@@ -78,29 +75,25 @@ module Api
         query = <<~GRAPHQL
           query($slug: String) {
             tournament(slug: $slug) {
+              addrState
+              city
+              countryCode
+              endAt
+              hashtag
               id
               name
               slug
-              hashtag
               startAt
-              endAt
               timezone
-              city
-              addrState
-              countryCode
-              images {
-                type
-                url
-              }
               events(filter: {
                 videogameId: [#{Game.pluck(:startgg_id).join(',')}]
               }) {
                 id
                 name
-                slug
-                state
-                startAt
                 numEntrants
+                slug
+                startAt
+                state
                 videogame {
                   id
                 }
@@ -116,6 +109,10 @@ module Api
                     }
                   }
                 }
+              }
+              images {
+                type
+                url
               }
               streams {
                 streamName
@@ -152,19 +149,19 @@ module Api
               entrants(query: { page: $page, perPage: $perPage }) {
                 nodes {
                   id
-                  name
                   initialSeedNum
+                  name
                   participants {
                     player {
-                      id
                       gamerTag
+                      id
                       #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
                         rank
                         title
                       }
                       user {
-                        id
                         discriminator
+                        id
                         name
                         authorizations(types: [TWITTER]) {
                           externalUsername
@@ -197,6 +194,9 @@ module Api
                 nodes {
                   completedAt
                   id
+                  startedAt
+                  state
+                  winnerId
                   phaseGroup {
                     bracketType
                   }
@@ -218,13 +218,10 @@ module Api
                       }
                     }
                   }
-                  startedAt
-                  state
                   stream {
                     streamName
                     streamSource
                   }
-                  winnerId
                 }
               }
             }
@@ -251,6 +248,9 @@ module Api
                 nodes {
                   completedAt
                   id
+                  startedAt
+                  state
+                  winnerId
                   phaseGroup {
                     bracketType
                   }
@@ -272,13 +272,10 @@ module Api
                       }
                     }
                   }
-                  startedAt
-                  state
                   stream {
                     streamName
                     streamSource
                   }
-                  winnerId
                 }
               }
             }
@@ -296,6 +293,9 @@ module Api
             set(id: $setId) {
               completedAt
               id
+              startedAt
+              state
+              winnerId
               phaseGroup {
                 bracketType
               }
@@ -317,13 +317,10 @@ module Api
                   }
                 }
               }
-              startedAt
-              state
               stream {
                 streamName
                 streamSource
               }
-              winnerId
             }
           }
         GRAPHQL
