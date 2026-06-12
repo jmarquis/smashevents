@@ -49,6 +49,10 @@ module Ingestor
                 tournament.save!
                 events.each(&:save!)
 
+                tournament.events.each do |event|
+                  Rails.cache.delete("tournament_has_other_events_for_game_#{event.id}")
+                end
+
                 StatsD.increment("#{provider_name}.tournament_updated")
                 updated_log(tournament, events)
                 stats[:updated] += 1

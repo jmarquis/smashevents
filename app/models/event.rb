@@ -93,7 +93,9 @@ class Event < ApplicationRecord
   end
 
   def tournament_has_other_events_for_game?
-    tournament.events.where(game_slug: game.slug).where.not(id:).filter(&:should_display?).any?
+    Rails.cache.fetch("tournament_has_other_events_for_game_#{id}", expires_in: Rails.env.development? ? 5.seconds : 1.day) do
+      tournament.events.where(game_slug: game.slug).where.not(id:).filter(&:should_display?).any?
+    end
   end
 
   def display_name
