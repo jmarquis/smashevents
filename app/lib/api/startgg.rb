@@ -39,6 +39,9 @@ module Api
                   slug
                   startAt
                   state
+                  teamRosterSize {
+                    minPlayers
+                  }
                   standings(query: {
                     sortBy: "placement desc",
                     page: 1,
@@ -50,6 +53,9 @@ module Api
                         id
                       }
                     }
+                  }
+                  videogame {
+                    id
                   }
                 }
                 images {
@@ -94,6 +100,9 @@ module Api
                 slug
                 startAt
                 state
+                teamRosterSize {
+                  minPlayers
+                }
                 videogame {
                   id
                 }
