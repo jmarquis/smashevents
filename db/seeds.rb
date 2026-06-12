@@ -9,7 +9,7 @@ melee.update!(
   rankings_regex: /^SSBMRank/,
   ingestion_threshold: 8,
   display_threshold: 100,
-  doubles_display_threshold: 50
+  # doubles_display_threshold: 50
 )
 
 ultimate = Game.find_or_create_by!(slug: 'ultimate')
@@ -23,7 +23,7 @@ ultimate.update!(
   rankings_regex: /^UltRank|^LumiRank/,
   ingestion_threshold: 8,
   display_threshold: 200,
-  doubles_display_threshold: 100
+  # doubles_display_threshold: 100
 )
 
 smash64 = Game.find_or_create_by!(slug: 'smash64')
@@ -76,5 +76,5 @@ rivals2.update!(
   rankings_regex: /^NA RCS/,
   ingestion_threshold: 8,
   display_threshold: 60,
-  doubles_display_threshold: 40
+  # doubles_display_threshold: 40
 )
