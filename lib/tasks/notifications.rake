@@ -178,7 +178,7 @@ namespace :notifications do
 
               notification_count += 1
             end
-          rescue X::Error
+          rescue X::Error # rubocop:disable Lint/SuppressedException
           end
         end
 
