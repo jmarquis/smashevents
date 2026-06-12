@@ -24,8 +24,8 @@ module Api
 
             embed.url = event.tournament.url
 
-            players_blurb = if event.entrant_count.present? && event.entrant_count > 0
-              blurb = "#{event.entrant_count} players"
+            players_blurb = if event.player_count.present? && event.player_count > 0
+              blurb = "#{event.player_count} players"
 
               blurb += " featuring #{event.entrants_sentence(show_count: false)}\n" if event.featured_entrants.present?
 
@@ -73,7 +73,7 @@ module Api
                   "#{prefix} #{event.entrants_sentence}"
                 else
                   prefix = event.tournament_has_other_events_for_game? ? "#{event.name.upcase}: " : ''
-                  "#{prefix}#{event.entrant_count} players"
+                  "#{prefix}#{event.player_count} players"
                 end
               end
 
@@ -108,7 +108,7 @@ module Api
           .filter { |e| e.start_at <= Time.now + 12.hours }
           .filter { |e| e.state != Event::STATE_COMPLETED }
           .filter { |e| e.should_display? }
-          .sort_by { |e| e.entrant_count || 0 }
+          .sort_by { |e| e.player_count || 0 }
           .reverse
 
         events.group_by(&:game).each do |game, events|

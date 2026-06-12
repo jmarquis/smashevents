@@ -82,7 +82,7 @@ namespace :notifications do
       .group_by(&:game)
       .each do |game, events|
 
-        events = events.sort_by(&:entrant_count).reverse
+        events = events.sort_by(&:player_count).reverse
 
         Notification.send_notification(
           events,
@@ -128,7 +128,7 @@ namespace :notifications do
       .filter { |event| event.winner_entrant.present? }
       .group_by(&:game)
       .each do |game, events|
-        events = events.sort_by(&:entrant_count).reverse
+        events = events.sort_by(&:player_count).reverse
 
         Notification.send_notification(
           events,

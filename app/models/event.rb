@@ -66,7 +66,7 @@ class Event < ApplicationRecord
   def should_ingest?
     return false unless game&.ingestion_threshold.present?
 
-    entrant_count.present? && entrant_count >= game.ingestion_threshold
+    player_count.present? && player_count >= game.ingestion_threshold
   end
 
   def should_display?
@@ -76,7 +76,7 @@ class Event < ApplicationRecord
     return should_display unless should_display.nil?
 
     return false unless game&.display_threshold.present?
-    return false unless entrant_count.present?
+    return false unless player_count.present?
 
     # Ignore long tournaments because some TOs reuse the same tournament for
     # weeklies, ladders, etc.
@@ -84,12 +84,12 @@ class Event < ApplicationRecord
 
     # If the event is stacked with ranked players, always display it. This
     # should catch invitationals and stuff.
-    if ranked_player_count.present? && ranked_player_count > 0 && entrant_count.present? && entrant_count >= 8
-      return true if ranked_player_count.to_f / entrant_count.to_f > 0.4
+    if ranked_player_count.present? && ranked_player_count > 0 && player_count.present? && player_count >= 8
+      return true if ranked_player_count.to_f / player_count.to_f > 0.4
       return true if ranked_player_count > 10
     end
 
-    score = entrant_count + ((ranked_player_count || 0) * 10)
+    score = player_count + ((ranked_player_count || 0) * 10)
     score > game.display_threshold
   end
 
@@ -106,6 +106,10 @@ class Event < ApplicationRecord
     game.name
   end
 
+  def player_count
+    (entrant_count || 0) * (entrant_size || 1)
+  end
+
   # Meant to be used like: "Featuring #{event.entrants_sentence}"
   def entrants_sentence(twitter: false, show_count: true)
     entrants = featured_entrants
@@ -115,12 +119,12 @@ class Event < ApplicationRecord
       entrants_tags = entrants.map { |entrant| entrant.tag(twitter:) }
 
       if show_count && remaining_entrant_count >= 10
-        [*entrants_tags, "#{entrant_count - entrants.count} more!"].to_sentence
+        [*entrants_tags, "#{player_count - (entrants.count * (entrant_size || 1))} more!"].to_sentence
       else
         [*entrants_tags, 'more!'].to_sentence
       end
     elsif show_count
-      "#{entrant_count} players!"
+      "#{player_count} players!"
     end
   end
 
@@ -248,7 +252,7 @@ class Event < ApplicationRecord
   end
 
   def upset_factor_threshold
-    return 3 if entrant_count <= 1000
+    return 3 if player_count <= 1000
 
     4
   end
