@@ -20,8 +20,8 @@
         <div class="game">
           <h3 class="game-heading">
             <a href="<%= event.url %>" target="_blank">
-              <%= event.display_name %><% if event.player_count.present? && event.player_count > 0 %>:
-                <%= event.player_count %> players
+              <%= event.display_name %><% if event.entrant_count.present? && event.entrant_count > 0 %>:
+                <%= event.entrant_count %> players
               <% end %>
             </a>
           </h3>

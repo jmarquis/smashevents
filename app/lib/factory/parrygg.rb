@@ -59,7 +59,7 @@ module Factory
           event.state = biggest_event[:state]
           event.start_at = DateTime.parse(biggest_event[:startDate])
           event.game = game
-          event.player_count = biggest_event[:entrantCount]
+          event.entrant_count = biggest_event[:entrantCount]
 
           # TODO: Figure out a way to get winner data
 

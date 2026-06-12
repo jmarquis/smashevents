@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_033744) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_192240) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -44,12 +44,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_033744) do
 
   create_table "events", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "entrant_count"
+    t.integer "entrant_size"
     t.datetime "entrants_synced_at"
     t.string "game_slug", null: false
     t.boolean "is_seeded"
     t.string "last_upset_tweet_id"
     t.string "name"
-    t.integer "player_count"
     t.string "provider_event_id", null: false
     t.integer "ranked_player_count"
     t.datetime "sets_synced_at"

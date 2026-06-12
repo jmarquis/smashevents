@@ -7,9 +7,9 @@ module Api
     class << self
 
       def tournament_added(tournament)
-        event_blurbs = tournament.events.filter(&:should_display?).sort_by(&:player_count).reverse.map do |event|
-          if event.player_count.present? && event.player_count > 0
-            blurb = "#{event.display_name}: #{event.player_count} players"
+        event_blurbs = tournament.events.filter(&:should_display?).sort_by(&:entrant_count).reverse.map do |event|
+          if event.entrant_count.present? && event.entrant_count > 0
+            blurb = "#{event.display_name}: #{event.entrant_count} players"
 
             blurb + " featuring #{event.entrants_sentence(twitter: true, show_count: false)}\n" if event.featured_entrants.present?
           else
@@ -35,7 +35,7 @@ module Api
 
       def weekend_briefing(game:, events:)
         tournament_blurbs = events.group_by(&:tournament).map do |tournament, events|
-          event = events.max_by { |event| event.player_count || 0 }
+          event = events.max_by { |event| event.entrant_count || 0 }
           blurb = "#{tournament.name.upcase} (#{tournament.formatted_day_range})"
           blurb += " featuring #{event.entrants_sentence(twitter: true)}"
 
@@ -100,7 +100,7 @@ module Api
 
         # Don't filter by should_display?, might as well just show all the events
         # on the day of.
-        event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
+        event_blurbs = events.sort_by(&:entrant_count).reverse.map do |event|
           "#{event.display_name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
         end
 

@@ -63,7 +63,7 @@ module Ingestor
 
               stats[:imported] += 1
               StatsD.increment("#{provider_name}.tournament_added")
-              event_blurbs = events.map { |event| "#{event.game.slug}: #{event.player_count}" }
+              event_blurbs = events.map { |event| "#{event.game.slug}: #{event.entrant_count}" }
               Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
             end
           end
@@ -125,7 +125,7 @@ module Ingestor
             events.each(&:save!)
 
             StatsD.increment("#{provider_name}.tournament_added")
-            event_blurbs = events.map { |event| "#{event.game.slug}: #{event.player_count}" }
+            event_blurbs = events.map { |event| "#{event.game.slug}: #{event.entrant_count}" }
             Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(',')}"
             stats[:imported] += 1
           end

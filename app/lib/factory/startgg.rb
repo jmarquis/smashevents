@@ -66,7 +66,7 @@ module Factory
           event.state = startgg_event.state
           event.start_at = Time.at(startgg_event.start_at)
           event.game = game
-          event.player_count = startgg_event.num_entrants
+          event.entrant_count = startgg_event.num_entrants
 
           winner_data = startgg_event.standings&.nodes&.first&.entrant
           if event.state == Event::STATE_COMPLETED && winner_data.present?

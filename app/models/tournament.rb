@@ -53,12 +53,12 @@ class Tournament < ApplicationRecord
           .or(
             where(override: { include: true }).or(
               where("end_at - tournaments.start_at <= interval '7 days'").merge(
-                where.not(events: { player_count: nil }).merge(
-                  where('coalesce(events.player_count, 0) >= 8').merge(
-                    where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.player_count, 1) = 0 then 1.0 else coalesce(events.player_count, 1)::float end > ?', 0.3).or(
+                where.not(events: { entrant_count: nil }).merge(
+                  where('coalesce(events.entrant_count, 0) >= 8').merge(
+                    where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.entrant_count, 1) = 0 then 1.0 else coalesce(events.entrant_count, 1)::float end > ?', 0.3).or(
                       where('events.ranked_player_count > ?', 10)
                     ).or(
-                      where('coalesce(events.player_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
+                      where('coalesce(events.entrant_count, 0) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
                     )
                   )
                 )
@@ -151,7 +151,7 @@ class Tournament < ApplicationRecord
     events
       .filter { |event| event.game_slug == game.slug }
       .filter { |event| event.should_display? }
-      .sort_by { |event| event.player_count || 0 }
+      .sort_by { |event| event.entrant_count || 0 }
       .reverse
   end
 
