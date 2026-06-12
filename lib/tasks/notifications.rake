@@ -37,6 +37,7 @@ namespace :notifications do
       .where('tournaments.start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
       .map(&:events)
+      .filter(&:should_display?)
       .flatten
       .each do |event|
         Notification.send_notification(
