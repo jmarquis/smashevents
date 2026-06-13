@@ -164,6 +164,10 @@ class Event < ApplicationRecord
     state == STATE_COMPLETED
   end
 
+  def in_progress?
+    state == STATE_ACTIVE
+  end
+
   def sync_entrants!
     Rails.logger.info "Syncing entrants for #{tournament.slug} (#{game.slug})..."
     entrants = []
