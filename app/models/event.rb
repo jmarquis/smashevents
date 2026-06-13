@@ -103,7 +103,13 @@ class Event < ApplicationRecord
     return game.name if name.blank?
     return name if tournament_has_other_events_for_game?
 
-    game.name
+    "#{game.name} #{bracket_label}"
+  end
+
+  def bracket_label
+    return 'Doubles' if entrant_size == 2
+
+    'Singles'
   end
 
   def player_count

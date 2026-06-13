@@ -9,11 +9,11 @@ module Api
       def tournament_added(tournament)
         event_blurbs = tournament.events.filter(&:should_display?).sort_by(&:player_count).reverse.map do |event|
           if event.player_count.present? && event.player_count > 0
-            blurb = "#{event.display_name}: #{event.player_count} players"
+            blurb = "#{event.display_name.upcase}: #{event.player_count} players"
 
             blurb + " featuring #{event.entrants_sentence(twitter: true, show_count: false)}\n" if event.featured_entrants.present?
           else
-            "#{event.display_name}: (player count TBD)"
+            "#{event.display_name.upcase}: (player count TBD)"
           end
         end
 
