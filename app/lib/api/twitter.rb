@@ -58,7 +58,13 @@ module Api
 
       def congratulations(game:, events:)
         blurbs = events.map do |event|
-          "Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event.tournament.name.upcase} (#{event.display_name})!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}"
+          event_name = if event.tournament_has_other_events_for_game?
+            "#{event.tournament.name.upcase} (#{event.display_name})"
+          else
+            event.tournament.name.upcase
+          end
+
+          "Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event_name})!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}"
         end
 
         text = <<~TEXT
