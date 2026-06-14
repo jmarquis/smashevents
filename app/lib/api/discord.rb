@@ -16,22 +16,16 @@ module Api
         post(game_channel_id(event.game_slug)) do |builder|
           builder.content = '## NEW EVENT ADDED'
           builder.add_embed do |embed|
-            embed.title = if event.tournament_has_other_events_for_game?
-              "#{event.tournament.name}: #{event.name}"
-            else
-              event.tournament.name
-            end
+            embed.title = event.tournament.name
 
             embed.url = event.tournament.url
 
-            players_blurb = if event.player_count.present? && event.player_count > 0
-              blurb = "#{event.player_count} players"
-
-              blurb += " featuring #{event.entrants_sentence(show_count: false)}\n" if event.featured_entrants.present?
-
-              blurb
+            blurb = if event.featured_entrants.present?
+              "#{event.display_name} featuring #{event.entrants_sentence}\n"
+            elsif event.player_count.present?
+              "#{event.display_name}: #{event.player_count} players"
             else
-              "#{event.game.name}: (player count TBD)"
+              "#{event.display_name}: (player count TBD)"
             end
 
             embed.description = <<~TEXT
@@ -39,7 +33,7 @@ module Api
               #{event.tournament.formatted_date_range}
               #{event.tournament.formatted_location}
 
-              #{players_blurb}
+              #{blurb}
             TEXT
 
             embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?

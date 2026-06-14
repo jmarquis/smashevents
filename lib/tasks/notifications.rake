@@ -12,14 +12,28 @@ namespace :notifications do
       .should_display
       .where('tournaments.start_at > ?', Time.now)
       .order(start_at: :asc, name: :asc)
-      .each do |tournament|
+      .map(&:events)
+      .flatten
+      .filter(&:should_display?)
+      .group_by(&:tournament)
+      .each do |tournament, events|
+        # We used to notify once per tournament, in which case we don't know
+        # which events have already been announced, so we'll just have to skip
+        # these to avoid over-notifying.
+        next if Notification.exists?(
+          notifiable: tournament,
+          notification_type: Notification::TYPE_TOURNAMENT_ADDED,
+          platform: Notification::PLATFORM_TWITTER,
+          success: true
+        )
+
         Notification.send_notification(
-          tournament,
-          type: Notification::TYPE_TOURNAMENT_ADDED,
+          events,
+          type: Notification::TYPE_EVENT_ADDED,
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
-        ) do |tournament|
-          tweet = Api::Twitter.tournament_added(tournament)
+        ) do |events|
+          tweet = Api::Twitter.events_added(tournament:, events:)
 
           if tweet.present?
             tournament.last_announcement_tweet_id = tweet['data']['id']

@@ -6,8 +6,20 @@ module Api
 
     class << self
 
-      def tournament_added(tournament)
-        event_blurbs = tournament.events.filter(&:should_display?).sort_by(&:player_count).reverse.map do |event|
+      def events_added(tournament:, events:)
+        intro = if tournament.last_announcement_tweet_id.present?
+          "#{'Event'.pluralize(events.size)} added for #{tournament.name.upcase}!"
+        else
+          <<~TEXT
+            New tournament added to Smash Radar!
+            \n\n
+            #{tournament.name.upcase}
+            #{tournament.formatted_date_range}
+            #{tournament.formatted_location}
+          TEXT
+        end
+
+        event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
           if event.player_count.present? && event.player_count > 0
             blurb = "#{event.display_name.upcase}: #{event.player_count} players"
 
@@ -17,20 +29,29 @@ module Api
           end
         end
 
+        outro = if tournament.last_announcement_tweet_id.present?
+          tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil
+        else
+          <<~TEXT
+            #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
+            \n\n
+            #{tournament.url}
+          TEXT
+        end
+
         text = <<~TEXT
-          New tournament added to Smash Radar!
-          \n\n
-          #{tournament.name.upcase}
-          #{tournament.formatted_date_range}
-          #{tournament.formatted_location}
+          #{intro}
           \n\n
           #{event_blurbs.join("\n")}
-          #{tournament.hashtag.present? ? "\n\n##{tournament.hashtag}" : nil}
           \n\n
-          #{tournament.url}
+          #{outro}
         TEXT
 
-        tweet!(text)
+        tweet!(
+          text,
+          reply_to_tweet_id: tournament.last_announcement_tweet_id,
+          remove_mentions: true
+        )
       end
 
       def weekend_briefing(game:, events:)
@@ -140,7 +161,11 @@ module Api
           UPSET FACTOR #{Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)}
         TEXT
 
-        tweet!(text, reply_to_tweet_id: event.last_upset_tweet_id, remove_mentions: true)
+        tweet!(
+          text,
+          reply_to_tweet_id: event.last_upset_tweet_id,
+          remove_mentions: true
+        )
       end
 
       def tweet(id, fields: nil)
@@ -152,6 +177,8 @@ module Api
       end
 
       def tweet!(text, images: [], reply_to_tweet_id: nil, remove_mentions: false)
+        Rails.logger.info "TWEETING: #{text}"
+
         media_ids = images.map do |image|
           image.present? ? upload_image(image)['media_id_string'] : nil
         end.compact
@@ -162,8 +189,6 @@ module Api
           mentions_data = last_tweet.dig('data', 'entities', 'mentions')
           mentions = mentions_data.map { |mention| mention['id'] } if mentions_data.present?
         end
-
-        Rails.logger.info "TWEETING: #{text}"
 
         instrument('tweet') do
           client.post('tweets', JSON.generate({
