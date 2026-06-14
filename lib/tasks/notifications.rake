@@ -19,7 +19,12 @@ namespace :notifications do
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |tournament|
-          Api::Twitter.tournament_added(tournament)
+          tweet = Api::Twitter.tournament_added(tournament)
+
+          if tweet.present?
+            tournament.last_announcement_tweet_id = tweet['data']['id']
+            tournament.save
+          end
 
           notification_count += 1
 

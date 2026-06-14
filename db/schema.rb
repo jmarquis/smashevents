@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_192240) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_195142) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -143,6 +143,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_192240) do
     t.datetime "created_at", null: false
     t.datetime "end_at"
     t.string "hashtag"
+    t.string "last_announcement_tweet_id"
     t.string "name"
     t.string "profile_image_url"
     t.string "provider"

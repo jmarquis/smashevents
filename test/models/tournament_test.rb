@@ -2,23 +2,24 @@
 #
 # Table name: tournaments
 #
-#  id                     :bigint           not null, primary key
-#  banner_image_url       :string
-#  city                   :string
-#  country                :string
-#  end_at                 :datetime
-#  hashtag                :string
-#  name                   :string
-#  profile_image_url      :string
-#  provider               :string
-#  slug                   :string
-#  start_at               :datetime
-#  state                  :string
-#  stream_data            :json
-#  timezone               :string
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  provider_tournament_id :string
+#  id                         :bigint           not null, primary key
+#  banner_image_url           :string
+#  city                       :string
+#  country                    :string
+#  end_at                     :datetime
+#  hashtag                    :string
+#  name                       :string
+#  profile_image_url          :string
+#  provider                   :string
+#  slug                       :string
+#  start_at                   :datetime
+#  state                      :string
+#  stream_data                :json
+#  timezone                   :string
+#  created_at                 :datetime         not null
+#  updated_at                 :datetime         not null
+#  last_announcement_tweet_id :string
+#  provider_tournament_id     :string
 #
 # Indexes
 #
