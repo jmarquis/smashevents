@@ -20,8 +20,14 @@ namespace :twitch do
         live_streams = Api::Twitch.streams(streams:)
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
+          game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game])
+          potential_events = tournament.events.where(game_slug: game.slug)
 
-          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH && stream[:name].downcase.in?(live_streams) && Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game]).present?
+          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH
+            && stream[:name].downcase.in?(live_streams)
+            && game.present?
+            && potential_events.any?(&:should_display?)
+
             should_notify = stream[:status] != Tournament::STREAM_STATUS_LIVE
 
             stream[:status] = Tournament::STREAM_STATUS_LIVE
