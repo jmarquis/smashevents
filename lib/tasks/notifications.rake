@@ -5,9 +5,6 @@ namespace :notifications do
     Rails.logger.info 'Scanning for new event notifications that need to be sent...'
     notification_count = 0
 
-    # We only do this notification once per tournament for Twitter, and just
-    # list all the games regardless of player count as soon as one event has
-    # crossed the display threshold.
     Tournament
       .should_display
       .where('tournaments.start_at > ?', Time.now)
