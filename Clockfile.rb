@@ -3,20 +3,18 @@ using RubyClock::DSL
 
 around_action do |job_proc, job_info|
   Rails.logger.formatter.set_entrypoint(job_info[:task])
-  Rails.logger.debug "Starting task"
+  Rails.logger.debug 'Starting task'
   StatsD.measure("cron.total_time.#{job_info[:task].gsub(':', '_')}") do
     Sentry.with_exception_captured do
       job_proc.call
     end
   end
-  Rails.logger.debug "Task finished"
-  STDOUT.flush
+  Rails.logger.debug 'Task finished'
+  $stdout.flush
 end
 
-on_error do |job, error|
-  if job.is_a?(String)
-    Sentry.capture_exception(StandardError.new('Error when loading Clockfile'))
-  end
+on_error do |job, _error|
+  Sentry.capture_exception(StandardError.new('Error when loading Clockfile')) if job.is_a?(String)
 end
 
 
