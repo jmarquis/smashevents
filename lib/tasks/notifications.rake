@@ -14,9 +14,9 @@ namespace :notifications do
       .filter(&:should_display?)
       .group_by(&:tournament)
       .each do |tournament, events|
-        # We used to notify once per tournament, in which case we don't know
-        # which events have already been announced, so we'll just have to skip
-        # these to avoid over-notifying.
+        # We used to notify only once per tournament, in which case we don't
+        # know which events have already been announced, so we'll just have to
+        # skip these to avoid over-notifying.
         next if Notification.exists?(
           notifiable: tournament,
           notification_type: Notification::TYPE_TOURNAMENT_ADDED,
@@ -46,8 +46,6 @@ namespace :notifications do
         # Swallow errors, they got logged from the Twitter class
       end
 
-    # For Discord we want to notify per event since there are separate channels
-    # for each game.
     Tournament
       .should_display
       .where('tournaments.start_at > ?', Time.now)
