@@ -134,7 +134,6 @@ namespace :notifications do
     effective_time = Time.now
 
     Tournament
-      .should_display
       .where('end_at between ? and ?', effective_time - 1.day, effective_time)
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
