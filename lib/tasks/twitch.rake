@@ -20,11 +20,10 @@ namespace :twitch do
         live_streams = Api::Twitch.streams(streams:)
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
-          game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game])
-          potential_events = tournament.events.where(game_slug: game.slug)
+          game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game]) if stream[:name].downcase.in?(live_streams)
+          potential_events = tournament.events.where(game_slug: game&.slug)
 
           if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH
-            && stream[:name].downcase.in?(live_streams)
             && game.present?
             && potential_events.any?(&:should_display?)
 
@@ -58,7 +57,7 @@ namespace :twitch do
           Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
           tournament.save
         end
-      rescue Twitch::APIError => e
+      rescue Twitch::Error => e
         Rails.logger.error "Error syncing stream: #{e.message}"
       end
     end
