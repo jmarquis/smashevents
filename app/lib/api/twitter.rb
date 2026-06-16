@@ -85,7 +85,7 @@ module Api
             event.tournament.name.upcase
           end
 
-          "Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event_name})!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}"
+          "Congratulations to #{event.winner_entrant.tag(twitter: true)} for winning #{event_name}!#{event.tournament.hashtag.present? ? " ##{event.tournament.hashtag}" : nil}"
         end
 
         text = <<~TEXT
