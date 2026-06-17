@@ -18,7 +18,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const time = moment
       .unix(parseInt(startTime.getAttribute("datetime") || ""))
       .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
-    startTime.innerHTML = `${time.format("dddd")} @ ${time.format("h:mm a z")}`
+    startTime.innerHTML = `${time.format("dddd")} ${time.format("h:mm a z")}`
   })
 })
 
