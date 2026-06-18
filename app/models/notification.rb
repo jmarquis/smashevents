@@ -27,7 +27,7 @@ class Notification < ApplicationRecord
   TYPE_TOURNAMENT_ADDED = 'tournament_added'
   TYPE_EVENT_ADDED = 'event_added'
   TYPE_WEEKEND_BRIEFING = 'weekend_briefing'
-  TYPE_CONGRATULATIONS = 'congratulations'
+  TYPE_RECAP = 'congratulations'
   TYPE_HAPPENING_TODAY = 'happening_today'
   TYPE_STREAM_LIVE = 'stream_live'
   TYPE_PLAYER_SET_LIVE = 'player_set_live'

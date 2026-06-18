@@ -36,8 +36,8 @@ cron '0 14 * * *', locals: { task: 'notifications:happening_today' }, overlap: f
 end
 
 # 3:00pm UTC
-cron '0 15 * * *', locals: { task: 'notifications:congratulations' }, overlap: false do
-  rake_async('notifications:congratulations')
+cron '0 15 * * *', locals: { task: 'notifications:recap' }, overlap: false do
+  rake_async('notifications:recap')
 end
 
 # 4:00pm UTC

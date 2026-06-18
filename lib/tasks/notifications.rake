@@ -127,7 +127,7 @@ namespace :notifications do
     Rails.logger.info "Done, sent #{notification_count} notifications."
   end
 
-  task congratulations: [:environment] do
+  task recap: [:environment] do
     Rails.logger.info 'Sending congratulation notifications...'
     notification_count = 0
 
@@ -145,11 +145,11 @@ namespace :notifications do
 
         Notification.send_notification(
           events,
-          type: Notification::TYPE_CONGRATULATIONS,
+          type: Notification::TYPE_RECAP,
           platform: Notification::PLATFORM_TWITTER,
           idempotent: true
         ) do |events|
-          Api::Twitter.congratulations(game:, events:)
+          Api::Twitter.recap(game:, events:)
 
           notification_count += 1
         end

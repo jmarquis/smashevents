@@ -77,7 +77,7 @@ module Api
         tweet!(text, images: banner_images)
       end
 
-      def congratulations(game:, events:)
+      def recap(game:, events:)
         blurbs = events.map do |event|
           event_name = if event.tournament_has_other_events_for_game?(should_display: false)
             "#{event.tournament.name.upcase} (#{event.name})"
