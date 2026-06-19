@@ -15,16 +15,13 @@ class ApplicationController < BaseController
     @tournaments = Tournament.should_display(games: @games)
       # Leave a few hours of leeway for events that run long
       .where('end_at > ?', 6.hours.ago)
+      .where.not(events: { state: Event::STATE_COMPLETED })
       .order(start_at: :asc, end_at: :asc, name: :asc)
 
     if params[:player]
       @tournaments = @tournaments
         .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
-    end
-
-    @tournaments = @tournaments.filter do |tournament|
-      tournament.events.any? { |event| !event.completed? }
     end
   end
 
@@ -42,6 +39,9 @@ class ApplicationController < BaseController
     @tournaments = Tournament.should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
       .where('end_at > ?', Time.now - 6.months)
+      .where.not(
+        id: Tournament.joins(:events).where.not(events: { state: Event::STATE_COMPLETED })
+      )
       .order(end_at: :desc, start_at: :desc, name: :asc)
       .limit(50)
 
@@ -49,10 +49,6 @@ class ApplicationController < BaseController
       @tournaments = @tournaments
         .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
-    end
-
-    @tournaments = @tournaments.filter do |tournament|
-      tournament.completed?
     end
 
     render :index
