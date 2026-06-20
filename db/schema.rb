@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_195142) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_20_034604) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -154,6 +154,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_195142) do
     t.json "stream_data"
     t.string "timezone"
     t.datetime "updated_at", null: false
+    t.index ["end_at"], name: "index_tournaments_on_end_at"
     t.index ["name"], name: "index_tournaments_on_name"
     t.index ["provider", "provider_tournament_id"], name: "index_tournaments_on_provider_and_provider_tournament_id", unique: true
     t.index ["start_at"], name: "index_tournaments_on_start_at"

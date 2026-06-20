@@ -8,10 +8,5 @@ namespace :backfill do
       e.state = Event::STATE_COMPLETED
       e.save!
     end
-
-    Player.find_each do |p|
-      p.provider = Provider::Startgg::PROVIDER_NAME
-      p.save!
-    end
   end
 end

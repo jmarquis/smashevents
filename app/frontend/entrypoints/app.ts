@@ -4,6 +4,16 @@ import moment from "moment-timezone"
 const loadedAt = moment()
 let tournamentsLoading = false
 
+const localizeStartTimes = () => {
+  const startTimes = document.querySelectorAll(".event-time")
+  startTimes.forEach(startTime => {
+    const time = moment
+      .unix(parseInt(startTime.getAttribute("datetime") || ""))
+      .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    startTime.innerHTML = `${time.format("ddd")} ${time.format("h:mm a z")}`
+  })
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   // Game selector menu setup
   const toggle = document.querySelector("#menu-toggle") as HTMLInputElement
@@ -16,13 +26,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Event time localization
-  const startTimes = document.querySelectorAll(".event-time")
-  startTimes.forEach(startTime => {
-    const time = moment
-      .unix(parseInt(startTime.getAttribute("datetime") || ""))
-      .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
-    startTime.innerHTML = `${time.format("ddd")} ${time.format("h:mm a z")}`
-  })
+  localizeStartTimes()
 
   // Infinite scroll setup
   const tournamentLoader = document.querySelector(
@@ -53,6 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
               .then(response => response.text())
               .then(data => {
                 entry.target.outerHTML = data
+                localizeStartTimes()
 
                 const newTournamentLoader = document.querySelector(
                   "#tournament-loader"

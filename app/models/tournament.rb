@@ -23,6 +23,7 @@
 #
 # Indexes
 #
+#  index_tournaments_on_end_at                               (end_at)
 #  index_tournaments_on_name                                 (name)
 #  index_tournaments_on_provider_and_provider_tournament_id  (provider,provider_tournament_id) UNIQUE
 #  index_tournaments_on_start_at                             (start_at)
