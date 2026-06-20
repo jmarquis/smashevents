@@ -1,17 +1,11 @@
 namespace :backfill do
-  task provider_startgg: [:environment] do
-    Tournament.find_each do |t|
-      t.provider = Provider::Startgg::PROVIDER_NAME
-      t.save!
-    end
+  task event_completed_state: [:environment] do
+    Event.find_each do |e|
+      next if e.state.present?
+      next if e.start_at.nil?
+      next if e.start_at > 6.months.ago
 
-    TournamentOverride.find_each do |o|
-      o.provider = Provider::Startgg::PROVIDER_NAME
-      o.save!
-    end
-
-    Entrant.find_each do |e|
-      e.provider = Provider::Startgg::PROVIDER_NAME
+      e.state = Event::STATE_COMPLETED
       e.save!
     end
 
