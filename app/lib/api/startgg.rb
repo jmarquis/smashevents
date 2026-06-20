@@ -410,7 +410,7 @@ module Api
             'Authorization' => "Bearer #{Rails.application.credentials.dig(:startgg, :token)}"
           },
           http_options: {
-            read_timeout: 20,
+            read_timeout: 30,
             write_timeout: 30
           }
         )
