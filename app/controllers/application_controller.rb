@@ -65,7 +65,7 @@ class ApplicationController < BaseController
 
       StatsD.increment('view.past_scroll')
 
-      render :index, layout: nil
+      return render :index, layout: nil
     end
 
     render :index
