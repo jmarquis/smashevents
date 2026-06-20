@@ -1,0 +1,90 @@
+<% tournament = locals[:tournament] %>
+<% games = locals[:games] %>
+
+<article>
+  <% if tournament.in_progress? %>
+    <div class="tournament-status in-progress"><div>In progress</div></div>
+  <% elsif tournament.starting_soon? %>
+    <div class="tournament-status starting-soon"><div>Starting soon</div></div>
+  <% elsif tournament.completed? %>
+    <div class="tournament-status completed"><div>Completed</div></div>
+  <% else %>
+    <div class="tournament-status upcoming"><div>Upcoming</div></div>
+  <% end %>
+  <time><%= tournament.formatted_date_range %></time>
+  <h2><a href="<%= tournament.url %>" target="_blank"><%= tournament.name %></a></h2>
+  <div>
+    <%= tournament.formatted_location %>
+  </div>
+
+  <% games.each do |game| %>
+    <% tournament.events_for_display(game).each do |event| %>
+      <div class="game">
+        <h3 class="game-heading">
+          <a href="<%= event.url %>" target="_blank">
+            <%= event.display_name %>
+          </a>
+        </h3>
+        <div class="event-details">
+          <% if event.player_count.present? && event.player_count > 0 %>
+            <div class="player-count">
+              <%= event.player_count %> players
+            </div>
+          <% end %>
+          <% if !event.completed? && event.start_at.present? %>
+            <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
+              <%= event .start_at.in_time_zone(tournament.timezone || "America/New_York").strftime("%a %l:%M %p") %> (local time)
+            </time>
+          <% end %>
+        </div>
+        <% if event.winner_entrant.present? %>
+          <h4>Winner: <%= event.winner_player.tag %></h4>
+        <% end %>
+        <ul class="players">
+          <% if event.featured_entrants_data.present? %>
+            <% event.featured_entrants_data.each do |entrant_data| %>
+              <li>
+                <% if entrant_data[:twitter_username].present? %>
+                  <%= link_to entrant_data[:tag],
+                  "https://twitter.com/#{entrant_data[:twitter_username]}",
+                  target: "_blank" %>
+                <% else %>
+                  <%= entrant_data[:tag] %>
+                <% end %>
+                <% if entrant_data[:player2_tag].present? %>
+                  /
+                  <% if entrant_data[:player2_twitter_username].present? %>
+                    <%= link_to entrant_data[:player2_tag],
+                    "https://twitter.com/#{entrant_data[:player2_twitter_username]}",
+                    target: "_blank" %>
+                  <% else %>
+                    <%= entrant_data[:player2_tag] %>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          <% else %>
+            <li>Featured players coming soon</li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if tournament.start_at <= Time.now && tournament.stream_data.present? && !tournament.past? %>
+    <div class="streams">
+      <h3>Streams</h3>
+      <ul class="streams">
+        <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase.in?(['twitch', 'youtube']) }.each do |stream| %>
+          <li>
+            <%= stream_link(stream) %>
+            <% if stream[:status]&.downcase == Tournament::STREAM_STATUS_LIVE %>
+              <span class="live">Live</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+</article>

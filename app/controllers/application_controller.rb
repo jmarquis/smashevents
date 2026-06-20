@@ -23,6 +23,15 @@ class ApplicationController < BaseController
         .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
     end
+
+    if params[:last_tournament_id].present?
+      last_tournament = Tournament.find(params[:last_tournament_id])
+      @tournaments = @tournaments.where('(tournaments.start_at, tournaments.end_at, tournaments.name) > (?, ?, ?)', last_tournament.start_at, last_tournament.end_at, last_tournament.name)
+
+      StatsD.increment('view.index_scroll')
+
+      render :index, layout: nil
+    end
   end
 
   def past
@@ -38,17 +47,25 @@ class ApplicationController < BaseController
 
     @tournaments = Tournament.should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
-      .where('end_at > ?', Time.now - 6.months)
+      .where('end_at > ?', Time.now - 6.months) # TODO: Remove this once we have pagination
       .where.not(
         id: Tournament.joins(:events).where.not(events: { state: Event::STATE_COMPLETED })
       )
-      .order(end_at: :desc, start_at: :desc, name: :asc)
-      .limit(50)
+      .order(end_at: :desc, start_at: :desc, name: :desc)
 
     if params[:player]
       @tournaments = @tournaments
         .joins(events: { entrants: :player })
         .where('LOWER(players.tag) = ?', params[:player].downcase)
+    end
+
+    if params[:last_tournament_id].present?
+      last_tournament = Tournament.find(params[:last_tournament_id])
+      @tournaments = @tournaments.where('(tournaments.start_at, tournaments.end_at, tournaments.name) < (?, ?, ?)', last_tournament.start_at, last_tournament.end_at, last_tournament.name)
+
+      StatsD.increment('view.past_scroll')
+
+      render :index, layout: nil
     end
 
     render :index

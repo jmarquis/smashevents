@@ -5,18 +5,15 @@
     <a href="/setbot" class="text-link">Setbot</a>
   </div>
 
-  <% if Flag.radar? %>
-    <h1>Smash<%= inline_svg_tag "logo-color.svg" %>Radar</h1>
-  <% else %>
-    <h1>Smash Events</h1>
-  <% end %>
+  <h1>
+    Smash<%= inline_svg_tag "logo-color.svg" %>Radar
+  </h1>
 
   <nav class="pages">
     <% if action_name == 'index' %>
       Upcoming
     <% elsif params[:player].present? %>
-      <%= link_to "Upcoming",
-      player_path(player: params[:player], game: params[:game], games: params[:games]) %>
+      <%= link_to "Upcoming", player_path(player: params[:player], game: params[:game], games: params[:games]) %>
     <% else %>
       <%= link_to "Upcoming", root_path(game: params[:game], games: params[:games]) %>
     <% end %>
@@ -24,12 +21,7 @@
     <% if action_name == 'past' %>
       Past
     <% elsif params[:player].present? %>
-      <%= link_to "Past",
-      player_past_path(
-        player: params[:player],
-        game: params[:game],
-        games: params[:games],
-      ) %>
+      <%= link_to "Past", player_past_path(player: params[:player], game: params[:game], games: params[:games]) %>
     <% else %>
       <%= link_to "Past", past_events_path(game: params[:game], games: params[:games]) %>
     <% end %>
@@ -60,6 +52,12 @@
   <main>
     <%= yield %>
   </main>
+
+  <form id="params" action="<%= request.path %>">
+    <%= hidden_field_tag 'game', params[:game] if params[:game].present? %>
+    <%= hidden_field_tag 'games', params[:games] if params[:games].present? %>
+    <%= hidden_field_tag 'player', params[:player] if params[:player].present? %>
+  </form>
 <% end %>
 
 <%= render template: "layouts/application" %>

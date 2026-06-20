@@ -2,8 +2,10 @@ import "../react-mounter"
 import moment from "moment-timezone"
 
 const loadedAt = moment()
+let tournamentsLoading = false
 
 window.addEventListener("DOMContentLoaded", () => {
+  // Game selector menu setup
   const toggle = document.querySelector("#menu-toggle") as HTMLInputElement
   const menuContainer = document.querySelector(".menu-container")
   if (toggle && menuContainer) {
@@ -13,6 +15,7 @@ window.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+  // Event time localization
   const startTimes = document.querySelectorAll(".event-time")
   startTimes.forEach(startTime => {
     const time = moment
@@ -20,6 +23,60 @@ window.addEventListener("DOMContentLoaded", () => {
       .tz(Intl.DateTimeFormat().resolvedOptions().timeZone)
     startTime.innerHTML = `${time.format("ddd")} ${time.format("h:mm a z")}`
   })
+
+  // Infinite scroll setup
+  const tournamentLoader = document.querySelector(
+    "#tournament-loader"
+  ) as HTMLElement | null
+  if (tournamentLoader) {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.target instanceof HTMLElement) {
+            if (tournamentsLoading) return
+            tournamentsLoading = true
+
+            const paramsForm = document.querySelector(
+              "form#params"
+            ) as HTMLFormElement
+
+            const requestData = new URLSearchParams(
+              new FormData(paramsForm) as any
+            )
+
+            requestData.set(
+              "last_tournament_id",
+              entry.target.dataset["lastTournamentId"] || ""
+            )
+
+            fetch(`${paramsForm.action}?${requestData.toString()}`)
+              .then(response => response.text())
+              .then(data => {
+                entry.target.outerHTML = data
+
+                const newTournamentLoader = document.querySelector(
+                  "#tournament-loader"
+                ) as HTMLElement
+
+                if (newTournamentLoader) {
+                  observer.observe(newTournamentLoader)
+                }
+
+                tournamentsLoading = false
+              })
+          }
+        })
+      },
+      {
+        root: null,
+        rootMargin: "200px"
+      }
+    )
+
+    observer.observe(
+      document.querySelector("#tournament-loader") as HTMLElement
+    )
+  }
 })
 
 window.addEventListener("focus", () => {
