@@ -3,6 +3,10 @@ class BaseController < ActionController::Base
   before_action :set_logger_metadata
   around_action :record_action_metrics
 
+  rescue_from ActionView::MissingTemplate do
+    head :not_found
+  end
+
   private
 
   def record_action_metrics
