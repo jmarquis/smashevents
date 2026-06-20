@@ -47,7 +47,6 @@ class ApplicationController < BaseController
 
     @tournaments = Tournament.should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
-      .where('end_at > ?', Time.now - 6.months) # TODO: Remove this once we have pagination
       .where.not(
         id: Tournament.joins(:events).where.not(events: { state: Event::STATE_COMPLETED })
       )
