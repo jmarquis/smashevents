@@ -171,7 +171,7 @@ module Ingestor
 
       def sync_sets
         Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
-          events = tournament.events.filter(&:should_display)
+          events = tournament.events.filter(&:should_display?)
           events.each(&:sync_state!)
           events.filter(&:in_progress?).each(&:sync_sets!)
         end
