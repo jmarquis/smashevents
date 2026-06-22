@@ -7,7 +7,7 @@ namespace :twitch do
       .where('tournaments.end_at >= ?', Time.now - 12.hours)
       .each do |tournament|
       next unless tournament.stream_data.present?
-      next unless tournament.in_progress?
+      next unless tournament.events.any? { |e| e.winner_entrant_id.blank? }
 
       Rails.logger.debug "Syncing Twitch streams for #{tournament.slug}..."
 
