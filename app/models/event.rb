@@ -292,9 +292,6 @@ class Event < ApplicationRecord
   end
 
   def sync_sets!
-    return if completed?
-    return unless should_display?
-
     start_time = Time.now
 
     sync_in_progress_sets!
