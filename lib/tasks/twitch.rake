@@ -3,8 +3,8 @@ namespace :twitch do
   task sync_streams: [:environment] do
     Tournament
       .should_display
-      .where('start_at <= ?', Time.now + 12.hours)
-      .where('end_at >= ?', Time.now - 12.hours)
+      .where('tournaments.start_at <= ?', Time.now + 12.hours)
+      .where('tournaments.end_at >= ?', Time.now - 12.hours)
       .each do |tournament|
       next unless tournament.stream_data.present?
       next unless tournament.in_progress?
