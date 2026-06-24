@@ -89,7 +89,7 @@ module Api
         end
 
         text = <<~TEXT
-          #{game.name.upcase} RECAP
+          #{game.name.upcase} RECAP (#{1.day.ago.strftime('%-m/%-d')})
           \n\n
           #{blurbs.join("\n\n")}
         TEXT
