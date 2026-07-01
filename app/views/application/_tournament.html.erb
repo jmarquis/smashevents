@@ -33,7 +33,7 @@
           <% end %>
           <% if !event.completed? && event.start_at.present? %>
             <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
-              <%= event .start_at.in_time_zone(tournament.timezone || "America/New_York").strftime("%a %l:%M %p") %> (local time)
+              <%= event.start_at.in_time_zone(tournament.timezone || "America/New_York").strftime("%a %l:%M %p") %> (local time)
             </time>
           <% end %>
         </div>
@@ -45,18 +45,14 @@
             <% event.featured_entrants_data.each do |entrant_data| %>
               <li>
                 <% if entrant_data[:twitter_username].present? %>
-                  <%= link_to entrant_data[:tag],
-                  "https://twitter.com/#{entrant_data[:twitter_username]}",
-                  target: "_blank" %>
+                  <%= link_to entrant_data[:tag], "https://twitter.com/#{entrant_data[:twitter_username]}", target: "_blank" %>
                 <% else %>
                   <%= entrant_data[:tag] %>
                 <% end %>
                 <% if entrant_data[:player2_tag].present? %>
                   /
                   <% if entrant_data[:player2_twitter_username].present? %>
-                    <%= link_to entrant_data[:player2_tag],
-                    "https://twitter.com/#{entrant_data[:player2_twitter_username]}",
-                    target: "_blank" %>
+                    <%= link_to entrant_data[:player2_tag], "https://twitter.com/#{entrant_data[:player2_twitter_username]}", target: "_blank" %>
                   <% else %>
                     <%= entrant_data[:player2_tag] %>
                   <% end %>
