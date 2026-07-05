@@ -14,7 +14,14 @@ module Provider
         'https://parry.gg'
       end
 
-      def tournaments(page:, cursor:, after_date:, updated_after:)
+      def tournaments(
+        page:,
+        cursor:,
+        before_date: nil,
+        after_date: nil,
+        updated_after: nil,
+        sort_order: nil
+      )
         result = Api::Parrygg.tournaments(
           batch_size: 20,
           cursor:,

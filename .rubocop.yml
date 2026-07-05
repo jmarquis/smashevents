@@ -90,3 +90,6 @@ Style/ExplicitBlockArgument:
 
 Style/SymbolProc:
   Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false

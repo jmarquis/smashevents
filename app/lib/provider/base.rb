@@ -1,5 +1,8 @@
 module Provider
   class Base
+    SORT_ORDER_OLDEST_FIRST = 'oldest_first'
+    SORT_ORDER_NEWEST_FIRST = 'newest_first'
+
     class << self
 
       def provider(name)
@@ -17,7 +20,14 @@ module Provider
         raise NotImplementedError
       end
 
-      def tournaments(page:, cursor:, after_date:, updated_after:)
+      def tournaments(
+        page:,
+        cursor:,
+        before_date: nil,
+        after_date: nil,
+        updated_after: nil,
+        sort_order: nil
+      )
         raise NotImplementedError
       end
 

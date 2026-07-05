@@ -9,13 +9,22 @@ module Provider
         'https://start.gg'
       end
 
-      def tournaments(page:, cursor:, after_date:, updated_after:)
+      def tournaments(
+        page:,
+        cursor:,
+        before_date: nil,
+        after_date: nil,
+        updated_after: nil,
+        sort_order: nil
+      )
         [Api::Startgg.with_retries(10, batch_size: 15) do |batch_size|
           Api::Startgg.tournaments(
             batch_size:,
             page:,
+            before_date:,
             after_date:,
-            updated_after:
+            updated_after:,
+            sort_order:
           )
         end, nil]
       end

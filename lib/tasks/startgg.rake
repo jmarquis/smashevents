@@ -18,4 +18,8 @@ namespace :startgg do
     Ingestor::Startgg.sync_sets
   end
 
+  task sync_past_tournaments: [:environment] do
+    Ingestor::Startgg.sync_tournaments(before_date: cursor_date)
+  end
+
 end

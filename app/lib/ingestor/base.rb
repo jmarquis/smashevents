@@ -7,7 +7,7 @@ module Ingestor
         sync_entrants
       end
 
-      def sync_tournaments
+      def sync_tournaments(before_date: nil, limit: nil)
         stats = {
           analyzed: 0,
           imported: 0,
@@ -23,13 +23,26 @@ module Ingestor
         Rails.logger.info "Starting #{provider_name} tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
 
         (1..1000).each do |page|
-          Rails.logger.info "Fetching page #{page} of tournaments..."
-          tournaments, cursor = provider.tournaments(
-            page:,
-            cursor:,
-            after_date: 7.days.ago,
-            updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago)
-          )
+          tournaments, cursor = if before_date.present?
+            Rails.logger.info "Fetching page #{page} of past tournaments..."
+
+            provider.tournaments(
+              page:,
+              cursor:,
+              before_date:,
+              sort_order: Provider::Base::SORT_ORDER_NEWEST_FIRST
+            )
+          else
+            Rails.logger.info "Fetching page #{page} of upcoming tournaments..."
+
+            provider.tournaments(
+              page:,
+              cursor:,
+              after_date: 7.days.ago,
+              updated_after: (!full_sync && last_sync.present? ? last_sync - 5.minutes : 1.year.ago),
+              sort_order: Provider::Base::SORT_ORDER_OLDEST_FIRST
+            )
+          end
 
           break if tournaments.blank?
 

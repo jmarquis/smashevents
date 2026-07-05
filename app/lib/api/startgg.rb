@@ -6,20 +6,111 @@ module Api
 
     class << self
 
-      def tournaments(batch_size:, page:, after_date: Time.now, updated_after: 6.hours.ago)
-        query = <<~GRAPHQL
-          query($perPage: Int, $page: Int, $afterDate: Timestamp, $updatedAfter: Timestamp) {
-            tournaments(query: {
-              perPage: $perPage
-              page: $page
-              sortBy: "startAt asc"
-              filter: {
-                videogameIds: [#{Game.pluck(:startgg_id).join(',')}],
-                afterDate: $afterDate,
-                computedUpdatedAt: $updatedAfter
-              }
-            }) {
-              nodes {
+      def tournaments(
+        batch_size:,
+        page:,
+        before_date: nil,
+        after_date: nil,
+        updated_after: nil,
+        sort_order: nil
+      )
+        instrument('tournaments') do
+          client.query(
+            {
+              perPage: batch_size,
+              page:,
+              beforeDate: before_date&.to_i,
+              afterDate: after_date&.to_i,
+              updatedAfter: updated_after&.to_i,
+              sortBy: sort_order == Provider::Base::SORT_ORDER_NEWEST_FIRST ? 'startAt desc' : 'startAt asc'
+            }.compact
+          ) do
+            query({
+              perPage: :int!,
+              page: :int!,
+              beforeDate: before_date.present? ? :Timestamp : nil,
+              afterDate: after_date.present? ? :Timestamp : nil,
+              updatedAfter: updated_after.present? ? :Timestamp : nil,
+              sortBy: :string!
+            }.compact) do
+              tournaments(query: {
+                perPage: :perPage,
+                page: :page,
+                sortBy: :sortBy,
+                filter: {
+                  videogameIds: Game.pluck(:startgg_id),
+                  beforeDate: before_date.present? ? :beforeDate : nil,
+                  afterDate: after_date.present? ? :afterDate : nil,
+                  computedUpdatedAt: updated_after.present? ? :updatedAfter : nil
+                }.compact
+              }.compact) do
+                nodes do
+                  addrState
+                  city
+                  countryCode
+                  endAt
+                  hashtag
+                  id
+                  name
+                  slug
+                  startAt
+                  timezone
+
+                  events(filter: {
+                    videogameId: Game.pluck(:startgg_id)
+                  }) do
+                    id
+                    name
+                    numEntrants
+                    slug
+                    startAt
+                    state
+
+                    teamRosterSize do
+                      minPlayers
+                    end
+
+                    standings(query: {
+                      sortBy: 'placement desc',
+                      page: 1,
+                      perPage: 1
+                    }) do
+                      nodes do
+                        isFinal
+
+                        entrant do
+                          id
+                        end
+                      end
+                    end
+
+                    videogame do
+                      id
+                    end
+                  end
+
+                  images do
+                    type
+                    url
+                  end
+
+                  streams do
+                    streamName
+                    streamSource
+                    streamStatus
+                  end
+                end
+              end
+            end
+          end&.data&.tournaments&.nodes
+        end
+      end
+
+      def tournament(slug:)
+        instrument('tournament') do
+          client.query(slug:) do
+            query(slug: :string) do
+              tournament(slug: :slug) do
                 addrState
                 city
                 countryCode
@@ -27,127 +118,68 @@ module Api
                 hashtag
                 id
                 name
-                slug
+                slug() # rubocop:disable Style/MethodCallWithoutArgsParentheses
                 startAt
                 timezone
+
                 events(filter: {
-                  videogameId: [#{Game.pluck(:startgg_id).join(',')}]
-                }) {
+                  videogameId: Game.pluck(:startgg_id).join(',')
+                }) do
                   id
                   name
                   numEntrants
-                  slug
+                  slug() # rubocop:disable Style/MethodCallWithoutArgsParentheses
                   startAt
                   state
-                  teamRosterSize {
+
+                  teamRosterSize do
                     minPlayers
-                  }
+                  end
+
+                  videogame do
+                    id
+                  end
+
                   standings(query: {
-                    sortBy: "placement desc",
+                    sortBy: 'placement desc',
                     page: 1,
                     perPage: 1
-                  }) {
-                    nodes {
+                  }) do
+                    nodes do
                       isFinal
-                      entrant {
+
+                      entrant do
                         id
-                      }
-                    }
-                  }
-                  videogame {
-                    id
-                  }
-                }
-                images {
+                      end
+                    end
+                  end
+                end
+
+                images do
                   type
                   url
-                }
-                streams {
+                end
+
+                streams do
                   streamName
                   streamSource
                   streamStatus
-                }
-              }
-            }
-          }
-        GRAPHQL
-
-        instrument('tournaments') do
-          client.query(query, perPage: batch_size, page:, afterDate: after_date.to_i, updatedAfter: updated_after.to_i)&.data&.tournaments&.nodes
-        end
-      end
-
-      def tournament(slug:)
-        query = <<~GRAPHQL
-          query($slug: String) {
-            tournament(slug: $slug) {
-              addrState
-              city
-              countryCode
-              endAt
-              hashtag
-              id
-              name
-              slug
-              startAt
-              timezone
-              events(filter: {
-                videogameId: [#{Game.pluck(:startgg_id).join(',')}]
-              }) {
-                id
-                name
-                numEntrants
-                slug
-                startAt
-                state
-                teamRosterSize {
-                  minPlayers
-                }
-                videogame {
-                  id
-                }
-                standings(query: {
-                  sortBy: "placement desc",
-                  page: 1,
-                  perPage: 1
-                }) {
-                  nodes {
-                    isFinal
-                    entrant {
-                      id
-                    }
-                  }
-                }
-              }
-              images {
-                type
-                url
-              }
-              streams {
-                streamName
-                streamSource
-                streamStatus
-              }
-            }
-          }
-        GRAPHQL
-
-        instrument('tournament') do
-          client.query(query, slug:)&.data&.tournament
+                end
+              end
+            end
+          end&.data&.tournament
         end
       end
 
       def event(id:)
-        query = <<~GRAPHQL
-          query($id: ID) {
-            event(id: $id) {
-              state
-            }
-          }
-        GRAPHQL
-
         instrument('event') do
-          client.query(query, id:)&.data&.event
+          client.query(id:) do
+            query(id: :id) do
+              event(id: :id) do
+                state
+              end
+            end
+          end&.data&.event
         end
       end
 
@@ -402,9 +434,7 @@ module Api
       private
 
       def client
-        return @client if @client
-
-        @client = Graphlient::Client.new(
+        @client ||= Graphlient::Client.new(
           'https://api.start.gg/gql/alpha',
           headers: {
             'Authorization' => "Bearer #{Rails.application.credentials.dig(:startgg, :token)}"
