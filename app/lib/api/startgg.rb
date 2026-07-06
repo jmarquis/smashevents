@@ -367,46 +367,49 @@ module Api
         end
       end
 
-      def set(set_id)
-        query = <<~GRAPHQL
-          query($setId: ID!) {
-            set(id: $setId) {
-              completedAt
-              id
-              startedAt
-              state
-              winnerId
-              phaseGroup {
-                bracketType
-              }
-              slots {
-                entrant {
-                  id
-                  name
-                  participants {
-                    player {
-                      id
-                    }
-                  }
-                }
-                standing {
-                  stats {
-                    score {
-                      value
-                    }
-                  }
-                }
-              }
-              stream {
-                streamName
-                streamSource
-              }
-            }
-          }
-        GRAPHQL
-
+      def set(id)
         instrument('set') do
-          client.query(query, setId: set_id)&.data&.set
+          client.query(id:) do
+            query(id: :id!) do
+              set(id: :id) do
+                completedAt
+                id() # rubocop:disable Style/MethodCallWithoutArgsParentheses
+                startedAt
+                state
+                winnerId
+
+                phaseGroup do
+                  bracketType
+                end
+
+                slots do
+                  entrant do
+                    id() # rubocop:disable Style/MethodCallWithoutArgsParentheses
+                    name
+
+                    participants do
+                      player do
+                        id() # rubocop:disable Style/MethodCallWithoutArgsParentheses
+                      end
+                    end
+                  end
+
+                  standing do
+                    stats do
+                      score do
+                        value
+                      end
+                    end
+                  end
+                end
+
+                stream do
+                  streamName
+                  streamSource
+                end
+              end
+            end
+          end&.data&.set
         end
       end
 
