@@ -389,7 +389,7 @@ module Api
 
                     participants do
                       player do
-                        id() # rubocop:disable Style/MethodCallWithoutArgsParentheses
+                        id()
                       end
                     end
                   end

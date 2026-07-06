@@ -17,5 +17,5 @@ namespace :cleanup do
       player.destroy!
     end
   end
-  
+
 end

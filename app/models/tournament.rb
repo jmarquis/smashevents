@@ -165,7 +165,7 @@ class Tournament < ApplicationRecord
     Provider::Base.provider(provider).tournament(slug:)
   end
 
-  def sync
+  def sync!
     tournament, events = factory.tournament(provider_data)
 
     tournament.save!

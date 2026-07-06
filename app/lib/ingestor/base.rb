@@ -7,17 +7,25 @@ module Ingestor
         sync_entrants
       end
 
-      def sync_tournaments(before_date: nil, limit: nil)
+      def sync_tournaments(before_date: nil, limit: nil, sync_entrants: false)
         stats = {
           analyzed: 0,
           imported: 0,
           updated: 0
         }
+
+        entrant_stats = {
+          created: 0,
+          updated: 0,
+          deleted: 0
+        }
+
         start_time = Time.now
         last_sync = Rails.cache.read("#{provider_name}/last_tournament_sync")
         last_full_sync = Rails.cache.read("#{provider_name}/last_full_tournament_sync")
         full_sync = last_full_sync.blank? || last_full_sync < 24.hours.ago
 
+        last_tournament = nil
         cursor = nil
 
         Rails.logger.info "Starting #{provider_name} tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
@@ -53,7 +61,7 @@ module Ingestor
             tournament, events = factory.tournament(data)
 
             next if events.blank?
-            next if tournament.end_at < 7.days.ago
+            next if before_date.blank? && tournament.end_at < 7.days.ago
             next if tournament.exclude?
             next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
@@ -79,7 +87,22 @@ module Ingestor
               event_blurbs = events.map { |event| "#{event.game.slug}: #{event.entrant_count}" }
               Rails.logger.info "+ #{tournament.slug}: #{event_blurbs.join(', ')}"
             end
+
+            next unless sync_entrants
+
+            events.each do |event|
+              entrant_stats = event.sync_entrants!.each_with_object(entrant_stats) do |(key, total), entrant_stats|
+                entrant_stats[key] += total
+              end
+            end
+
+            # Now that we have entrant data, sync the tournament again to
+            # populate the winner entrant if necessary.
+            redo if events.any? { |event| event.winner_entrant.blank? && event.completed? }
           end
+
+          last_tournament = tournaments.last
+          break if limit.present? && stats[:analyzed] >= limit
 
           sleep provider.sleep_time
         end
@@ -88,6 +111,9 @@ module Ingestor
         Rails.cache.write("#{provider_name}/last_full_tournament_sync", start_time, expires_in: 1.day) if full_sync
 
         Rails.logger.info "#{provider_name} tournament sync complete. #{stats.to_json}"
+        Rails.logger.info "Entrants synced: #{entrant_stats.to_json}" if sync_entrants
+
+        last_tournament
       end
 
       def sync_overrides
