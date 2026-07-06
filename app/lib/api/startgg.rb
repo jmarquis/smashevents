@@ -237,55 +237,66 @@ module Api
       end
 
       def in_progress_sets(event_id:, batch_size: 20, page: 1)
-        query = <<~GRAPHQL
-          query($id: ID, $perPage: Int, $page: Int) {
-            event(id: $id) {
-              sets(
-                perPage: $perPage,
-                page: $page,
-                filters: {
-                  state: [#{Event::SET_STATE_IN_PROGRESS}]
-                }
-              ) {
-                nodes {
-                  completedAt
-                  id
-                  startedAt
-                  state
-                  winnerId
-                  phaseGroup {
-                    bracketType
-                  }
-                  slots {
-                    entrant {
-                      id
-                      name
-                      participants {
-                        player {
-                          id
-                        }
-                      }
-                    }
-                    standing {
-                      stats {
-                        score {
-                          value
-                        }
-                      }
-                    }
-                  }
-                  stream {
-                    streamName
-                    streamSource
-                  }
-                }
-              }
-            }
-          }
-        GRAPHQL
-
         instrument('in_progress_sets') do
-          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.sets&.nodes
+          client.query(
+            event_id:,
+            perPage: batch_size,
+            page:
+          ) do
+            query(
+              event_id: :id,
+              perPage: :int,
+              page: :int
+            ) do
+              event(id: :event_id) do
+                sets(
+                  perPage: :perPage,
+                  page: :page,
+                  filters: {
+                    state: [Event::SET_STATE_IN_PROGRESS]
+                  }
+                ) do
+                  nodes do
+                    completedAt
+                    id
+                    startedAt
+                    state
+                    winnerId
+
+                    phaseGroup do
+                      bracketType
+                    end
+
+                    slots do
+                      entrant do
+                        id
+                        name
+
+                        participants do
+                          player do
+                            id
+                          end
+                        end
+                      end
+
+                      standing do
+                        stats do
+                          score do
+                            value
+                          end
+                        end
+                      end
+                    end
+
+                    stream do
+                      streamName
+                      streamSource
+                    end
+                  end
+                end
+              end
+            end
+          end
         end
       end
 
