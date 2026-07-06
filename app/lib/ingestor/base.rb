@@ -107,8 +107,10 @@ module Ingestor
           sleep provider.sleep_time
         end
 
-        Rails.cache.write("#{provider_name}/last_tournament_sync", start_time, expires_in: 1.day)
-        Rails.cache.write("#{provider_name}/last_full_tournament_sync", start_time, expires_in: 1.day) if full_sync
+        unless before_date.present?
+          Rails.cache.write("#{provider_name}/last_tournament_sync", start_time, expires_in: 1.day)
+          Rails.cache.write("#{provider_name}/last_full_tournament_sync", start_time, expires_in: 1.day) if full_sync
+        end
 
         Rails.logger.info "#{provider_name} tournament sync complete. #{stats.to_json}"
         Rails.logger.info "Entrants synced: #{entrant_stats.to_json}" if sync_entrants
