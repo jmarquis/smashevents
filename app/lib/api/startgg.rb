@@ -296,7 +296,7 @@ module Api
                 end
               end
             end
-          end
+          end&.data&.event&.sets&.nodes
         end
       end
 
