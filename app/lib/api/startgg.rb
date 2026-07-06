@@ -184,40 +184,55 @@ module Api
       end
 
       def event_entrants(event_id:, game:, batch_size:, page:)
-        query = <<~GRAPHQL
-          query($id: ID, $perPage: Int, $page: Int) {
-            event(id: $id) {
-              entrants(query: { page: $page, perPage: $perPage }) {
-                nodes {
-                  id
-                  initialSeedNum
-                  name
-                  participants {
-                    player {
-                      gamerTag
-                      id
-                      #{game.rankings_key}: rankings(limit: 5, videogameId: #{game.startgg_id}) {
-                        rank
-                        title
-                      }
-                      user {
-                        discriminator
-                        id
-                        name
-                        authorizations(types: [TWITTER]) {
-                          externalUsername
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        GRAPHQL
-
         instrument('event_entrants') do
-          client.query(query, id: event_id, perPage: batch_size, page:)&.data&.event&.entrants&.nodes
+          client.query(
+            event_id:,
+            perPage: batch_size,
+            page:,
+            authorization_types: ['TWITTER']
+          ) do
+            query(
+              event_id: :id,
+              perPage: :int,
+              page: :int,
+              authorization_types: '[SocialConnectionType]'
+            ) do
+              event(id: :event_id) do
+                entrants(query: {
+                  page: :page,
+                  perPage: :perPage
+                }) do
+                  nodes do
+                    id
+                    initialSeedNum
+                    name
+
+                    participants do
+                      player do
+                        gamerTag
+                        id
+
+                        send("#{game.rankings_key}: rankings", limit: 5, videogameId: game.startgg_id) do
+                          rank
+                          title
+                        end
+
+                        user do
+                          discriminator
+                          id
+                          name
+
+                          authorizations(types: :authorization_types) do
+                            externalUsername
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end&.data&.event&.entrants&.nodes
         end
       end
 
