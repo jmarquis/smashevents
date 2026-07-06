@@ -22,7 +22,7 @@ module Api
               beforeDate: before_date&.to_i,
               afterDate: after_date&.to_i,
               updatedAfter: updated_after&.to_i,
-              sortBy: sort_order == Provider::Base::SORT_ORDER_NEWEST_FIRST ? 'startAt desc' : 'startAt asc'
+              sortBy: sort_order == Provider::Base::SORT_ORDER_NEWEST_FIRST ? 'endAt desc' : 'startAt asc'
             }.compact
           ) do
             query({
