@@ -21,7 +21,7 @@ namespace :startgg do
   task sync_past_tournaments: [:environment] do
     cursor_date = Rails.cache.read('startgg/past_tournaments_cursor_date') || Time.now
 
-    last_tournament = Ingestor::Startgg.sync_tournaments(before_date: cursor_date, limit: 100, sync_entrants: true)
+    last_tournament = Ingestor::Startgg.sync_tournaments(before_date: cursor_date, limit: 300, sync_entrants: true)
 
     Rails.cache.write('startgg/past_tournaments_cursor_date', last_tournament.start_at, expires_in: 30.days) if last_tournament.present?
   end
