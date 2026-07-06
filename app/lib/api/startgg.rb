@@ -123,7 +123,7 @@ module Api
                 timezone
 
                 events(filter: {
-                  videogameId: Game.pluck(:startgg_id).join(',')
+                  videogameId: Game.pluck(:startgg_id)
                 }) do
                   id
                   name
