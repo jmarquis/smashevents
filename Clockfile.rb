@@ -11,6 +11,7 @@ around_action do |job_proc, job_info|
   end
   Rails.logger.debug 'Task finished'
   $stdout.flush
+  GC.start
 end
 
 on_error do |job, _error|
