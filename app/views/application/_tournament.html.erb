@@ -38,7 +38,7 @@
           <% end %>
         </div>
         <% if event.winner_entrant.present? %>
-          <h4>Winner: <%= event.winner_player.tag %></h4>
+          <h4>Winner: <%= event.winner_entrant.tag %></h4>
         <% end %>
         <ul class="players">
           <% if event.featured_entrants_data.present? %>
