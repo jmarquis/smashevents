@@ -26,6 +26,7 @@ module Ingestor
         full_sync = last_full_sync.blank? || last_full_sync < 24.hours.ago
 
         cursor = nil
+        winner_resync_data = nil
 
         Rails.logger.info "Starting #{provider_name} tournament sync (last sync: #{last_sync.inspect}, full sync: #{full_sync})..."
 
@@ -97,8 +98,12 @@ module Ingestor
               end
 
               # Now that we have entrant data, sync the tournament again to
-              # populate the winner entrant if necessary.
-              redo if events.any? { |event| event.winner_entrant.blank? && event.completed? }
+              # populate the winner entrant if necessary. Only redo once per
+              # tournament so a persistently missing winner can't loop forever.
+              if !winner_resync_data.equal?(data) && events.any? { |event| event.winner_entrant.blank? && event.completed? }
+                winner_resync_data = data
+                redo
+              end
             end
 
             yield(tournament) if block_given?
@@ -109,6 +114,7 @@ module Ingestor
           sleep provider.sleep_time
         end
 
+        # Don't update this stuff if we're syncing past tournaments.
         unless before_date.present?
           Rails.cache.write("#{provider_name}/last_tournament_sync", start_time, expires_in: 1.day)
           Rails.cache.write("#{provider_name}/last_full_tournament_sync", start_time, expires_in: 1.day) if full_sync
