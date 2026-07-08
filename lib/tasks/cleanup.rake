@@ -5,7 +5,7 @@ namespace :cleanup do
       .where('end_at < ?', 30.days.ago)
       .order(end_at: :asc)
       .find_each do |tournament|
-        next if t.should_display?
+        next if tournament.should_display?
 
         Rails.logger.info "Deleting tournament #{tournament.slug}..."
         tournament.destroy!
