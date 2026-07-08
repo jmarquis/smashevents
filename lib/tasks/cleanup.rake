@@ -2,10 +2,11 @@ namespace :cleanup do
 
   task delete_old_tournaments: [:environment] do
     Tournament
-      .where('end_at < ?', Date.today - 30.days)
-      .order(created_at: :asc)
-      .filter { |t| !t.should_display? }
+      .where('end_at < ?', 30.days.ago)
+      .order(end_at: :asc)
       .find_each do |tournament|
+        next if t.should_display?
+
         Rails.logger.info "Deleting tournament #{tournament.slug}..."
         tournament.destroy!
       end
