@@ -311,7 +311,7 @@ h3 {
   font-weight: bold;
 }
 
-h3.game-heading {
+h3.event-heading {
   margin-bottom: 4px;
 }
 
@@ -362,7 +362,7 @@ time {
   text-transform: uppercase;
 }
 
-article + article {
+article ~ article {
   margin-top: 80px;
 }
 
@@ -403,12 +403,12 @@ article > div + div {
   margin-top: 8px;
 }
 
-article > .game,
+article > .event,
 article > .streams {
   margin-top: 40px;
 }
 
-article > .game > .players {
+article > .event > .players {
   margin: 24px 0 0;
   padding: 0;
   list-style: none;

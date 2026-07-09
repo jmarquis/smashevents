@@ -2,6 +2,8 @@
   "name": "app",
   "private": true,
   "dependencies": {
+    "@hotwired/turbo": "^8.0.23",
+    "@hotwired/turbo-rails": "^8.0.23",
     "classnames": "^2.5.1",
     "downshift": "^9.0.9",
     "moment": "^2.30.1",

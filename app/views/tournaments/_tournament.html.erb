@@ -1,7 +1,8 @@
-<% tournament = locals[:tournament] %>
-<% games = locals[:games] %>
+<% games = @games.present? ? @games : Game.all %>
 
-<article>
+<%= turbo_stream_from dom_id(tournament) %>
+
+<article id="<%= dom_id(tournament) %>">
   <% if tournament.in_progress? %>
     <div class="tournament-status in-progress"><div>In progress</div></div>
   <% elsif tournament.starting_soon? %>
@@ -19,8 +20,8 @@
 
   <% games.each do |game| %>
     <% tournament.events_for_display(game).each do |event| %>
-      <div class="game">
-        <h3 class="game-heading">
+      <div class="event game-<%= game.slug %>">
+        <h3 class="event-heading">
           <a href="<%= event.url %>" target="_blank">
             <%= event.display_name %>
           </a>

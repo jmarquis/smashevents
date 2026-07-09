@@ -1,5 +1,9 @@
-import "../react-mounter"
 import moment from "moment-timezone"
+import { Turbo } from "@hotwired/turbo-rails"
+
+import "../react-mounter"
+
+Turbo.session.drive = false
 
 const loadedAt = moment()
 let tournamentsLoading = false
@@ -84,8 +88,18 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 })
 
+document.addEventListener("turbo:before-stream-render", ((
+  event: CustomEvent
+) => {
+  const originalRender = event.detail.render
+  event.detail.render = (streamElement: Element) => {
+    originalRender(streamElement)
+    localizeStartTimes()
+  }
+}) as EventListener)
+
 window.addEventListener("focus", () => {
-  if (moment().subtract(10, "minute").isAfter(loadedAt)) {
+  if (moment().subtract(6, "hour").isAfter(loadedAt)) {
     location.reload()
   }
 })

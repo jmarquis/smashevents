@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     // Enable latest features
-    "lib": ["ESNext", "dom"],
+    "lib": ["ESNext", "dom", "dom.iterable"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",

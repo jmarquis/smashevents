@@ -1,7 +1,7 @@
 <% tournaments = @tournaments.limit(15) %>
 
 <% tournaments.each do |tournament| %>
-  <%= render 'tournament', locals: { games: @games, tournament: } %>
+  <%= render tournament, locals: { games: @games } %>
 <% end %>
 
 <% if @tournaments.count > tournaments.count %>

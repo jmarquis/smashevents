@@ -29,8 +29,7 @@
 
   <nav class="game-selector">
     <% @games.each do |game| %>
-      <div class="selected-game"><%= game.name %>
-        <%= remove_game_link(game, @games) if @games.count > 1 %></div>
+      <div class="selected-game"><%= game.name %> <%= remove_game_link(game, @games) if @games.count > 1 %></div>
     <% end %>
     <% if @unselected_games.any? %>
       <div class="menu-container">
@@ -48,6 +47,14 @@
   <nav class="player-selector">
     <%= react_component "PlayerSelector" %>
   </nav>
+
+  <style>
+    <% @unselected_games.each do |game| %>
+      .event.game-<%= game.slug %> {
+        display: none;
+      }
+    <% end %>
+  </style>
 
   <main>
     <%= yield %>

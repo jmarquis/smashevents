@@ -47,7 +47,7 @@ class Tournament < ApplicationRecord
   }
   scope :reasonable_duration, -> { where("end_at - start_at < interval '7 days'") }
   scope :has_streams, -> { where.not(stream_data: nil) }
-  scope :should_display, ->(games: Game.all.map(&:slug)) {
+  scope :should_display, ->(games: Game.all) {
     includes(:override, events: [:game, :winner_player, { winner_entrant: :player }])
       .where(events: { game: games })
       .merge(
@@ -69,6 +69,8 @@ class Tournament < ApplicationRecord
           )
       )
   }
+
+  broadcasts_to ->(tournament) { ActionView::RecordIdentifier.dom_id(tournament) }
 
   def should_ingest?
     return override.include unless override&.include.nil?

@@ -93,3 +93,6 @@ Style/SymbolProc:
 
 Metrics/ParameterLists:
   Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
