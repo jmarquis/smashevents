@@ -61,9 +61,9 @@ cron '5/20 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
 end
 
 # Every 10 minutes (8 minute offset)
-# cron '8/10 * * * *', locals: { task: 'startgg:sync_past_tournaments' }, overlap: false do
-#   rake_async('startgg:sync_past_tournaments')
-# end
+cron '8/10 * * * *', locals: { task: 'startgg:sync_past_tournaments' }, overlap: false do
+  rake_async('startgg:sync_past_tournaments')
+end
 
 # Every 20 minutes (19 minute offset)
 cron '19/20 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
