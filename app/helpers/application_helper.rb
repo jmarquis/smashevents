@@ -21,7 +21,7 @@ module ApplicationHelper
         title: stream[:status] == Tournament::STREAM_STATUS_LIVE ? "#{stream[:game]} | #{stream[:title]}" : nil
       )
     when Tournament::STREAM_SOURCE_YOUTUBE
-      link_to inline_svg_tag('youtube.svg') + stream[:name], stream[:url], target: '_blank'
+      link_to inline_svg_tag('youtube.svg') + stream[:name], stream[:url], target: '_blank' if stream[:url].present?
     end
   end
 
