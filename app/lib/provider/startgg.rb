@@ -17,7 +17,7 @@ module Provider
         updated_after: nil,
         sort_order: nil
       )
-        [Api::Startgg.with_retries(10, batch_size: 15) do |batch_size|
+        [Api::Startgg.with_retries(15, batch_size: 15) do |batch_size|
           Api::Startgg.tournaments(
             batch_size:,
             page:,
