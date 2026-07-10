@@ -21,16 +21,6 @@ end
 
 ### DAILY JOBS
 
-# 7:00am UTC
-cron '0 7 * * *', locals: { task: 'cleanup:delete_old_tournaments' }, overlap: false do
-  rake_async('cleanup:delete_old_tournaments')
-end
-
-# 8:00am UTC
-cron '0 8 * * *', locals: { task: 'cleanup:delete_orphaned_players' }, overlap: false do
-  rake_async('cleanup:delete_orphaned_players')
-end
-
 # 2:00pm UTC
 cron '0 14 * * *', locals: { task: 'notifications:happening_today' }, overlap: false do
   rake_async('notifications:happening_today')
@@ -53,6 +43,16 @@ cron '10 * * * *', locals: { task: 'youtube:fetch_stream_urls' }, overlap: false
   rake_async('youtube:fetch_stream_urls')
 end
 
+# Every hour at :17
+cron '17 * * * *', locals: { task: 'cleanup:delete_old_tournaments' }, overlap: false do
+  rake_async('cleanup:delete_old_tournaments')
+end
+
+# Every hour at :47
+cron '47 * * * *', locals: { task: 'cleanup:delete_orphaned_players' }, overlap: false do
+  rake_async('cleanup:delete_orphaned_players')
+end
+
 ### MORE FREQUENT JOBS
 
 # Every 20 minutes (5 minute offset)
@@ -60,14 +60,14 @@ cron '5/20 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
   rake_async('startgg:sync')
 end
 
-# Every 10 minutes (8 minute offset)
-cron '8/10 * * * *', locals: { task: 'startgg:sync_past_tournaments' }, overlap: false do
-  rake_async('startgg:sync_past_tournaments')
-end
-
 # Every 20 minutes (19 minute offset)
 cron '19/20 * * * *', locals: { task: 'notifications:new_events' }, overlap: false do
   rake_async('notifications:new_events')
+end
+
+# Every 10 minutes (8 minute offset)
+cron '8/10 * * * *', locals: { task: 'startgg:sync_past_tournaments' }, overlap: false do
+  rake_async('startgg:sync_past_tournaments')
 end
 
 # Every minute
