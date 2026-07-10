@@ -44,7 +44,7 @@ module Provider
       end
 
       def event_entrants(provider_event_id:, game:, page:, cursor:)
-        [Api::Startgg.with_retries(5, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
+        [Api::Startgg.with_retries(20, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
           Api::Startgg.event_entrants(
             event_id: provider_event_id,
             game:,
