@@ -70,6 +70,18 @@ module ApplicationHelper
     end
   end
 
+  def tournament_status_class(tournament)
+    if tournament.in_progress?
+      'in-progress'
+    elsif tournament.starting_soon?
+      'starting-soon'
+    elsif tournament.completed?
+      'completed'
+    else
+      'upcoming'
+    end
+  end
+
   def react_component(component, props = {})
     render 'react_component', locals: {
       component:,

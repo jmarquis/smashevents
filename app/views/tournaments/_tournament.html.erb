@@ -1,6 +1,6 @@
 <% games = @games.present? ? @games : Game.all %>
 
-<article id="<%= dom_id(tournament) %>">
+<article id="<%= dom_id(tournament) %>" class="tournament <%= tournament_status_class(tournament) %>">
   <% if tournament.in_progress? %>
     <div class="tournament-status in-progress"><div>In progress</div></div>
   <% elsif tournament.starting_soon? %>

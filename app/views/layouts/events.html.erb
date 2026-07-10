@@ -49,6 +49,12 @@
   </nav>
 
   <style>
+    <% if action_name == 'index' %>
+      .tournament.completed {
+        display: none;
+      }
+    <% end %>
+
     <% @unselected_games.each do |game| %>
       .event.game-<%= game.slug %> {
         display: none;
