@@ -1,7 +1,5 @@
 <% games = @games.present? ? @games : Game.all %>
 
-<%= turbo_stream_from dom_id(tournament) %>
-
 <article id="<%= dom_id(tournament) %>">
   <% if tournament.in_progress? %>
     <div class="tournament-status in-progress"><div>In progress</div></div>

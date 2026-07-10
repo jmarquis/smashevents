@@ -1,6 +1,7 @@
 <% tournaments = @tournaments.limit(15) %>
 
 <% tournaments.each do |tournament| %>
+  <%= turbo_stream_from dom_id(tournament) %>
   <%= render tournament, locals: { games: @games } %>
 <% end %>
 
