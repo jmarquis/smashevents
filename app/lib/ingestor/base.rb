@@ -220,7 +220,10 @@ module Ingestor
         Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
           events = tournament.events.filter(&:should_display?)
           events.each(&:sync_state!)
-          events.filter(&:in_progress?).each(&:sync_sets!)
+
+          Tournament.no_touching do
+            events.filter(&:in_progress?).each(&:sync_sets!)
+          end
         end
       end
 
