@@ -32,4 +32,9 @@ class Turbo::StreamsChannel
     end
     StatsD.gauge('turbo_streams.consumers', consumer_count)
   end
+
+  def transmit(data, via: nil)
+    StatsD.increment('turbo_streams.transmit') if via&.start_with?('streamed from')
+    super
+  end
 end
