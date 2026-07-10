@@ -288,7 +288,7 @@ class Event < ApplicationRecord
     return unless event_state.present?
 
     self.state = event_state
-    save!
+    save! if state_changed?
   end
 
   def sync_sets!
@@ -298,7 +298,7 @@ class Event < ApplicationRecord
     sync_completed_sets!
 
     self.sets_synced_at = start_time
-    save!
+    save!(touch: false)
   end
 
   def sync_in_progress_sets!
