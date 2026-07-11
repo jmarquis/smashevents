@@ -51,7 +51,10 @@
   <style>
     <% if action_name == 'index' %>
       .tournament.completed {
-        display: none;
+        max-height: 0;
+        opacity: 0;
+        margin-top: 0;
+        pointer-events: none;
       }
     <% end %>
 

@@ -362,7 +362,13 @@ time {
   text-transform: uppercase;
 }
 
-article ~ article {
+article {
+  overflow: hidden;
+  max-height: 2000px;
+  transition: max-height 1s ease-out, opacity 1s ease-out, margin-top 1s ease-out;
+}
+
+article:not(.completed) ~ article {
   margin-top: 80px;
 }
 
