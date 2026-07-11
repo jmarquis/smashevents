@@ -21,7 +21,7 @@ namespace :startgg do
   task sync_past_tournaments: [:environment] do
     # This hits the startgg API a lot so let's only do it when we're not polling
     # for sets and stuff for in-progress tournaments.
-    return if Tournament.where(provider: Provider::Startgg::PROVIDER_NAME).should_display.in_progress.any?
+    next if Tournament.where(provider: Provider::Startgg::PROVIDER_NAME).should_display.in_progress.any?
 
     cursor_date = Rails.cache.read('startgg/past_tournaments_cursor_date') || Time.now
 
