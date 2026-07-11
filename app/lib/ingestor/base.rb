@@ -7,7 +7,7 @@ module Ingestor
         sync_entrants
       end
 
-      def sync_tournaments(before_date: nil, limit: nil, sync_entrants: false)
+      def sync_tournaments(before_date: nil, limit: nil, sync_entrants: false, delete_if_shouldnt_display: false)
         stats = {
           analyzed: 0,
           imported: 0,
@@ -103,6 +103,10 @@ module Ingestor
               if !winner_resync_data.equal?(data) && events.any? { |event| event.winner_entrant.blank? && event.completed? }
                 winner_resync_data = data
                 redo
+              end
+
+              if delete_if_shouldnt_display && !tournament.should_display?
+                tournament.destroy!
               end
             end
 

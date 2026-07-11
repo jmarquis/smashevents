@@ -25,7 +25,7 @@ namespace :startgg do
 
     cursor_date = Rails.cache.read('startgg/past_tournaments_cursor_date') || Time.now
 
-    Ingestor::Startgg.sync_tournaments(before_date: cursor_date + 1.hour, limit: 100, sync_entrants: true) do |tournament|
+    Ingestor::Startgg.sync_tournaments(before_date: cursor_date + 1.hour, limit: 100, sync_entrants: true, delete_if_shouldnt_display: true) do |tournament|
       Rails.cache.write('startgg/past_tournaments_cursor_date', tournament.end_at, expires_in: 30.days)
       StatsD.gauge('startgg.past_tournaments_cursor_date', tournament.end_at.to_i)
     end
