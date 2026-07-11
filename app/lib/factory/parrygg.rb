@@ -82,7 +82,11 @@ module Factory
         e.player = player(users&.first, tag: data[:name])
 
         if users.present? && users.count > 1
-          e.player2 = player(users.second)
+          e.player2 = if users.second[:id] == users.first[:id]
+            e.player
+          else
+            player(users.second)
+          end
         end
 
         e

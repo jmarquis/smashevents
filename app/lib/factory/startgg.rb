@@ -101,7 +101,11 @@ module Factory
           player2_rank = data.participants[1]&.player&.send(rankings_key)&.filter { |ranking| ranking.title&.match(rankings_regex) }&.first&.rank
           e.rank = player2_rank if player2_rank.present? && (e.rank.blank? || player2_rank < e.rank)
 
-          e.player2 = player(data.participants[1]&.player)
+          e.player2 = if data.participants[1]&.player&.id == data.participants[0]&.player&.id
+            e.player
+          else
+            player(data.participants[1]&.player)
+          end
         end
 
         e
