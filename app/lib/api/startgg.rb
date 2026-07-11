@@ -442,7 +442,9 @@ module Api
 
           Rails.logger.info "Query complexity error, reducing batch size and retrying. New batch size: #{batch_size}. Retry ##{retries}..."
 
-          sleep 5 * retries
+          # No need to do backoff if we know the failure was due to query
+          # complexity.
+          sleep 1
 
           next
         rescue Graphlient::Errors::ExecutionError,
@@ -460,9 +462,9 @@ module Api
           end
 
           Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
-          retries += 1
 
-          sleep 5 * retries
+          sleep [(2 ** retries) + rand(-2..2), 1].max
+          retries += 1
 
           next
         rescue StandardError => e

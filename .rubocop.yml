@@ -96,3 +96,6 @@ Metrics/ParameterLists:
 
 Style/ClassAndModuleChildren:
   Enabled: false
+
+Style/SpaceAroundOperators:
+  EnforcedStyleForExponentOperator: space
