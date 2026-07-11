@@ -1,7 +1,7 @@
 <% tournaments = @tournaments.limit(15) %>
 
 <% tournaments.each do |tournament| %>
-  <%= turbo_stream_from dom_id(tournament) %>
+  <%= turbo_stream_from dom_id(tournament) unless tournament.completed? %>
   <%= render tournament, locals: { games: @games } %>
 <% end %>
 
