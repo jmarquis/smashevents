@@ -5,6 +5,7 @@ import "../react-mounter"
 
 Turbo.session.drive = false
 
+let refreshedAt = moment()
 let tournamentsLoading = false
 
 const localizeStartTimes = () => {
@@ -119,6 +120,8 @@ const refreshTournaments = () => {
   })
     .then(response => response.text())
     .then(html => Turbo.renderStreamMessage(html))
+
+  refreshedAt = moment()
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -131,6 +134,13 @@ window.addEventListener("DOMContentLoaded", () => {
     }).observe(document.body, {
       subtree: true,
       attributeFilter: ["connected"]
+    })
+
+    window.addEventListener("focus", () => {
+      if (moment().subtract(1, "hour").isAfter(refreshedAt)) {
+        if (refreshDebounce) clearTimeout(refreshDebounce)
+        refreshDebounce = setTimeout(refreshTournaments, 300)
+      }
     })
   }, 3000)
 })
