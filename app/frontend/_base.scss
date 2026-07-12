@@ -365,11 +365,15 @@ time {
 article {
   overflow: hidden;
   max-height: 2000px;
-  transition: max-height 1s ease-out, opacity 1s ease-out, margin-top 1s ease-out;
+  transition:
+    max-height 1s ease-out,
+    opacity 1s ease-out,
+    margin-top 1s ease-out;
   padding-bottom: 8px;
 }
 
-article:not(.completed) ~ article {
+article:not(.completed) ~ article,
+article + article {
   margin-top: 80px;
 }
 
