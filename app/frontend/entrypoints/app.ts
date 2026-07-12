@@ -137,7 +137,7 @@ window.addEventListener("DOMContentLoaded", () => {
     })
 
     window.addEventListener("focus", () => {
-      if (moment().subtract(1, "hour").isAfter(refreshedAt)) {
+      if (moment().subtract(10, "minute").isAfter(refreshedAt)) {
         if (refreshDebounce) clearTimeout(refreshDebounce)
         refreshDebounce = setTimeout(refreshTournaments, 300)
       }
