@@ -195,8 +195,9 @@ class Event < ApplicationRecord
       # Respect provider rate limits...
       sleep provider.sleep_time
 
-      # This means the tournament was probably deleted.
-      if event_entrants.nil?
+      # This means the tournament was probably deleted, but let's double check
+      # in case it was some weird API error or something.
+      if event_entrants.nil? && provider.tournament(slug: tournament.slug).nil?
         Rails.logger.info "Tournament #{tournament.slug} not found. Deleting..."
         StatsD.increment('startgg.tournament_deleted')
         tournament.destroy
