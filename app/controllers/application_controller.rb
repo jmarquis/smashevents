@@ -70,6 +70,19 @@ class ApplicationController < BaseController
     render :index
   end
 
+  # Used for refreshing a given list of tournaments via Turbo Streams.
+  def tournaments
+    @games = selected_games
+
+    ids = Array(params[:ids]).map(&:to_i)
+    tournaments = Tournament.where(id: ids).index_by(&:id)
+
+    @tournaments = ids.filter_map { |id| tournaments[id] }
+    @missing_ids = ids - tournaments.keys
+
+    render formats: :turbo_stream
+  end
+
   def setbot
     @title = 'Setbot: a Discord bot for Smash & Rivals streams'
     @description = 'A Discord bot that notifies when a Smash/Rivals player is on a tournament stream.'

@@ -5,7 +5,6 @@ import "../react-mounter"
 
 Turbo.session.drive = false
 
-const loadedAt = moment()
 let tournamentsLoading = false
 
 const localizeStartTimes = () => {
@@ -98,8 +97,40 @@ document.addEventListener("turbo:before-stream-render", ((
   }
 }) as EventListener)
 
-window.addEventListener("focus", () => {
-  if (moment().subtract(6, "hour").isAfter(loadedAt)) {
-    location.reload()
-  }
+// Turbo's cable stream sources re-add a "connected" attribute every time their
+// ActionCable subscription (re)connects, including after a dropped connection.
+// Any broadcasts sent while we were disconnected are gone for good, so treat a
+// reconnect as a signal to fetch the current state of every tournament on the
+// page. Debounced because every tournament's stream source reconnects at once.
+let refreshDebounce: ReturnType<typeof setTimeout> | null = null
+
+const refreshTournaments = () => {
+  const ids = Array.from(document.querySelectorAll("article.tournament"))
+    .map(tournament => tournament.id.replace("tournament_", ""))
+    .filter(Boolean)
+
+  if (!ids.length) return
+
+  const params = new URLSearchParams()
+  ids.forEach(id => params.append("ids[]", id))
+
+  fetch(`/tournaments?${params.toString()}`, {
+    headers: { Accept: "text/vnd.turbo-stream.html" }
+  })
+    .then(response => response.text())
+    .then(html => Turbo.renderStreamMessage(html))
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  // Give the initial subscriptions a moment to connect so that isn't mistaken
+  // for a reconnect.
+  setTimeout(() => {
+    new MutationObserver(() => {
+      if (refreshDebounce) clearTimeout(refreshDebounce)
+      refreshDebounce = setTimeout(refreshTournaments, 300)
+    }).observe(document.body, {
+      subtree: true,
+      attributeFilter: ["connected"]
+    })
+  }, 3000)
 })

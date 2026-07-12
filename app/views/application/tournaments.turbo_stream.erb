@@ -1,0 +1,7 @@
+<% @tournaments.each do |tournament| %>
+  <%= turbo_stream.replace tournament, partial: "tournaments/tournament", locals: { tournament:, games: @games } %>
+<% end %>
+
+<% @missing_ids.each do |id| %>
+  <%= turbo_stream.remove "tournament_#{id}" %>
+<% end %>

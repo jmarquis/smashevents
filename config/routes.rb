@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   get 'setbot' => 'application#setbot', as: :setbot
 
+  get 'tournaments' => 'application#tournaments'
+
   get 'players/search' => 'players#search'
   get 'players/:player' => 'application#index', as: :player
   get 'players/:player/past' => 'application#past', as: :player_past

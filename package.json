@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
+    "prettier": "^3.9.5",
     "vite": "^8.0.0",
     "vite-plugin-ruby": "^5.2.0",
     "vite-plugin-svgr": "^5.2.0"
