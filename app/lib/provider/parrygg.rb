@@ -22,6 +22,9 @@ module Provider
         updated_after: nil,
         sort_order: nil
       )
+        # As of July 2026, the Parrygg API doesn't support filtering by start
+        # date so we can't use before_date or after_date. It also doesn't
+        # support any useful sorting so we can't use sort_order. Pain.
         result = Api::Parrygg.tournaments(
           batch_size: 20,
           cursor:,
@@ -58,7 +61,7 @@ module Provider
 
       def event_entrants(provider_event_id:, game:, page:, cursor:)
         # Simulate a blank page after the first page to stop the loop, because
-        # parrygg doesn't currently paginate entrants.
+        # as of July 2026 parrygg doesn't currently paginate entrants.
         return [[], nil] if page > 1
 
         result = Api::Parrygg.event_entrants(event_id: provider_event_id)

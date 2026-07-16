@@ -43,14 +43,23 @@ module Factory
 
         events = []
 
-        Game.all.each do |game|
-          biggest_event = (data[:events] || [])
-            .filter { |event| event[:game][:id] == game.parrygg_id }
-            # TODO: It seems like most events on Parrygg have an empty start date?
-            # .filter { |event| DateTime.parse(event[:startDate]) >= t.start_at - 2.days }
-            .max { |a, b| (a[:entrantCount] || 0) <=> (b[:entrantCount] || 0) }
+        return t, events unless data[:events].present?
 
-          next unless biggest_event.present?
+        data[:events].each do |parrygg_event|
+          game = Game.find_by(parrygg_id: parrygg_event[:game][:id])
+          next unless game.present?
+
+          unless t.override&.include
+            next unless parrygg_event[:entrantCount].present?
+            next unless parrygg_event[:entrantCount] >= game.ingestion_threshold
+          end
+
+          # Some TOs make a single tournament for a weekly for some reason, and
+          # just move the tournament's start_at and end_at every week. So make
+          # sure we don't consider old events part of the current tournament.
+          # NB: Give a couple days of grace because some TOs also mess this up
+          # for legitimate tournaments.
+          next unless parrygg_event[:startDate].blank? || Time.at(parrygg_event[:startDate]) >= t.start_at - 2.days
 
           event = t.events.find_by(game:) || t.events.new
 
@@ -76,6 +85,9 @@ module Factory
         e.provider = Provider::Parrygg::PROVIDER_NAME
         e.provider_entrant_id = data[:id]
         e.seed = data[:seed]
+
+        # TODO: As of July 2026, the Parrygg API has no ranking data. If/when
+        # they add it, we should ingest it here.
 
         users = data.dig(:entrant, :users)
 

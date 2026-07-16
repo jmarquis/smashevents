@@ -71,14 +71,12 @@ module Api
       end
 
       def client
-        return @client if @client
-
-        @client = Faraday.new(url: 'https://grpcweb.parry.gg', headers: {
+        @client ||= Faraday.new(url: 'https://grpcweb.parry.gg', headers: {
           'X-API-KEY': Rails.application.credentials.dig(:parrygg, :api_key)
         }) do |builder|
           builder.request :json
           builder.response :json
-          # builder.response :raise_error
+          builder.response :raise_error
         end
       end
 
