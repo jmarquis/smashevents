@@ -9,7 +9,7 @@ let refreshedAt = moment()
 let tournamentsLoading = false
 
 const localizeStartTimes = () => {
-  const startTimes = document.querySelectorAll(".event-time")
+  const startTimes = document.querySelectorAll("time.event-time")
   startTimes.forEach(startTime => {
     const time = moment
       .unix(parseInt(startTime.getAttribute("datetime") || ""))
