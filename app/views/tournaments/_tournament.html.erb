@@ -30,12 +30,14 @@
               <%= event.player_count %> players
             </div>
           <% end %>
-          <% if !event.completed? && event.start_at.present? %>
+          <% if event.completed? %>
+            <div class="event-time">Completed</div>
+          <% elsif event.in_progress? %>
+            <div class="event-time">In progress</div>
+          <% elsif event.start_at.present? %>
             <time datetime="<%= event.start_at.strftime("%s") %>" class="event-time">
               <%= event.start_at.in_time_zone(tournament.timezone || "America/New_York").strftime("%a %l:%M %p") %> (local time)
             </time>
-          <% elsif event.completed? %>
-            <div class="event-time">Completed</div>
           <% end %>
         </div>
         <% if event.winner_entrant.present? %>
