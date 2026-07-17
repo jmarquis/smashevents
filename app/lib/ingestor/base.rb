@@ -223,8 +223,10 @@ module Ingestor
       def sync_sets
         Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
           events = tournament.events.filter(&:should_display?)
-          events.each(&:sync_state!)
-          sleep provider.sleep_time if events.filter(&:in_progress?).any?
+          events.each do |event|
+            event.sync_state!
+            sleep provider.sleep_time
+          end
 
           Tournament.no_touching do
             events.filter(&:in_progress?).each(&:sync_sets!)
