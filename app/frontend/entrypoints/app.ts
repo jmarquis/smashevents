@@ -98,11 +98,6 @@ document.addEventListener("turbo:before-stream-render", ((
   }
 }) as EventListener)
 
-// Turbo's cable stream sources re-add a "connected" attribute every time their
-// ActionCable subscription (re)connects, including after a dropped connection.
-// Any broadcasts sent while we were disconnected are gone for good, so treat a
-// reconnect as a signal to fetch the current state of every tournament on the
-// page. Debounced because every tournament's stream source reconnects at once.
 let refreshDebounce: ReturnType<typeof setTimeout> | null = null
 
 const refreshTournaments = () => {
@@ -125,8 +120,6 @@ const refreshTournaments = () => {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  // Give the initial subscriptions a moment to connect so that isn't mistaken
-  // for a reconnect.
   setTimeout(() => {
     new MutationObserver(() => {
       if (refreshDebounce) clearTimeout(refreshDebounce)
@@ -136,11 +129,16 @@ window.addEventListener("DOMContentLoaded", () => {
       attributeFilter: ["connected"]
     })
 
-    window.addEventListener("focus", () => {
+    const refreshIfStale = () => {
+      if (document.visibilityState !== "visible") return
       if (moment().subtract(5, "minute").isAfter(refreshedAt)) {
         if (refreshDebounce) clearTimeout(refreshDebounce)
         refreshDebounce = setTimeout(refreshTournaments, 300)
       }
-    })
+    }
+
+    window.addEventListener("focus", refreshIfStale)
+    document.addEventListener("visibilitychange", refreshIfStale)
+    window.addEventListener("pageshow", refreshIfStale)
   }, 3000)
 })
