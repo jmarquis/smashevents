@@ -50,6 +50,7 @@ class Player < ApplicationRecord
 
   has_many :entrants
   has_many :events, through: :entrants
+  has_many :player_subscriptions
 
   scope :tag_similar_to, lambda { |query|
     quoted_query = ActiveRecord::Base.connection.quote_string(query)
