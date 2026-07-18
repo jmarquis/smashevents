@@ -18,7 +18,7 @@
 
   <% games.each do |game| %>
     <% tournament.events_for_display(game).each do |event| %>
-      <div class="event game-<%= game.slug %>">
+      <div class="event game-<%= game.slug %> <%= event_state_class(event) %>">
         <h3 class="event-heading">
           <a href="<%= event.url %>" target="_blank">
             <%= event.display_name %>

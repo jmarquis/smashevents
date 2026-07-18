@@ -324,6 +324,10 @@ p {
   }
 }
 
+.tournament:not(.completed) .event.completed {
+  opacity: 0.7;
+}
+
 .event-details {
   display: flex;
   justify-content: center;

@@ -82,6 +82,16 @@ module ApplicationHelper
     end
   end
 
+  def event_state_class(event)
+    if event.completed?
+      'completed'
+    elsif event.in_progress?
+      'in-progress'
+    else
+      'upcoming'
+    end
+  end
+
   def react_component(component, props = {})
     render 'react_component', locals: {
       component:,
