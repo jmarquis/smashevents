@@ -299,7 +299,12 @@ class Event < ApplicationRecord
     start_time = Time.now
 
     sync_in_progress_sets!
-    sync_completed_sets!
+
+    # We only want to do anything with completed sets (i.e. upset threads) if
+    # the event meets its game's display threshold. We don't do this check for
+    # in-progress sets because Setbot notifications should go out regardless of
+    # thresholds.
+    sync_completed_sets! if should_display?
 
     self.sets_synced_at = start_time
     save!(touch: false)
@@ -380,6 +385,13 @@ class Event < ApplicationRecord
         startgg_set_id: set.id
       )
     end
+
+    # At this point we may have an event that doesn't meet its game's display
+    # threshold but is syncing sets because it has an entrant with an associated
+    # PlayerSubscription, which we would have notified about just above via
+    # Setbot.notify_subscriptions. But we don't want to do other notifications
+    # for this, so exit here.
+    return unless should_display?
 
     # Now update the set Discord channels.
     player = players.first

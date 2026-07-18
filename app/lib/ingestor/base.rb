@@ -221,16 +221,41 @@ module Ingestor
       end
 
       def sync_sets
-        Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
-          events = tournament.events.filter(&:should_display?)
-          events.each do |event|
-            event.sync_state!
-            sleep provider.sleep_time
-          end
+        events = []
 
-          Tournament.no_touching do
-            events.filter(&:in_progress?).each(&:sync_sets!)
-          end
+        # We want to look at all in-progress tournaments with events above the
+        # display threshold. We don't filter by event state here because there's
+        # no guarantee that the state is in sync, so we'll sync all of them now.
+        Tournament.where(provider: provider_name).should_display.in_progress.each do |tournament|
+          events += tournament.events.filter(&:should_display?)
+        end
+
+        # We also want to look at events from in-progress tournaments with
+        # streams that have a player with a Setbot subscription, so we can
+        # notify for those even if the event doesn't meet the display threshold.
+        events += Event.joins(entrants: { player: :player_subscriptions })
+          .where(tournament_id: Tournament.in_progress.has_streams.select(:id))
+          .distinct
+
+        # In case the two resultsets above overlap...
+        events.uniq!
+
+        # Sync the state now because if the event just started or ended, this is
+        # where we'll find out.
+        #
+        # TODO: Think of a way to be smarter about this so we don't have to do
+        # it every single time we poll for sets.
+        events.each do |event|
+          event.sync_state!
+          sleep provider.sleep_time
+        end
+
+        # We don't want the tournament to be touched when we sync sets because
+        # that will cause unnecessary turbo stream updates.
+        Tournament.no_touching do
+
+          # Now we can filter by event state since we just synced it.
+          events.filter(&:in_progress?).each(&:sync_sets!)
         end
       end
 
