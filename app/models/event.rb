@@ -398,14 +398,14 @@ class Event < ApplicationRecord
     opponent = (players - [player]).first
     return unless opponent.present?
 
-    previous_notification = Notification.where(
+    recent_notifications = Notification.where(
       notifiable: player,
       notification_type: Notification::TYPE_PLAYER_SET_LIVE,
       platform: Notification::PLATFORM_DISCORD,
       success: true
-    ).order(sent_at: :desc).first
+    ).order(sent_at: :desc).first(10)
 
-    return if previous_notification.present? && previous_notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s
+    return if recent_notifications.any? { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }
 
     Notification.send_notification(
       player,
