@@ -1,5 +1,12 @@
 module Factory
   class Parrygg < Base
+
+    EVENT_STATE_UNSPECIFIED = 'EVENT_STATE_UNSPECIFIED'
+    EVENT_STATE_PENDING = 'EVENT_STATE_PENDING'
+    EVENT_STATE_READY = 'EVENT_STATE_READY'
+    EVENT_STATE_IN_PROGRESS = 'EVENT_STATE_IN_PROGRESS'
+    EVENT_STATE_COMPLETED = 'EVENT_STATE_COMPLETED'
+
     class << self
 
       def tournament(data)
@@ -23,23 +30,23 @@ module Factory
         end
 
         # TODO: Feels pretty bad making API calls in a factory method...
-        stream_data = Api::Parrygg.tournament_streams(tournament_id: data[:id])
+        # stream_data = Api::Parrygg.tournament_streams(tournament_id: data[:id])
 
-        t.stream_data = if stream_data.present? && stream_data[:streams].present?
-          stream_data[:streams]&.map do |stream|
-            stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream[:channel].downcase } || {}
+        # t.stream_data = if stream_data.present? && stream_data[:streams].present?
+        #   stream_data[:streams]&.map do |stream|
+        #     stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream[:channel].downcase } || {}
 
-            stream_data[:name] = stream[:channel]
-            stream_data[:source] = case stream[:platform]
-            when 'STREAM_PLATFORM_TWITCH'
-              Tournament::STREAM_SOURCE_TWITCH
-            when 'STREAM_PLATFORM_YOUTUBE'
-              Tournament::STREAM_SOURCE_YOUTUBE
-            end
+        #     stream_data[:name] = stream[:channel]
+        #     stream_data[:source] = case stream[:platform]
+        #     when 'STREAM_PLATFORM_TWITCH'
+        #       Tournament::STREAM_SOURCE_TWITCH
+        #     when 'STREAM_PLATFORM_YOUTUBE'
+        #       Tournament::STREAM_SOURCE_YOUTUBE
+        #     end
 
-            stream_data
-          end
-        end
+        #     stream_data
+        #   end
+        # end
 
         events = []
 
@@ -59,18 +66,24 @@ module Factory
           # sure we don't consider old events part of the current tournament.
           # NB: Give a couple days of grace because some TOs also mess this up
           # for legitimate tournaments.
-          next unless parrygg_event[:startDate].blank? || Time.at(parrygg_event[:startDate]) >= t.start_at - 2.days
+          begin
+            next unless parrygg_event[:startDate].blank? || DateTime.parse(parrygg_event[:startDate]) >= t.start_at - 2.days
+          rescue => e
+            binding.pry
+          end
 
-          event = t.events.find_by(game:) || t.events.new
+          event = t.events.find_by(provider_event_id: parrygg_event[:id]) || t.events.new
 
-          event.provider_event_id = biggest_event[:id]
-          event.slug = [t.slug, biggest_event[:slug]].join('/')
-          event.state = biggest_event[:state]
-          event.start_at = DateTime.parse(biggest_event[:startDate])
+          event.provider_event_id = parrygg_event[:id]
+          event.slug = [t.slug, parrygg_event[:slug]].join('/')
+          event.state = event_state(parrygg_event[:state])
+          event.start_at = DateTime.parse(parrygg_event[:startDate])
           event.game = game
-          event.entrant_count = biggest_event[:entrantCount]
+          event.entrant_count = parrygg_event[:entrantCount]
 
-          # TODO: Figure out a way to get winner data
+          if event.state == Event::STATE_COMPLETED
+            event.winner_entrant = Provider::Parrygg.event_winner_entrant
+          end
 
           events << event
         end
@@ -118,6 +131,21 @@ module Factory
         p.name = [data[:firstName], data[:lastName]].join(' ')
 
         p
+      end
+
+      def event_state(parrygg_state)
+        case parrygg_state
+        when EVENT_STATE_UNSPECIFIED
+          nil
+        when EVENT_STATE_PENDING
+          Event::STATE_CREATED
+        when EVENT_STATE_READY
+          Event::STATE_READY
+        when EVENT_STATE_IN_PROGRESS
+          Event::STATE_ACTIVE
+        when EVENT_STATE_COMPLETED
+          Event::STATE_COMPLETED
+        end
       end
 
     end

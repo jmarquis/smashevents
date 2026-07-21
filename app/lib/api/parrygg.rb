@@ -1,3 +1,5 @@
+require 'google/protobuf/well_known_types'
+
 module Api
   class Parrygg
     extend Instrumentable
@@ -47,10 +49,20 @@ module Api
       end
 
       def tournament_streams(tournament_id:)
-        instrument('event_entrants') do
+        instrument('tournament_streams') do
           execute('parrygg.services.StreamService/GetTournamentStreams', {
             tournament_identifier: {
               id: tournament_id
+            }
+          })
+        end
+      end
+
+      def event_placements(event_id:)
+        instrument('event_placements') do
+          execute('parrygg.services.EventService/GetEventPlacements', {
+            event_identifier: {
+              id: event_id
             }
           })
         end

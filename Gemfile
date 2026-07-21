@@ -100,3 +100,5 @@ gem 'rack-sanitizer', '~> 2.0'
 gem 'faraday'
 
 gem 'turbo-rails'
+
+gem "google-protobuf", "~> 4.35"
