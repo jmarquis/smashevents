@@ -141,7 +141,7 @@ namespace :notifications do
       .filter { |event| event.winner_entrant.present? }
       .group_by(&:game)
       .each do |game, events|
-        events = events.sort_by(&:player_count).reverse.first(5)
+        events = events.sort_by(&:player_count).reverse.first(10)
 
         Notification.send_notification(
           events,
