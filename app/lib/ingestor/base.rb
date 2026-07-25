@@ -60,8 +60,9 @@ module Ingestor
           tournaments.each do |data|
             tournament, events = factory.tournament(data)
 
+            Rails.logger.info "Start date: #{tournament.start_at}, end date: #{tournament.end_at}"
+
             next if events.blank?
-            next if before_date.blank? && tournament.end_at < 7.days.ago
             next if tournament.exclude?
             next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
@@ -114,6 +115,10 @@ module Ingestor
           end
 
           break if limit.present? && stats[:analyzed] >= limit
+
+          # For cursor-based pagination, an actual false cursor means there are
+          # no more results to fetch.
+          break if cursor == false
 
           sleep provider.sleep_time
         end

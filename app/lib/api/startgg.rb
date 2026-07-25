@@ -1,6 +1,7 @@
 module Api
   class Startgg
     extend Instrumentable
+    extend Retryable
 
     @client = nil
 
@@ -411,68 +412,6 @@ module Api
             end
           end&.data&.set
         end
-      end
-
-      def with_retries(max_retries, batch_size: nil)
-        retries = 0
-        result = nil
-
-        loop do
-          result = if batch_size.present?
-            yield batch_size
-          else
-            yield
-          end
-
-          break
-        rescue Graphlient::Errors::GraphQLError => e
-          raise e unless e.message.match?(/query complexity/)
-          raise e unless batch_size.present?
-
-          if retries >= max_retries
-            Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
-            raise e
-          end
-
-          retries += 1
-
-          if batch_size.present?
-            batch_size = (batch_size * 0.9).round == batch_size ? batch_size - 1 : (batch_size * 0.9).round
-          end
-
-          Rails.logger.info "Query complexity error, reducing batch size and retrying. New batch size: #{batch_size}. Retry ##{retries}..."
-
-          # No need to do backoff if we know the failure was due to query
-          # complexity.
-          sleep 1
-
-          next
-        rescue Graphlient::Errors::ExecutionError,
-          Graphlient::Errors::FaradayServerError,
-          Graphlient::Errors::ConnectionFailedError,
-          Graphlient::Errors::TimeoutError,
-          Faraday::ParsingError,
-          Faraday::SSLError,
-          OpenSSL::SSL::SSLError => e
-          StatsD.increment('startgg.request_error')
-
-          if retries >= max_retries
-            Rails.logger.info "Retry threshold exceeded, exiting: #{e.message}"
-            raise e
-          end
-
-          Rails.logger.info "Transient error communicating with startgg, will retry: #{e.message}"
-
-          sleep [(2 ** retries) + rand(-2..2), 1].max
-          retries += 1
-
-          next
-        rescue StandardError => e
-          Rails.logger.error "Unexpected error communicating with startgg: #{e.message}"
-          raise e
-        end
-
-        result
       end
 
       private

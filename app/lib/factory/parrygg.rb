@@ -66,11 +66,7 @@ module Factory
           # sure we don't consider old events part of the current tournament.
           # NB: Give a couple days of grace because some TOs also mess this up
           # for legitimate tournaments.
-          begin
-            next unless parrygg_event[:startDate].blank? || DateTime.parse(parrygg_event[:startDate]) >= t.start_at - 2.days
-          rescue => e
-            binding.pry
-          end
+          next unless parrygg_event[:startDate].blank? || DateTime.parse(parrygg_event[:startDate]) >= t.start_at - 2.days
 
           event = t.events.find_by(provider_event_id: parrygg_event[:id]) || t.events.new
 
@@ -82,7 +78,9 @@ module Factory
           event.entrant_count = parrygg_event[:entrantCount]
 
           if event.state == Event::STATE_COMPLETED
-            event.winner_entrant = Provider::Parrygg.event_winner_entrant
+            event.winner_entrant = event.entrants.find_by(
+              provider_entrant_id: Provider::Parrygg.event_winner_entrant_id(provider_event_id: event.provider_event_id)
+            )
           end
 
           events << event

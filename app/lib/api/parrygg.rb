@@ -3,6 +3,7 @@ require 'google/protobuf/well_known_types'
 module Api
   class Parrygg
     extend Instrumentable
+    extend Retryable
 
     @client = nil
 
@@ -16,7 +17,7 @@ module Api
             },
             pagination_request: {
               page_size: batch_size,
-              cursor: nil
+              cursor:
             }
           })
         end
@@ -61,9 +62,7 @@ module Api
       def event_placements(event_id:)
         instrument('event_placements') do
           execute('parrygg.services.EventService/GetEventPlacements', {
-            event_identifier: {
-              id: event_id
-            }
+            id: event_id
           })
         end
       end
