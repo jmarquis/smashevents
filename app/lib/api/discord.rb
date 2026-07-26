@@ -83,25 +83,28 @@ module Api
       end
 
       def happening_today(tournament)
-        streams = tournament.stream_data.blank? ? nil : tournament.stream_data.map do |stream|
-          case stream['source'].downcase
-          when Tournament::STREAM_SOURCE_TWITCH
-            "[#{stream['name']}](https://twitch.tv/#{stream['name']})"
-          when Tournament::STREAM_SOURCE_YOUTUBE
-            "[#{stream['name']}](#{stream['url']})"
-          end
-        end.compact
+        streams = if tournament.stream_data.present?
+          tournament.stream_data.map do |stream|
+            case stream['source'].downcase
+            when Tournament::STREAM_SOURCE_TWITCH
+              "[#{stream['name']}](https://twitch.tv/#{stream['name']})"
+            when Tournament::STREAM_SOURCE_YOUTUBE
+              "[#{stream['name']}](#{stream['url']}/live)"
+            end
+          end.compact
+        end
 
-        stream_text = streams.blank? ? nil : <<~TEXT
+        stream_text = if streams.present?
+          <<~TEXT
 
-          Streams:
-          #{streams.join("\n")}
-        TEXT
+            Streams:
+            #{streams.join("\n")}
+          TEXT
+        end
 
         events = tournament.events
           .filter { |e| e.start_at <= Time.now + 12.hours }
           .filter { |e| e.state != Event::STATE_COMPLETED }
-          .filter { |e| e.should_display? }
           .sort_by { |e| e.player_count || 0 }
           .reverse
 
@@ -113,7 +116,11 @@ module Api
               embed.url = tournament.url
 
               event_blurbs = events.map do |event|
-                "#{event.display_name.upcase} featuring #{event.entrants_sentence}"
+                start_time = if event.start_at >= Time.now
+                  " (#{event.start_at.in_time_zone(tournament.timezone || 'America/New_York')}.strftime('%a %-l:%M %p %Z'))"
+                end
+
+                "#{event.display_name(should_display: false).upcase}#{start_time} featuring #{event.entrants_sentence}"
               end
 
               embed.description = <<~TEXT

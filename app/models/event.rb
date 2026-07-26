@@ -101,9 +101,9 @@ class Event < ApplicationRecord
     end
   end
 
-  def display_name
+  def display_name(should_display: true)
     return game.name if name.blank?
-    return name if tournament_has_other_events_for_game?
+    return name if tournament_has_other_events_for_game?(should_display:)
 
     "#{game.name} #{bracket_label}"
   end

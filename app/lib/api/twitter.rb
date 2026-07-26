@@ -120,7 +120,7 @@ module Api
         end
 
         events = tournament.events
-          .filter { |e| e.start_at.in_time_zone(tournament.timezone || 'America/New_York') <= Time.now.in_time_zone(tournament.timezone || 'America/New_York') + 12.hours }
+          .filter { |e| e.start_at <= Time.now + 12.hours }
           .filter { |e| e.state != Event::STATE_COMPLETED }
 
         return if events.blank?
@@ -128,7 +128,11 @@ module Api
         # Don't filter by should_display?, might as well just show all the events
         # on the day of.
         event_blurbs = events.sort_by(&:player_count).reverse.map do |event|
-          "#{event.display_name.upcase} featuring #{event.entrants_sentence(twitter: true)}"
+          start_time = if event.start_at >= Time.now
+            " (#{event.start_at.in_time_zone(tournament.timezone || 'America/New_York')}.strftime('%a %-l:%M %p %Z'))"
+          end
+
+          "#{event.display_name(should_display: false).upcase}#{start_time} featuring #{event.entrants_sentence(twitter: true)}"
         end
 
         text = <<~TEXT

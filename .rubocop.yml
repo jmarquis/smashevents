@@ -99,3 +99,6 @@ Style/ClassAndModuleChildren:
 
 Style/SpaceAroundOperators:
   EnforcedStyleForExponentOperator: space
+
+Style/IfUnlessModifier:
+  Enabled: false
