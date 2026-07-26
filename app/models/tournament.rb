@@ -185,6 +185,12 @@ class Tournament < ApplicationRecord
     stream_data.present?
   end
 
+  def stream_live?(stream_name)
+    return false unless has_streams?
+
+    stream_data.index_by { |d| d['name'].downcase }.dig(stream_name.downcase, 'status') == Tournament::STREAM_STATUS_LIVE
+  end
+
   def in_progress?
     return false unless start_at <= Time.now && end_at + 12.hours >= Time.now
     return false unless events.any? { |e| e.winner_entrant_id.blank? }
