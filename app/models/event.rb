@@ -40,8 +40,6 @@ class Event < ApplicationRecord
 
   PLACEMENTS = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025]
 
-  BRACKET_TYPE_DOUBLE_ELIMINATION = 'DOUBLE_ELIMINATION'
-
   belongs_to :tournament, touch: true
   has_many :entrants, dependent: :destroy
   has_many :players, through: :entrants
@@ -429,7 +427,6 @@ class Event < ApplicationRecord
 
   def process_completed_set(set)
     return unless set.winner_id.present?
-    return unless set.phase_group&.bracket_type == BRACKET_TYPE_DOUBLE_ELIMINATION
 
     entrant_provider_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
     return unless entrant_provider_ids.count == 2
