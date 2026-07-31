@@ -163,9 +163,9 @@ module Api
         end
       end
 
-      def player_set_live(event:, player:, opponent:, stream_name:)
+      def set_live(event:, entrant:, opponent:, stream_name:)
         post(sets_channel_id(event.game.slug)) do |builder|
-          builder.content = "### SET IS LIVE: #{player.tag} vs #{opponent.tag}"
+          builder.content = "### SET IS LIVE: #{entrant.tag} vs #{opponent.tag}"
 
           builder.add_embed do |embed|
             embed.title = stream_name

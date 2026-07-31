@@ -185,69 +185,71 @@ class Setbot
       )
     end
 
-    def notify_subscriptions(event:, player:, opponent:, stream_name:, startgg_set_id:)
+    def notify_subscriptions(event:, entrant:, opponent:, stream_name:, startgg_set_id:)
       bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
 
-      PlayerSubscription.where(player:).each do |subscription|
-        previous_notifications = Notification.where(
-          notifiable: subscription,
-          notification_type: Notification::TYPE_SETBOT_SET_LIVE,
-          platform: Notification::PLATFORM_DISCORD,
-          success: true
-        ).order(sent_at: :desc)
+      [entrant.player, entrant.player2].compact.each do |player|
+        PlayerSubscription.where(player:).each do |subscription|
+          previous_notifications = Notification.where(
+            notifiable: subscription,
+            notification_type: Notification::TYPE_SETBOT_SET_LIVE,
+            platform: Notification::PLATFORM_DISCORD,
+            success: true
+          ).order(sent_at: :desc).limit(10)
 
-        next if previous_notifications.any? do |notification|
-          metadata = notification&.metadata&.with_indifferent_access
-          metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
-          metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
-          metadata[:startgg_set_id]&.to_s == startgg_set_id
-        end
-
-        StatsD.increment('setbot.notification.set_live')
-
-        Notification.send_notification(
-          subscription,
-          type: Notification::TYPE_SETBOT_SET_LIVE,
-          platform: Notification::PLATFORM_DISCORD,
-          metadata: {
-            discord_server_id: subscription.discord_server_id,
-            discord_channel_id: subscription.discord_channel_id,
-            startgg_set_id:
-          }
-        ) do |subscription|
-          instrument('post') do
-            builder = Discordrb::Webhooks::Builder.new
-
-            content = "### SET IS LIVE: #{player.tag} vs. #{opponent.tag}"
-
-            content += "\n\n<@&#{subscription.discord_role_id}>" if subscription.discord_role_id.present?
-
-            builder.content = content
-
-            builder.add_embed do |embed|
-              embed.title = stream_name
-              embed.url = "https://twitch.tv/#{stream_name}"
-
-              embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
-
-              embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
-              embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
-
-              embed.footer = Api::Discord::DEFAULT_FOOTER
-            end
-
-            bot.send_message(
-              subscription.discord_channel_id,
-              builder.content,
-              false, # tts
-              builder.embeds
-            )
+          next if previous_notifications.any? do |notification|
+            metadata = notification&.metadata&.with_indifferent_access
+            metadata[:discord_server_id]&.to_s == subscription.discord_server_id.to_s &&
+            metadata[:discord_channel_id]&.to_s == subscription.discord_channel_id.to_s &&
+            metadata[:startgg_set_id]&.to_s == startgg_set_id
           end
-        rescue => e
-          Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
-          Sentry.capture_exception(e)
-        end
 
+          StatsD.increment('setbot.notification.set_live')
+
+          Notification.send_notification(
+            subscription,
+            type: Notification::TYPE_SETBOT_SET_LIVE,
+            platform: Notification::PLATFORM_DISCORD,
+            metadata: {
+              discord_server_id: subscription.discord_server_id,
+              discord_channel_id: subscription.discord_channel_id,
+              startgg_set_id:
+            }
+          ) do |subscription|
+            instrument('post') do
+              builder = Discordrb::Webhooks::Builder.new
+
+              content = "### SET IS LIVE: #{entrant.tag} vs. #{opponent.tag}"
+
+              content += "\n\n<@&#{subscription.discord_role_id}>" if subscription.discord_role_id.present?
+
+              builder.content = content
+
+              builder.add_embed do |embed|
+                embed.title = stream_name
+                embed.url = "https://twitch.tv/#{stream_name}"
+
+                embed.description = "#{event.tournament.name}\n(#{event.game.twitch_name})"
+
+                embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
+                embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+
+                embed.footer = Api::Discord::DEFAULT_FOOTER
+              end
+
+              bot.send_message(
+                subscription.discord_channel_id,
+                builder.content,
+                false, # tts
+                builder.embeds
+              )
+            end
+          rescue => e
+            Rails.logger.error("Error when attempting to send SetBot notification for subscription #{subscription.id}: #{e.message}")
+            Sentry.capture_exception(e)
+          end
+
+        end
       end
     end
 

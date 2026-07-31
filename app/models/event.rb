@@ -370,19 +370,19 @@ class Event < ApplicationRecord
     # to start before the stream started.
     return unless tournament.stream_live?(set.stream.stream_name)
 
-    players = Player.where(provider_player_id: [
-      set.slots.first.entrant.participants.first.player.id,
-      set.slots.second.entrant.participants.first.player.id
+    set_entrants = entrants.where(provider_entrant_id: [
+      set.slots.first.entrant.id,
+      set.slots.second.entrant.id
     ])
 
     # Let Setbot do its thing.
-    players.each do |player|
-      opponent = (players - [player]).first
+    set_entrants.each do |entrant|
+      opponent = (set_entrants - [entrant]).first
       next unless opponent.present?
 
       Setbot.notify_subscriptions(
         event: self,
-        player:,
+        entrant:,
         opponent:,
         stream_name: set.stream.stream_name,
         startgg_set_id: set.id
@@ -397,12 +397,12 @@ class Event < ApplicationRecord
     return unless should_display?
 
     # Now update the set Discord channels.
-    player = players.first
-    opponent = (players - [player]).first
+    entrant = set_entrants.first
+    opponent = (set_entrants - [entrant]).first
     return unless opponent.present?
 
     recent_notifications = Notification.where(
-      notifiable: player,
+      notifiable: entrant,
       notification_type: Notification::TYPE_PLAYER_SET_LIVE,
       platform: Notification::PLATFORM_DISCORD,
       success: true
@@ -410,15 +410,18 @@ class Event < ApplicationRecord
 
     return if recent_notifications.any? { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }
 
+    # Attaching this to the first entrant is kind of weird and meaningless, but
+    # we don't store sets so we don't really have anything more sensible to use
+    # as the notifiable.
     Notification.send_notification(
-      player,
+      entrant,
       type: Notification::TYPE_PLAYER_SET_LIVE,
       platform: Notification::PLATFORM_DISCORD,
       metadata: { startgg_set_id: set.id }
-    ) do |player|
-      Api::Discord.player_set_live(
+    ) do |entrant|
+      Api::Discord.set_live(
         event: self,
-        player:,
+        entrant:,
         opponent:,
         stream_name: set.stream.stream_name
       )
