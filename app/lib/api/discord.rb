@@ -117,7 +117,7 @@ module Api
 
               event_blurbs = events.map do |event|
                 start_time = if event.start_at >= Time.now
-                  " (#{event.start_at.in_time_zone(tournament.timezone || 'America/New_York')}.strftime('%a %-l:%M %p %Z'))"
+                  " (#{event.start_at.in_time_zone(tournament.timezone || 'America/New_York').strftime('%a %-l:%M %p %Z')})"
                 end
 
                 "#{event.display_name(should_display: false).upcase}#{start_time} featuring #{event.entrants_sentence}"
