@@ -56,7 +56,7 @@ module Factory
           # sure we don't consider old events part of the current tournament.
           # NB: Give a couple days of grace because some TOs also mess this up
           # for legitimate tournaments.
-          next unless Time.at(startgg_event.start_at) >= t.start_at - 2.days
+          next if t.start_at.present? && Time.at(startgg_event.start_at) < t.start_at - 2.days
 
           event = t.events.find_by(provider_event_id: startgg_event.id) || t.events.new
 
