@@ -64,6 +64,7 @@ module Ingestor
 
             next if events.blank?
             next if tournament.exclude?
+            next if tournament.start_at.blank?
             next unless events.any?(&:should_ingest?) || tournament.should_ingest?
 
             if tournament.persisted?
