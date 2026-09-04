@@ -22,13 +22,13 @@ end
 ### DAILY JOBS
 
 # 2:00pm UTC
-cron '0 14 * * *', locals: { task: 'notifications:happening_today' }, overlap: false do
-  rake_async('notifications:happening_today')
+cron '0 14 * * *', locals: { task: 'notifications:recap' }, overlap: false do
+  rake_async('notifications:recap')
 end
 
 # 3:00pm UTC
-cron '0 15 * * *', locals: { task: 'notifications:recap' }, overlap: false do
-  rake_async('notifications:recap')
+cron '0 15 * * *', locals: { task: 'notifications:happening_today' }, overlap: false do
+  rake_async('notifications:happening_today')
 end
 
 # 4:00pm UTC
