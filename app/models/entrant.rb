@@ -30,17 +30,17 @@ class Entrant < ApplicationRecord
 
   def tag(twitter: false)
     player1_tag = if twitter && player.twitter_username.present?
-      "#{player.tag} (@#{player.twitter_username})"
+      "#{player.twitter_tag} (@#{player.twitter_username})"
     else
-      player.tag
+      player.twitter_tag
     end
 
     return player1_tag unless player2.present?
 
     player2_tag = if twitter && player2.twitter_username.present?
-      "#{player2.tag} (@#{player2.twitter_username})"
+      "#{player2.twitter_tag} (@#{player2.twitter_username})"
     else
-      player2.tag
+      player2.twitter_tag
     end
 
     "#{player1_tag} / #{player2_tag}"
