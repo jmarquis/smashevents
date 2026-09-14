@@ -1,12 +1,6 @@
 module Ingestor
   class Base
     class << self
-      def sync
-        sync_tournaments
-        sync_overrides
-        sync_entrants
-      end
-
       def sync_tournaments(before_date: nil, limit: nil, sync_entrants: false, delete_if_shouldnt_display: false)
         stats = {
           analyzed: 0,

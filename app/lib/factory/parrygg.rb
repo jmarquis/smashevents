@@ -61,22 +61,35 @@ module Factory
             next unless parrygg_event[:entrantCount] >= game.ingestion_threshold
           end
 
-          # Some TOs make a single tournament for a weekly for some reason, and
-          # just move the tournament's start_at and end_at every week. So make
-          # sure we don't consider old events part of the current tournament.
-          # NB: Give a couple days of grace because some TOs also mess this up
-          # for legitimate tournaments.
-          next unless parrygg_event[:startDate].blank? || DateTime.parse(parrygg_event[:startDate]) >= t.start_at - 2.days
-
           event = t.events.find_by(provider_event_id: parrygg_event[:id]) || t.events.new
 
           event.provider_event_id = parrygg_event[:id]
           event.slug = [t.slug, parrygg_event[:slug]].join('/')
           event.state = event_state(parrygg_event[:state])
-          event.start_at = DateTime.parse(parrygg_event[:startDate])
           event.game = game
           event.entrant_count = parrygg_event[:entrantCount]
 
+          event_start = if parrygg_event[:startDate].present?
+            DateTime.parse(parrygg_event[:startDate])
+          end
+
+          # Parrygg seems to default empty dates to the Unix epoch, so treat
+          # those as nil in our data.
+          event.start_at = event_start.present? && event_start != Time.at(0) ? event_start : nil
+
+          # Some TOs make a single tournament for a weekly for some reason, and
+          # just move the tournament's start_at and end_at every week. So make
+          # sure we don't consider old events part of the current tournament.
+          #
+          # NB: Give a couple days of grace because some TOs also mess this up
+          # for legitimate tournaments.
+          #
+          # NB: An empty start date is okay here because a lot of Parrygg events
+          # don't seem to have a start date for some reason.
+          next unless event.start_at.blank? || event.start_at >= t.start_at - 2.days
+
+          # TODO: Probably should move this API call out of the factory, but
+          # this should be so infrequent that it's okay for now.
           if event.state == Event::STATE_COMPLETED
             event.winner_entrant = event.entrants.find_by(
               provider_entrant_id: Provider::Parrygg.event_winner_entrant_id(provider_event_id: event.provider_event_id)
