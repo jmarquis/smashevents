@@ -310,10 +310,10 @@ class Event < ApplicationRecord
 
   def sync_in_progress_sets!
     (1..1000).each do |page|
-      sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
+      sets = Startgg::Api.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
-        Api::Startgg.in_progress_sets(event_id: provider_event_id, batch_size:, page:)
+        Startgg::Api.in_progress_sets(event_id: provider_event_id, batch_size:, page:)
       end
 
       break if sets.blank?
@@ -332,10 +332,10 @@ class Event < ApplicationRecord
 
   def sync_completed_sets!
     (1..1000).each do |page|
-      sets = Api::Startgg.with_retries(5, batch_size: 20) do |batch_size|
+      sets = Startgg::Api.with_retries(5, batch_size: 20) do |batch_size|
         Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
-        Api::Startgg.completed_sets(event_id: provider_event_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 1.minute : 1.hour.ago))
+        Startgg::Api.completed_sets(event_id: provider_event_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 1.minute : 1.hour.ago))
       end
 
       break if sets.blank?
@@ -497,10 +497,10 @@ class Event < ApplicationRecord
   end
 
   def provider
-    Provider::Base.provider(tournament.provider)
+    Provider.provider(tournament.provider)
   end
 
   def factory
-    Factory::Base.factory(tournament.provider)
+    Factory.factory(tournament.provider)
   end
 end

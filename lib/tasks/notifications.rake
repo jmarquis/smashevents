@@ -8,7 +8,7 @@ namespace :notifications do
     Tournament
       .should_display
       .where('tournaments.start_at > ?', Time.now)
-      .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
+      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -50,7 +50,7 @@ namespace :notifications do
     Tournament
       .should_display
       .where('tournaments.start_at > ?', Time.now)
-      .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
+      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -91,7 +91,7 @@ namespace :notifications do
       .should_display
       .where('end_at > ?', Time.now + 1.day)
       .where('tournaments.start_at < ?', Time.now + 5.days)
-      .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
+      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -138,7 +138,7 @@ namespace :notifications do
 
     Tournament
       .where('end_at between ? and ?', effective_time - 1.day, effective_time)
-      .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
+      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .order(start_at: :asc, end_at: :asc, name: :asc)
       .map(&:events)
       .flatten
@@ -172,7 +172,7 @@ namespace :notifications do
       .should_display
       .where('end_at > ?', effective_time)
       .where('tournaments.start_at < ?', effective_time + 2.days)
-      .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
+      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .filter { |t| effective_time < t.end_at }
       .filter { |t| (effective_time + 12.hours) > t.start_at }
       .each do |tournament|

@@ -1,9 +1,9 @@
 require 'google/protobuf/well_known_types'
 
-module Api
-  class Parrygg
-    extend Instrumentable
-    extend Retryable
+module Parrygg
+  class Api
+    extend ::Api::Instrumentable
+    extend ::Api::Retryable
 
     @client = nil
 
@@ -75,8 +75,8 @@ module Api
 
       def execute(url, body = nil)
         response = client.post(url, body).body
-        raise Api::ParryggError, response if response.is_a? String
-        raise Api::ParryggError, response if response['code'].present?
+        raise Error, response if response.is_a? String
+        raise Error, response if response['code'].present?
 
         response.with_indifferent_access
       end

@@ -164,7 +164,7 @@ class Tournament < ApplicationRecord
   end
 
   def provider_data
-    Provider::Base.provider(provider).tournament(slug:)
+    Provider.provider(provider).tournament(slug:)
   end
 
   def sync!
@@ -211,13 +211,13 @@ class Tournament < ApplicationRecord
   end
 
   def url
-    [Provider::Base.provider(provider).base_url, slug].join('/')
+    [Provider.provider(provider).base_url, slug].join('/')
   end
 
   private
 
   def factory
-    Factory::Base.factory(provider)
+    Factory.factory(provider)
   end
 
 end

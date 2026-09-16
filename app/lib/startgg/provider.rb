@@ -1,5 +1,5 @@
-module Provider
-  class Startgg < Base
+module Startgg
+  class Provider < ::Provider
     PROVIDER_NAME = 'startgg'
     ENTRANT_SYNC_BATCH_SIZE = 50
 
@@ -17,8 +17,8 @@ module Provider
         updated_after: nil,
         sort_order: nil
       )
-        [Api::Startgg.with_retries(15, batch_size: 15) do |batch_size|
-          Api::Startgg.tournaments(
+        [Api.with_retries(15, batch_size: 15) do |batch_size|
+          Api.tournaments(
             batch_size:,
             page:,
             before_date:,
@@ -30,22 +30,22 @@ module Provider
       end
 
       def tournament(slug:)
-        Api::Startgg.with_retries(5) do
-          Api::Startgg.tournament(slug:)
+        Api.with_retries(5) do
+          Api.tournament(slug:)
         end
       end
 
       def event_state(provider_event_id:)
-        event = Api::Startgg.with_retries(5) do
-          Api::Startgg.event(id: provider_event_id)
+        event = Api.with_retries(5) do
+          Api.event(id: provider_event_id)
         end
 
         event&.state
       end
 
       def event_entrants(provider_event_id:, game:, page:, cursor:)
-        [Api::Startgg.with_retries(20, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
-          Api::Startgg.event_entrants(
+        [Api.with_retries(20, batch_size: ENTRANT_SYNC_BATCH_SIZE) do |batch_size|
+          Api.event_entrants(
             event_id: provider_event_id,
             game:,
             batch_size:,

@@ -1,5 +1,5 @@
-module Ingestor
-  class Parrygg < Base
+module Parrygg
+  class Ingestor < ::Ingestor
     PROVIDER_NAME = 'parrygg'
 
     class << self
@@ -9,7 +9,7 @@ module Ingestor
         Tournament.not_past.reasonable_duration.where(provider: 'parrygg').each do |tournament|
           next unless tournament.should_display?
 
-          stream_data = Api::Parrygg.tournament_streams(tournament_id: tournament.provider_tournament_id)
+          stream_data = Api.tournament_streams(tournament_id: tournament.provider_tournament_id)
 
           tournament.stream_data = if stream_data.present? && stream_data[:streams].present?
             stream_data[:streams]&.map do |stream|

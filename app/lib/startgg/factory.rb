@@ -1,11 +1,11 @@
-module Factory
-  class Startgg < Base
+module Startgg
+  class Factory < ::Factory
     class << self
 
       def tournament(data)
-        t = Tournament.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_tournament_id: data.id) || Tournament.new
+        t = Tournament.find_by(provider: Provider::PROVIDER_NAME, provider_tournament_id: data.id) || Tournament.new
 
-        t.provider = Provider::Startgg::PROVIDER_NAME
+        t.provider = Provider::PROVIDER_NAME
         t.provider_tournament_id = data.id
         t.slug = data.slug.match(/^tournament\/(.*)/)[1]
         t.name = data.name
@@ -85,10 +85,10 @@ module Factory
       end
 
       def entrant(data, event:)
-        e = Entrant.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_entrant_id: data.id) || Entrant.new
+        e = Entrant.find_by(provider: Provider::PROVIDER_NAME, provider_entrant_id: data.id) || Entrant.new
 
         e.event = event
-        e.provider = Provider::Startgg::PROVIDER_NAME
+        e.provider = Provider::PROVIDER_NAME
         e.provider_entrant_id = data.id
         e.seed = data.initial_seed_num
 
@@ -113,11 +113,11 @@ module Factory
       end
 
       def player(data, tag: nil)
-        return Player.new(provider: Provider::Startgg::PROVIDER_NAME, tag:) if data.blank?
+        return Player.new(provider: Provider::PROVIDER_NAME, tag:) if data.blank?
 
-        p = Player.find_by(provider: Provider::Startgg::PROVIDER_NAME, provider_player_id: data.id) || Player.new
+        p = Player.find_by(provider: Provider::PROVIDER_NAME, provider_player_id: data.id) || Player.new
 
-        p.provider = Provider::Startgg::PROVIDER_NAME
+        p.provider = Provider::PROVIDER_NAME
         p.provider_player_id = data.id
         p.provider_user_id = data.user&.id
         p.provider_user_slug = data.user&.discriminator
