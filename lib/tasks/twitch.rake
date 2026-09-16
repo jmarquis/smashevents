@@ -21,7 +21,7 @@ namespace :twitch do
       next unless streams.present?
 
       begin
-        live_streams = Api::Twitch.streams(streams:)
+        live_streams = Twitch::Gateway.streams(streams:)
         tournament.stream_data = tournament.stream_data.map do |stream|
           stream = stream.with_indifferent_access
           game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game]) if stream[:name].downcase.in?(live_streams)
@@ -45,7 +45,7 @@ namespace :twitch do
                 type: Notification::TYPE_STREAM_LIVE,
                 platform: Notification::PLATFORM_DISCORD
               ) do |tournament|
-                Api::Discord.stream_live(tournament:, stream:)
+                Discord::Gateway.stream_live(tournament:, stream:)
               end
             end
           else

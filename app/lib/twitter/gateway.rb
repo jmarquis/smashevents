@@ -1,6 +1,6 @@
-module Api
-  class Twitter
-    extend Instrumentable
+module Twitter
+  class Gateway
+    extend ::Api::Instrumentable
 
     @client = nil
 

@@ -1,7 +1,7 @@
 module Api
   module Instrumentable
     def instrument(key)
-      api_name = self.name.downcase.demodulize
+      api_name = self.name.downcase.split('::').first
       StatsD.increment("api.#{api_name}.#{key}")
       result = StatsD.measure("api.#{api_name}.#{key}") do
         yield

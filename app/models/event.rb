@@ -278,7 +278,7 @@ class Event < ApplicationRecord
 
     Rails.logger.info("Starting upset thread for #{slug} (#{game.slug})...")
 
-    tweet = Api::Twitter.upset_thread_intro(self)
+    tweet = Twitter::Gateway.upset_thread_intro(self)
 
     self.last_upset_tweet_id = tweet['data']['id']
     save!
@@ -419,7 +419,7 @@ class Event < ApplicationRecord
       platform: Notification::PLATFORM_DISCORD,
       metadata: { startgg_set_id: set.id }
     ) do |entrant|
-      Api::Discord.set_live(
+      Discord::Gateway.set_live(
         event: self,
         entrant:,
         opponent:,
@@ -481,7 +481,7 @@ class Event < ApplicationRecord
       platform: Notification::PLATFORM_TWITTER,
       metadata: { startgg_set_id: set.id }
     ) do |event|
-      tweet = Api::Twitter.upset(
+      tweet = Twitter::Gateway.upset(
         event: event,
         winner_entrant:,
         winner_games:,

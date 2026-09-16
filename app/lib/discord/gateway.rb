@@ -1,6 +1,6 @@
-module Api
-  class Discord
-    extend Instrumentable
+module Discord
+  class Gateway
+    extend ::Api::Instrumentable
 
     @clients = {}
     @bot = nil

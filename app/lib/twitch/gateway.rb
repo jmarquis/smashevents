@@ -1,6 +1,6 @@
-module Api
-  class Twitch
-    extend Instrumentable
+module Twitch
+  class Gateway
+    extend ::Api::Instrumentable
 
     @client = nil
 

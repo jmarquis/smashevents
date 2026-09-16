@@ -1,6 +1,6 @@
-module Api
-  class Youtube
-    extend Instrumentable
+module Youtube
+  class Gateway
+    extend ::Api::Instrumentable
 
     @client = nil
 
