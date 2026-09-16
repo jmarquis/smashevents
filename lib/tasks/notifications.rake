@@ -173,8 +173,8 @@ namespace :notifications do
       .where('end_at > ?', effective_time)
       .where('tournaments.start_at < ?', effective_time + 2.days)
       .where(provider: Provider::Startgg::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
-      .filter { |t| effective_time.in_time_zone(t.timezone || 'America/New_York') < t.end_at.in_time_zone(t.timezone || 'America/New_York') }
-      .filter { |t| (effective_time + 12.hours).in_time_zone(t.timezone || 'America/New_York') > t.start_at.in_time_zone(t.timezone || 'America/New_York') }
+      .filter { |t| effective_time < t.end_at }
+      .filter { |t| (effective_time + 12.hours) > t.start_at }
       .each do |tournament|
 
         notification = Notification.where(
