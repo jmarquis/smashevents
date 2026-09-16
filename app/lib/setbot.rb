@@ -1,9 +1,10 @@
-class Setbot
-  extend Api::Instrumentable
-
+# TODO: This shouldn't really extend Gateway as is, but it gives access to
+# `instrument` which happens to be useful here. This class should probably get
+# converted into a module with a gateway, or reuse the Discord gateway somehow.
+class Setbot < ::Gateway
   SMASHRADAR_SERVER_ID = '1260259175586467840'
 
-  @@bot = nil
+  @bot = nil
 
   class << self
 
@@ -186,8 +187,6 @@ class Setbot
     end
 
     def notify_subscriptions(event:, entrant:, opponent:, stream_name:, startgg_set_id:)
-      bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
-
       [entrant.player, entrant.player2].compact.each do |player|
         PlayerSubscription.where(player:).each do |subscription|
           previous_notifications = Notification.where(
@@ -307,9 +306,7 @@ class Setbot
     end
 
     def bot
-      return @@bot if @@bot.present?
-
-      @@bot = Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
+      @bot ||= Discordrb::Bot.new token: Rails.application.credentials.dig(:discord, :setbot_token)
     end
 
   end
