@@ -19,8 +19,8 @@ module Parrygg
         # As of July 2026, the Parrygg API doesn't support filtering by start
         # date so we can't really use before_date or after_date as intended. It
         # also doesn't support any useful sorting so we can't use sort_order.
-        result = Api.with_retries(10) do
-          Api.tournaments(
+        result = Gateway.with_retries(10) do
+          Gateway.tournaments(
             batch_size: 20,
             cursor:,
             updated_after: after_date.present? && after_date > updated_after ? after_date : updated_after
@@ -31,16 +31,16 @@ module Parrygg
       end
 
       def tournament(slug:)
-        result = Api.with_retries(10) do
-          Api.tournament(slug:)
+        result = Gateway.with_retries(10) do
+          Gateway.tournament(slug:)
         end
 
         result[:tournament]
       end
 
       def event_state(provider_event_id:)
-        result = Api.with_retries(10) do
-          Api.event(id: provider_event_id)
+        result = Gateway.with_retries(10) do
+          Gateway.event(id: provider_event_id)
         end
 
         state = result.dig(:event, :state)
@@ -55,16 +55,16 @@ module Parrygg
         # as of July 2026 parrygg doesn't currently paginate entrants.
         return [[], nil] if page > 1
 
-        result = Api.with_retries(10) do
-          Api.event_entrants(event_id: provider_event_id)
+        result = Gateway.with_retries(10) do
+          Gateway.event_entrants(event_id: provider_event_id)
         end
 
         [result[:eventEntrants]]
       end
 
       def event_winner_entrant_id(provider_event_id:)
-        result = Api.with_retries(10) do
-          Api.event_placements(event_id: provider_event_id)
+        result = Gateway.with_retries(10) do
+          Gateway.event_placements(event_id: provider_event_id)
         end
 
         result[:results]&.first&.dig(:placement, :eventEntrant, :entrant, :id)
