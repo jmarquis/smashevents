@@ -1,12 +1,7 @@
 require 'google/protobuf/well_known_types'
 
 module Parrygg
-  class Gateway
-    extend ::Api::Instrumentable
-    extend ::Api::Retryable
-
-    @client = nil
-
+  class Gateway < ::Gateway
     class << self
 
       def tournaments(batch_size:, cursor: nil, updated_after: 6.hours.ago)

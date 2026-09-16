@@ -1,10 +1,5 @@
 module Startgg
-  class Gateway
-    extend ::Api::Instrumentable
-    extend ::Api::Retryable
-
-    @client = nil
-
+  class Gateway < ::Gateway
     class << self
 
       def tournaments(

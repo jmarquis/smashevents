@@ -1,9 +1,5 @@
 module Twitter
-  class Gateway
-    extend ::Api::Instrumentable
-
-    @client = nil
-
+  class Gateway < ::Gateway
     class << self
 
       def events_added(tournament:, events:)

@@ -1,9 +1,5 @@
 module Youtube
-  class Gateway
-    extend ::Api::Instrumentable
-
-    @client = nil
-
+  class Gateway < ::Gateway
     class << self
 
       def channel_url(channel_name)

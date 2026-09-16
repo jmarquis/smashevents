@@ -1,8 +1,5 @@
 module Discord
-  class Gateway
-    extend ::Api::Instrumentable
-
-    @clients = {}
+  class Gateway < ::Gateway
     @bot = nil
 
     DEFAULT_FOOTER = Discordrb::Webhooks::EmbedFooter.new(
