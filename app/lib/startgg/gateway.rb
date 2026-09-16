@@ -1,5 +1,5 @@
 module Startgg
-  class Api
+  class Gateway
     extend ::Api::Instrumentable
     extend ::Api::Retryable
 

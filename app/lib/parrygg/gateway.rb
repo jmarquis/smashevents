@@ -1,7 +1,7 @@
 require 'google/protobuf/well_known_types'
 
 module Parrygg
-  class Api
+  class Gateway
     extend ::Api::Instrumentable
     extend ::Api::Retryable
 
