@@ -57,7 +57,7 @@ module Parrygg
 
           # Parrygg seems to default empty dates to the Unix epoch, so treat
           # those as nil in our data.
-          event.start_at = event_start.present? && event_start != Time.at(0) ? event_start : nil
+          event.start_at = event_start.present? && event_start != Time.at(0) ? event_start : t.start_at
 
           # Some TOs make a single tournament for a weekly for some reason, and
           # just move the tournament's start_at and end_at every week. So make
