@@ -29,7 +29,6 @@ module Parrygg
           t.profile_image_url = data[:images].filter { |image| image[:type] == 'IMAGE_TYPE_AVATAR' }.first
         end
 
-
         events = []
 
         return t, events unless data[:events].present?

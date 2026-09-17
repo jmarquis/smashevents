@@ -62,6 +62,7 @@ module Parrygg
         end
       end
 
+      # Used for fetching game IDs for one-off stuff.
       def games
         execute('parrygg.services.GameService/GetGames')
       end
