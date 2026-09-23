@@ -330,11 +330,9 @@ class Event < ApplicationRecord
 
   def sync_completed_sets!
     (1..1000).each do |page|
-      sets = Startgg::Gateway.with_retries(5, batch_size: 20) do |batch_size|
-        Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
+      Rails.logger.debug "Fetching completed sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg::Gateway.completed_sets(event_id: provider_event_id, batch_size:, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 1.minute : 1.hour.ago))
-      end
+      sets = provider.completed_sets(provider_event_id:, batch_size: 20, page:, updated_after: (sets_synced_at.present? ? sets_synced_at - 1.minute : 1.hour.ago))
 
       break if sets.blank?
       break if sets.count.zero?
@@ -342,7 +340,7 @@ class Event < ApplicationRecord
       Rails.logger.debug "Found #{sets.count} updated completed sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
-        StatsD.increment('startgg.set_fetched.completed')
+        StatsD.increment("#{provider::PROVIDER_NAME}.set_fetched.completed")
         process_completed_set(set)
       end
 

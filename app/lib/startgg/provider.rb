@@ -60,6 +60,12 @@ module Startgg
         end
       end
 
+      def completed_sets(provider_event_id:, batch_size:, page:, updated_after:)
+        Gateway.with_retries(5, batch_size:) do |batch_size|
+          Gateway.completed_sets(event_id: provider_event_id, batch_size:, page:, updated_after:)
+        end
+      end
+
     end
   end
 end
