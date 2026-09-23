@@ -8,7 +8,7 @@ module Parrygg
         instrument('tournaments') do
           execute('parrygg.services.TournamentService/GetTournaments', {
             filter: {
-              event_updated_since: Google::Protobuf::Timestamp.new.from_time(updated_after)
+              event_updated_since: updated_after.present? ? Google::Protobuf::Timestamp.new.from_time(updated_after) : nil
             },
             pagination_request: {
               page_size: batch_size,
