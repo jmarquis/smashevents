@@ -310,11 +310,9 @@ class Event < ApplicationRecord
 
   def sync_in_progress_sets!
     (1..1000).each do |page|
-      sets = Startgg::Gateway.with_retries(5, batch_size: 20) do |batch_size|
-        Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
+      Rails.logger.debug "Fetching in progress sets for #{tournament.slug} #{game.slug}..."
 
-        Startgg::Gateway.in_progress_sets(event_id: provider_event_id, batch_size:, page:)
-      end
+      sets = provider.in_progress_sets(provider_event_id:, batch_size: 20, page:)
 
       break if sets.blank?
       break if sets.count.zero?
@@ -322,7 +320,7 @@ class Event < ApplicationRecord
       Rails.logger.debug "Found #{sets.count} in progress sets for #{tournament.slug} #{game.slug}. Analyzing..."
 
       sets.each do |set|
-        StatsD.increment('startgg.set_fetched.in_progress')
+        StatsD.increment("#{provider::PROVIDER_NAME}.set_fetched.in_progress")
         process_in_progress_set(set)
       end
 

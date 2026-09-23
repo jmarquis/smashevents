@@ -42,6 +42,14 @@ class Provider
       raise NotImplementedError
     end
 
+    def in_progress_sets(provider_event_id:, batch_size:, page:)
+      raise NotImplementedError
+    end
+
+    def completed_sets(provider_event_id:, batch_size:, page:, updated_after:)
+      raise NotImplementedError
+    end
+
     def sleep_time
       1
     end

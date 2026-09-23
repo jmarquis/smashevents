@@ -54,6 +54,12 @@ module Startgg
         end, nil]
       end
 
+      def in_progress_sets(provider_event_id:, batch_size:, page:)
+        Gateway.with_retries(5, batch_size:) do |batch_size|
+          Gateway.in_progress_sets(event_id: provider_event_id, batch_size:, page:)
+        end
+      end
+
     end
   end
 end
