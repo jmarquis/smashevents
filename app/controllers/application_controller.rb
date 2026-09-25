@@ -13,7 +13,6 @@ class ApplicationController < BaseController
     end
 
     @tournaments = Tournament.should_display(games: @games)
-      .where(provider: 'parrygg')
       # Leave a few hours of leeway for events that run long
       .where('end_at > ?', 6.hours.ago)
       .where(id: Event.where.not(state: Event::STATE_COMPLETED).select(:tournament_id))
