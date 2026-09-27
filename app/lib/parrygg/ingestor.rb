@@ -9,10 +9,10 @@ module Parrygg
         Tournament.not_past.reasonable_duration.where(provider: 'parrygg').each do |tournament|
           next unless tournament.should_display?
 
-          stream_data = Gateway.tournament_streams(tournament_id: tournament.provider_tournament_id)
+          result = Gateway.tournament_streams(tournament_id: tournament.provider_tournament_id)
 
-          tournament.stream_data = if stream_data.present? && stream_data[:streams].present?
-            stream_data[:streams]&.map do |stream|
+          tournament.stream_data = if result.present? && result[:streams].present?
+            result[:streams]&.map do |stream|
               stream_data = (tournament.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream[:channel].downcase } || {}
 
               stream_data[:name] = stream[:channel]
@@ -24,6 +24,17 @@ module Parrygg
               end
 
               stream_data
+            end
+          end
+
+          tournament.streams = if result.present? && result[:streams].present?
+            result[:streams].map do |stream_data|
+              stream = tournament.streams.find { |s| s.channel&.downcase == stream_data[:channel].downcase } || tournament.streams.new
+
+              stream.channel = stream_data[:channel]
+              stream.platform = stream_data[:platform]
+
+              stream
             end
           end
 
