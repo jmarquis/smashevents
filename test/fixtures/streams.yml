@@ -1,0 +1,41 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# == Schema Information
+#
+# Table name: streams
+#
+#  id                 :bigint           not null, primary key
+#  channel            :string
+#  game_name          :string
+#  platform           :string
+#  status             :string
+#  title              :string
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  provider_stream_id :string
+#  tournament_id      :bigint           not null
+#  youtube_channel_id :string
+#
+# Indexes
+#
+#  index_streams_on_tournament_id  (tournament_id)
+#
+one:
+  provider_stream_id: MyString
+  tournament: one
+  channel: MyString
+  platform: MyString
+  status: MyString
+  youtube_channel_id: MyString
+  game_name: MyString
+  title: MyString
+
+two:
+  provider_stream_id: MyString
+  tournament: two
+  channel: MyString
+  platform: MyString
+  status: MyString
+  youtube_channel_id: MyString
+  game_name: MyString
+  title: MyString

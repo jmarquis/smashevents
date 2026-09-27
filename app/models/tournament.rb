@@ -38,6 +38,7 @@ class Tournament < ApplicationRecord
   has_many :events, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_one :override, class_name: 'TournamentOverride', foreign_key: :slug, primary_key: :slug
+  has_many :streams, dependent: :destroy, autosave: true
 
   scope :not_past, -> { where('end_at > ?', 6.hours.ago) }
   scope :in_progress, -> {

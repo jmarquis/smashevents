@@ -29,6 +29,15 @@ module Startgg
             .first
         end
 
+        t.streams = (data.streams || []).map do |stream_data|
+          stream = t.streams.find { |s| s.channel&.downcase == stream_data.stream_name.downcase } || t.streams.new
+
+          stream.channel = stream_data.stream_name
+          stream.platform = stream_data.stream_source
+
+          stream
+        end
+
         t.stream_data = data.streams&.map do |stream|
           stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase } || {}
 

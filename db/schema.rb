@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_20_034604) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_201631) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -40,6 +40,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_20_034604) do
     t.index ["player2_id"], name: "index_entrants_on_player2_id"
     t.index ["player_id"], name: "index_entrants_on_player_id"
     t.index ["provider", "provider_entrant_id"], name: "index_entrants_on_provider_and_provider_entrant_id", unique: true
+  end
+
+  create_table "event_sets", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "discord_post_id"
+    t.bigint "entrant1_id", null: false
+    t.bigint "entrant2_id", null: false
+    t.bigint "event_id", null: false
+    t.string "provider_set_id"
+    t.datetime "updated_at", null: false
+    t.bigint "winner_entrant_id", null: false
+    t.index ["entrant1_id"], name: "index_event_sets_on_entrant1_id"
+    t.index ["entrant2_id"], name: "index_event_sets_on_entrant2_id"
+    t.index ["event_id"], name: "index_event_sets_on_event_id"
+    t.index ["provider_set_id"], name: "index_event_sets_on_provider_set_id"
+    t.index ["winner_entrant_id"], name: "index_event_sets_on_winner_entrant_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -124,6 +140,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_20_034604) do
     t.index ["provider_user_slug"], name: "index_players_on_provider_user_slug"
     t.index ["tag"], name: "gin_index_players_on_tag", opclass: :gin_trgm_ops, using: :gin
     t.index ["tag"], name: "index_players_on_tag"
+  end
+
+  create_table "streams", force: :cascade do |t|
+    t.string "channel"
+    t.datetime "created_at", null: false
+    t.string "game_name"
+    t.string "platform"
+    t.string "provider_stream_id"
+    t.string "status"
+    t.string "title"
+    t.bigint "tournament_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "youtube_channel_id"
+    t.index ["tournament_id"], name: "index_streams_on_tournament_id"
   end
 
   create_table "tournament_overrides", force: :cascade do |t|
