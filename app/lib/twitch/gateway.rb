@@ -2,9 +2,9 @@ module Twitch
   class Gateway < ::Gateway
     class << self
 
-      def streams(streams:)
+      def streams(channels:)
         instrument('streams') do
-          client.streams.list(user_login: streams).data.reduce({}) do |streams, stream|
+          client.streams.list(user_login: channels).data.reduce({}) do |streams, stream|
             streams[stream.user_name.downcase] = {
               name: stream.user_name,
               game: stream.game_name,

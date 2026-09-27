@@ -26,6 +26,7 @@ class Stream < ApplicationRecord
   STATUS_LIVE = 'live'
 
   belongs_to :tournament
+  belongs_to :game, foreign_key: :game_name, primary_key: :twitch_name, optional: true
 
   def live?
     status == STATUS_LIVE
