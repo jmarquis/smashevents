@@ -22,7 +22,7 @@ namespace :twitch do
       end
 
       streams = tournament.streams.filter do |stream|
-        stream.source.downcase == Tournament::STREAM_SOURCE_TWITCH
+        stream.platform.downcase == Tournament::STREAM_SOURCE_TWITCH
       end
 
       next unless channels.present?
