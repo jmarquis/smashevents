@@ -114,7 +114,7 @@ namespace :twitch do
         end
 
         # Broadcast changes if there were any.
-        tournament.touch if streams.any(&:saved_changes?)
+        tournament.touch if streams.any?(&:saved_changes?)
 
         if tournament.changed?
           Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
