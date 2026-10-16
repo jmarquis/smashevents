@@ -22,5 +22,9 @@ class Factory
       raise NotImplementedError
     end
 
+    def set(data)
+      raise NotImplementedError
+    end
+
   end
 end

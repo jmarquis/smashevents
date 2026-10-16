@@ -32,6 +32,7 @@ module Startgg
         t.streams = (data.streams || []).map do |stream_data|
           stream = t.streams.find { |s| s.channel&.downcase == stream_data.stream_name.downcase } || t.streams.new
 
+          stream.provider_stream_id = stream_data.id
           stream.channel = stream_data.stream_name
           stream.platform = stream_data.stream_source
 
@@ -135,6 +136,22 @@ module Startgg
         p.name = data.user&.name
 
         p
+      end
+
+      def set(data)
+        event = Event.find_by(provider: Provider::PROVIDER_NAME, provider_event_id: data.event.id)
+        set = EventSet.find_by(event:, provider: Provider::PROVIDER_NAME, provider_set_id: data.id) || Set.new
+
+        set.event = event
+        set.provider = Provider::PROVIDER_NAME
+        set.provider_set_id = data.id
+        set.started_at = data.started_at
+        set.completed_at = data.completed_at
+        set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id)
+        set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id)
+        set.stream = event.tournament.streams.find_by(channel: data.stream.stream_name)
+
+        set
       end
 
     end

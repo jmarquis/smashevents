@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_193138) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_195347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -43,18 +43,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_193138) do
   end
 
   create_table "event_sets", force: :cascade do |t|
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.string "discord_post_id"
     t.bigint "entrant1_id", null: false
     t.bigint "entrant2_id", null: false
     t.bigint "event_id", null: false
     t.string "provider_set_id", null: false
+    t.datetime "started_at"
+    t.bigint "stream_id"
     t.datetime "updated_at", null: false
     t.bigint "winner_entrant_id", null: false
     t.index ["entrant1_id"], name: "index_event_sets_on_entrant1_id"
     t.index ["entrant2_id"], name: "index_event_sets_on_entrant2_id"
     t.index ["event_id"], name: "index_event_sets_on_event_id"
     t.index ["provider_set_id"], name: "index_event_sets_on_provider_set_id"
+    t.index ["stream_id"], name: "index_event_sets_on_stream_id"
     t.index ["winner_entrant_id"], name: "index_event_sets_on_winner_entrant_id"
   end
 

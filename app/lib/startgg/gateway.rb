@@ -91,6 +91,7 @@ module Startgg
                   end
 
                   streams do
+                    id
                     streamName
                     streamSource
                     streamStatus
@@ -258,6 +259,10 @@ module Startgg
                     startedAt
                     state
                     winnerId
+
+                    event do
+                      id
+                    end
 
                     phaseGroup do
                       bracketType
