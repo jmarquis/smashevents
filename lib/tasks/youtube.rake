@@ -21,7 +21,13 @@ namespace :youtube do
         stream
       end
 
+      tournament.streams.where(platform: Stream::PLATFORM_YOUTUBE).each do |stream|
+        stream.youtube_channel_id = Youtube::Gateway.channel_id(stream.channel)
+        stream.save!
+      end
+
       Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
+      tournament.touch
       tournament.save
     end
   end

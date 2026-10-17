@@ -2,6 +2,20 @@ module Youtube
   class Gateway < ::Gateway
     class << self
 
+      def channel_id(channel_name)
+        Rails.logger.info "Fetching YouTube channel info for #{channel_name}..."
+
+        response = instrument('list_searches') do
+          client.list_searches('snippet', type: 'channel', q: channel_name)
+        end
+
+        response.items.first.id.channel_id
+      rescue => e
+        Rails.logger.error e.message
+        Sentry.capture_exception(e)
+        nil
+      end
+
       def channel_url(channel_name)
         Rails.logger.info "Fetching YouTube channel info for #{channel_name}..."
 
