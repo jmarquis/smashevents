@@ -28,6 +28,8 @@ class Stream < ApplicationRecord
   belongs_to :tournament
   belongs_to :game, foreign_key: :game_name, primary_key: :twitch_name, optional: true
 
+  normalizes :platform, with: ->(platform) { platform.downcase }
+
   def live?
     status == STATUS_LIVE
   end

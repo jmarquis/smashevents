@@ -4,8 +4,7 @@ namespace :youtube do
     Rails.logger.info 'Starting Youtube stream sync...'
 
     Tournament.where('start_at <= ?', Time.now + 1.day).where('end_at >= ?', Time.now - 1.day).each do |tournament|
-      next unless tournament.stream_data.present?
-      next unless tournament.stream_data.filter { |stream| stream.with_indifferent_access[:source].downcase == Tournament::STREAM_SOURCE_YOUTUBE }.any?
+      next unless tournament.streams.where(platform: Stream::PLATFORM_YOUTUBE).any?
       next unless tournament.should_display?
 
       Rails.logger.info "Syncing Youtube stream URLs for #{tournament.slug}..."

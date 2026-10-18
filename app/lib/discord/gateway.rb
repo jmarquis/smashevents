@@ -80,13 +80,13 @@ module Discord
       end
 
       def happening_today(tournament)
-        streams = if tournament.stream_data.present?
-          tournament.stream_data.map do |stream|
-            case stream['source'].downcase
-            when Tournament::STREAM_SOURCE_TWITCH
-              "[#{stream['name']}](https://twitch.tv/#{stream['name']})"
-            when Tournament::STREAM_SOURCE_YOUTUBE
-              "[#{stream['name']}](#{stream['url']}/live)"
+        streams = if tournament.streams.any?
+          tournament.streams.map do |stream|
+            case stream.platform.downcase
+            when Stream::PLATFORM_TWITCH
+              "[#{stream.channel}](https://twitch.tv/#{stream.channel})"
+            when Stream::PLATFORM_YOUTUBE
+              "[#{stream.channel}](https://youtube.com/channel/#{stream.youtube_channel_id}/live)"
             end
           end.compact
         end

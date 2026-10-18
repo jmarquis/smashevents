@@ -32,7 +32,14 @@ module Parrygg
               stream = tournament.streams.find { |s| s.channel&.downcase == stream_data[:channel].downcase } || tournament.streams.new
 
               stream.channel = stream_data[:channel]
-              stream.platform = stream_data[:platform]
+              stream.platform = case stream_data[:platform]
+              when 'STREAM_PLATFORM_TWITCH'
+                Stream::PLATFORM_TWITCH
+              when 'STREAM_PLATFORM_YOUTUBE'
+                Stream::PLATFORM_YOUTUBE
+              else
+                stream_data[:platform]
+              end
 
               stream
             end
