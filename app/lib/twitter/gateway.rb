@@ -96,22 +96,13 @@ module Twitter
       def happening_today(tournament)
         return unless tournament.events.any?(&:should_display?)
 
-        streams = if tournament.stream_data.present?
-          tournament.stream_data.map do |stream|
-            case stream['source'].downcase
-            when Tournament::STREAM_SOURCE_TWITCH
-              "https://twitch.tv/#{stream['name']}"
-            when Tournament::STREAM_SOURCE_YOUTUBE
-              "#{stream['url']}/live"
-            end
-          end.compact
-        end
+        stream_urls = tournament.streams.filter_map(&:url)
 
-        stream_text = if streams.present?
+        stream_text = if stream_urls.present?
           <<~TEXT
             \n\n
             Streams:
-            #{streams.join("\n")}
+            #{stream_urls.join("\n")}
           TEXT
         end
 

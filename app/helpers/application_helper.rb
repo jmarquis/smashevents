@@ -10,16 +10,16 @@ module ApplicationHelper
   end
 
   def stream_link(stream)
-    case stream.platform.downcase
+    case stream.platform
     when Stream::PLATFORM_TWITCH
       link_to(
         inline_svg_tag('twitch.svg') + stream.channel,
-        "https://twitch.tv/#{stream.channel}",
+        stream.url,
         target: '_blank',
         title: stream.live? ? "#{stream.game_name} | #{stream.title}" : nil
       )
     when Stream::PLATFORM_YOUTUBE
-      link_to inline_svg_tag('youtube.svg') + stream.channel, "https://youtube.com/channel/#{stream.youtube_channel_id}/live", target: '_blank' if stream.youtube_channel_id.present?
+      link_to inline_svg_tag('youtube.svg') + stream.channel, stream.url, target: '_blank'
     end
   end
 

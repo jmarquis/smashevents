@@ -16,20 +16,6 @@ module Youtube
         nil
       end
 
-      def channel_url(channel_name)
-        Rails.logger.info "Fetching YouTube channel info for #{channel_name}..."
-
-        response = instrument('list_searches') do
-          client.list_searches('snippet', type: 'channel', q: channel_name)
-        end
-
-        "https://youtube.com/channel/#{response.items.first.id.channel_id}/live"
-      rescue => e
-        Rails.logger.error e.message
-        Sentry.capture_exception(e)
-        "https://youtube.com/#{channel_name}"
-      end
-
       def client
         return @client if @client.present?
 

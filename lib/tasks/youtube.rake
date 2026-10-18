@@ -4,30 +4,20 @@ namespace :youtube do
     Rails.logger.info 'Starting Youtube stream sync...'
 
     Tournament.where('start_at <= ?', Time.now + 1.day).where('end_at >= ?', Time.now - 1.day).each do |tournament|
-      next unless tournament.streams.where(platform: Stream::PLATFORM_YOUTUBE).any?
       next unless tournament.should_display?
 
-      Rails.logger.info "Syncing Youtube stream URLs for #{tournament.slug}..."
+      streams = tournament.streams.where(platform: Stream::PLATFORM_YOUTUBE, youtube_channel_id: nil)
+      next unless streams.any?
 
-      tournament.stream_data = tournament.stream_data.map do |stream|
-        stream = stream.with_indifferent_access
+      Rails.logger.info "Syncing Youtube channel IDs for #{tournament.slug}..."
 
-        if stream[:source].downcase == Tournament::STREAM_SOURCE_YOUTUBE && stream[:url].blank?
-          url = Youtube::Gateway.channel_url(stream[:name])
-          stream[:url] = url if url.present?
-        end
-
-        stream
-      end
-
-      tournament.streams.where(platform: Stream::PLATFORM_YOUTUBE).each do |stream|
+      streams = streams.to_a
+      streams.each do |stream|
         stream.youtube_channel_id = Youtube::Gateway.channel_id(stream.channel)
         stream.save!
       end
 
-      Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
-      tournament.touch
-      tournament.save
+      tournament.touch if streams.any?(&:saved_changes?)
     end
   end
 

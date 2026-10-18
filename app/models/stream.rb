@@ -33,4 +33,19 @@ class Stream < ApplicationRecord
   def live?
     status == STATUS_LIVE
   end
+
+  def url
+    case platform
+    when PLATFORM_TWITCH
+      "https://twitch.tv/#{channel}"
+    when PLATFORM_YOUTUBE
+      if youtube_channel_id.present?
+        "https://youtube.com/channel/#{youtube_channel_id}/live"
+      else
+        # Just hope this works I guess. It's not super clear how well we should
+        # expect what people type into startgg to translate to a URL like this.
+        "https://youtube.com/#{channel}"
+      end
+    end
+  end
 end
