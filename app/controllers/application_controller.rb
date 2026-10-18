@@ -12,7 +12,7 @@ class ApplicationController < BaseController
       StatsD.increment("view.index.#{game.slug}")
     end
 
-    @tournaments = Tournament.should_display(games: @games)
+    @tournaments = Tournament.includes(:streams).should_display(games: @games)
       # Leave a few hours of leeway for events that run long
       .where('end_at > ?', 6.hours.ago)
       .where(id: Event.where.not(state: Event::STATE_COMPLETED).select(:tournament_id))
@@ -45,7 +45,7 @@ class ApplicationController < BaseController
       StatsD.increment("view.past.#{game.slug}")
     end
 
-    @tournaments = Tournament.should_display(games: @games)
+    @tournaments = Tournament.includes(:streams).should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
       .where.not(
         id: Tournament.joins(:events).where.not(events: { state: Event::STATE_COMPLETED })
