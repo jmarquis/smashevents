@@ -18,9 +18,9 @@ module Parrygg
               stream_data[:name] = stream[:channel]
               stream_data[:source] = case stream[:platform]
               when 'STREAM_PLATFORM_TWITCH'
-                Tournament::STREAM_SOURCE_TWITCH
+                Stream::PLATFORM_TWITCH
               when 'STREAM_PLATFORM_YOUTUBE'
-                Tournament::STREAM_SOURCE_YOUTUBE
+                Stream::PLATFORM_YOUTUBE
               end
 
               stream_data
@@ -36,6 +36,8 @@ module Parrygg
 
               stream
             end
+          else
+            []
           end
 
           tournament.save!
