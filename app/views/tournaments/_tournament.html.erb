@@ -70,14 +70,14 @@
     <% end %>
   <% end %>
 
-  <% if tournament.start_at <= Time.now && tournament.stream_data.present? && !tournament.past? %>
+  <% if tournament.start_at <= Time.now && tournament.streams.any? && !tournament.past? %>
     <div class="streams">
       <h3>Streams</h3>
       <ul class="streams">
-        <% tournament.stream_data.map(&:deep_symbolize_keys).filter{ |stream| stream[:source].downcase.in?(['twitch', 'youtube']) }.each do |stream| %>
+        <% tournament.streams.each do |stream| %>
           <li>
             <%= stream_link(stream) %>
-            <% if stream[:status]&.downcase == Tournament::STREAM_STATUS_LIVE %>
+            <% if stream.live? %>
               <span class="live">Live</span>
             <% end %>
           </li>

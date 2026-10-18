@@ -10,18 +10,16 @@ module ApplicationHelper
   end
 
   def stream_link(stream)
-    stream = stream.with_indifferent_access
-
-    case stream[:source].downcase
-    when Tournament::STREAM_SOURCE_TWITCH
+    case stream.platform.downcase
+    when Stream::PLATFORM_TWITCH
       link_to(
-        inline_svg_tag('twitch.svg') + stream[:name],
-        "https://twitch.tv/#{stream[:name]}",
+        inline_svg_tag('twitch.svg') + stream.channel,
+        "https://twitch.tv/#{stream.channel}",
         target: '_blank',
-        title: stream[:status] == Tournament::STREAM_STATUS_LIVE ? "#{stream[:game]} | #{stream[:title]}" : nil
+        title: stream.live? ? "#{stream.game_name} | #{stream.title}" : nil
       )
-    when Tournament::STREAM_SOURCE_YOUTUBE
-      link_to inline_svg_tag('youtube.svg') + stream[:name], stream[:url], target: '_blank' if stream[:url].present?
+    when Stream::PLATFORM_YOUTUBE
+      link_to inline_svg_tag('youtube.svg') + stream.channel, "https://youtube.com/channel/#{stream.youtube_channel_id}/live", target: '_blank' if stream.youtube_channel_id.present?
     end
   end
 
