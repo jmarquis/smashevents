@@ -21,6 +21,11 @@ end
 
 ### DAILY JOBS
 
+# 1:00pm UTC
+cron '0 13 * * *', locals: { task: 'startgg:clear_last_full_tournament_sync' }, overlap: false do
+  rake_async('startgg:clear_last_full_tournament_sync')
+end
+
 # 2:00pm UTC
 cron '0 14 * * *', locals: { task: 'notifications:recap' }, overlap: false do
   rake_async('notifications:recap')

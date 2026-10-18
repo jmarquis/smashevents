@@ -31,4 +31,8 @@ namespace :startgg do
     end
   end
 
+  task clear_last_full_tournament_sync: [:environment] do
+    Rails.cache.delete('startgg/last_full_tournament_sync')
+  end
+
 end
