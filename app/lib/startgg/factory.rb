@@ -39,15 +39,6 @@ module Startgg
           stream
         end
 
-        t.stream_data = data.streams&.map do |stream|
-          stream_data = (t.stream_data || []).map(&:deep_symbolize_keys).find { |data| data[:name]&.downcase == stream.stream_name.downcase } || {}
-
-          stream_data[:name] = stream.stream_name
-          stream_data[:source] = stream.stream_source
-
-          stream_data
-        end
-
         events = []
 
         return t, events unless data.events.present?
