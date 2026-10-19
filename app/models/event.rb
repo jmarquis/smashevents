@@ -364,7 +364,7 @@ class Event < ApplicationRecord
     # If the stream isn't actually live, we're not going to notify about it.
     # Probably the TO intended to stream it but for whatever reason the set
     # started before the stream started.
-    return unless tournament.stream_live?(set.stream.stream_name)
+    return unless tournament.streams.find_by(channel: set.stream.stream_name)&.live?
 
     set_entrants = entrants.where(provider_entrant_id: [
       set.slots.first.entrant.id,

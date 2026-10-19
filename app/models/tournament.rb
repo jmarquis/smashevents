@@ -47,7 +47,7 @@ class Tournament < ApplicationRecord
       .where(events: { winner_entrant_id: nil })
   }
   scope :reasonable_duration, -> { where("end_at - start_at < interval '7 days'") }
-  scope :has_streams, -> { where.not(stream_data: nil) }
+  scope :has_streams, -> { where.associated(:streams) }
   scope :should_display, ->(games: Game.all) {
     includes(:override, events: [:game, :winner_player, { winner_entrant: :player }])
       .where(events: { game: games })
@@ -180,16 +180,6 @@ class Tournament < ApplicationRecord
 
   def sync_entrants!
     events.each(&:sync_entrants!)
-  end
-
-  def has_streams?
-    stream_data.present?
-  end
-
-  def stream_live?(stream_name)
-    return false unless has_streams?
-
-    stream_data.index_by { |d| d['name'].downcase }.dig(stream_name.downcase, 'status') == Tournament::STREAM_STATUS_LIVE
   end
 
   def in_progress?
