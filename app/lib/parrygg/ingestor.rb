@@ -29,7 +29,7 @@ module Parrygg
 
           tournament.streams = if result.present? && result[:streams].present?
             result[:streams].map do |stream_data|
-              stream = tournament.streams.find { |s| s.channel&.downcase == stream_data[:channel].downcase } || tournament.streams.new
+              stream = tournament.streams.find { |s| s.channel?(stream_data[:channel]) } || tournament.streams.new
 
               stream.channel = stream_data[:channel]
               stream.platform = case stream_data[:platform]

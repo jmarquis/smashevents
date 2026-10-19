@@ -30,7 +30,7 @@ module Startgg
         end
 
         t.streams = (data.streams || []).map do |stream_data|
-          stream = t.streams.find { |s| s.channel&.downcase == stream_data.stream_name.downcase } || t.streams.new
+          stream = t.streams.find { |s| s.channel?(stream_data.stream_name) } || t.streams.new
 
           stream.provider_stream_id = stream_data.id
           stream.channel = stream_data.stream_name
@@ -149,7 +149,7 @@ module Startgg
         set.completed_at = data.completed_at
         set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id)
         set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id)
-        set.stream = event.tournament.streams.find_by(channel: data.stream.stream_name)
+        set.stream = event.tournament.streams.with_channel(data.stream.stream_name).first
 
         set
       end

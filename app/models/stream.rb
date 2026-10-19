@@ -30,6 +30,14 @@ class Stream < ApplicationRecord
 
   normalizes :platform, with: ->(platform) { platform.downcase }
 
+  # Channel names are case insensitive on every platform we care about, but we
+  # keep the original casing for display.
+  scope :with_channel, ->(channel) { where('LOWER(streams.channel) = ?', channel&.downcase) }
+
+  def channel?(other_channel)
+    channel.present? && channel.casecmp?(other_channel.to_s)
+  end
+
   def live?
     status == STATUS_LIVE
   end
