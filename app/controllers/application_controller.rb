@@ -75,7 +75,10 @@ class ApplicationController < BaseController
     @games = selected_games
 
     ids = Array(params[:ids]).map(&:to_i)
-    tournaments = Tournament.where(id: ids).index_by(&:id)
+    tournaments = Tournament
+      .includes(:streams, events: [:game, :winner_player, { winner_entrant: :player }])
+      .where(id: ids)
+      .index_by(&:id)
 
     @tournaments = ids.filter_map { |id| tournaments[id] }
     @missing_ids = ids - tournaments.keys
