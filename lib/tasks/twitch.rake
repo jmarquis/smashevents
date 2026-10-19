@@ -7,33 +7,24 @@ namespace :twitch do
       .where('tournaments.start_at <= ?', Time.now + 12.hours)
       .where('tournaments.end_at >= ?', Time.now - 12.hours)
       .each do |tournament|
-      # TODO: next unless tournament.streams.any?
-      next unless tournament.stream_data.present?
+      next unless tournament.streams.any?
       next unless tournament.events.any? { |e| e.winner_entrant_id.blank? }
 
       Rails.logger.debug "Syncing Twitch streams for #{tournament.slug}..."
 
       # Collect all the tournament's Twitch streams...
-      channels = tournament.stream_data.reduce([]) do |channels, stream|
-        stream = stream.with_indifferent_access
-        channels += [stream[:name]] if stream[:source]&.downcase == Tournament::STREAM_SOURCE_TWITCH
-
-        channels
-      end
-
       streams = tournament.streams.filter do |stream|
-        stream.platform.downcase == Tournament::STREAM_SOURCE_TWITCH
+        stream.platform == Stream::PLATFORM_TWITCH
       end
 
-      next unless channels.present?
+      next unless streams.present?
 
       begin
         # ...fetch their statuses from Twitch in bulk...
-        live_streams = Twitch::Gateway.streams(channels:)
-        # TODO: live_streams = Twitch::Gateway.streams(channels: streams.map(&:channel))
+        live_streams = Twitch::Gateway.streams(channels: streams.map(&:channel))
 
         # ...and update the tournament's stream data with the results.
-        tournament.stream_data = tournament.stream_data.map do |stream|
+        tournament.stream_data = (tournament.stream_data || []).map do |stream|
           stream = stream.with_indifferent_access
           game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game]) if stream[:name].downcase.in?(live_streams)
           potential_events = tournament.events.where(game_slug: game&.slug)
@@ -101,7 +92,7 @@ namespace :twitch do
 
           next # TODO: unless should_notify
 
-          Rails.logger.info "Sending stream live notification for #{tournament.slug} #{stream[:game]}: #{stream[:name]}"
+          Rails.logger.info "Sending stream live notification for #{tournament.slug} #{stream.game_name}: #{stream.channel}"
 
           Notification.send_notification(
             tournament,
