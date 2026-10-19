@@ -145,16 +145,16 @@ module Twitter
         tweet!(text)
       end
 
-      def upset(event:, winner_entrant:, winner_games:, loser_entrant:, loser_games:)
+      def upset(set:)
         text = <<~TEXT
-          [#{winner_entrant.seed}] #{winner_entrant.tag(twitter: true)} #{winner_games}-#{loser_games} #{loser_entrant.tag} [#{loser_entrant.seed}]
+          [#{set.winner_entrant.seed}] #{set.winner_entrant.tag(twitter: true)} #{set.winner_score}-#{set.loser_score} #{set.loser_entrant.tag} [#{set.loser_entrant.seed}]
           \n\n
-          UPSET FACTOR #{Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)}
+          UPSET FACTOR #{set.upset_factor}
         TEXT
 
         tweet!(
           text,
-          reply_to_tweet_id: event.last_upset_tweet_id,
+          reply_to_tweet_id: set.event.last_upset_tweet_id,
           remove_mentions: true
         )
       end

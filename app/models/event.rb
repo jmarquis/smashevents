@@ -38,8 +38,6 @@ class Event < ApplicationRecord
   SET_STATE_IN_PROGRESS = 2
   SET_STATE_COMPLETED = 3
 
-  PLACEMENTS = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025]
-
   belongs_to :tournament, touch: true
   has_many :entrants, dependent: :destroy
   has_many :players, through: :entrants
@@ -54,13 +52,6 @@ class Event < ApplicationRecord
       .or(in_progress.where('entrants_synced_at < start_at'))
   }
   scope :in_progress, -> { where(state: STATE_ACTIVE) }
-
-  # TODO: Put this somewhere else?
-  def self.upset_factor(winner_seed:, loser_seed:)
-    winner_seed_placement_index = PLACEMENTS.count { |placement| winner_seed >= placement } - 1
-    loser_seed_placement_index = PLACEMENTS.count { |placement| loser_seed >= placement } - 1
-    winner_seed_placement_index - loser_seed_placement_index
-  end
 
   def should_ingest?
     return false unless game&.ingestion_threshold.present?
@@ -322,7 +313,13 @@ class Event < ApplicationRecord
 
       sets.each do |set|
         StatsD.increment("#{provider::PROVIDER_NAME}.set_fetched.in_progress")
-        process_in_progress_set(factory.set(set))
+        set = factory.set(set, event: self)
+
+        next unless set.entrant1.present? && set.entrant2.present?
+
+        set.save!
+
+        process_in_progress_set(set)
       end
 
       sleep provider.sleep_time
@@ -342,6 +339,12 @@ class Event < ApplicationRecord
 
       sets.each do |set|
         StatsD.increment("#{provider::PROVIDER_NAME}.set_fetched.completed")
+        set = factory.set(set, event: self)
+
+        next unless set.entrant1.present? && set.entrant2.present?
+
+        set.save!
+
         process_completed_set(set)
       end
 
@@ -367,12 +370,6 @@ class Event < ApplicationRecord
     # started before the stream started.
     return unless set.stream.live?
 
-    # At this point there's a decent chance we'll be notifying for this set, so
-    # let's save it. If there are no player subscriptions and the event isn't
-    # displayable we won't, but at this point that's fairly uncommon and low
-    # volume and those unused set records will get cleaned up eventually anyway.
-    set.save!
-
     # Let Setbot do its thing.
     Setbot.notify_subscriptions(set:)
 
@@ -395,65 +392,32 @@ class Event < ApplicationRecord
   end
 
   def process_completed_set(set)
-    return unless set.winner_id.present?
-
-    entrant_provider_ids = set.slots.map(&:entrant).map(&:id).map(&:to_s)
-    return unless entrant_provider_ids.count == 2
-
-    winner_entrant = entrants.find_by(provider_entrant_id: set.winner_id)
-    return unless winner_entrant.present? && winner_entrant.seed.present?
-
-    loser_entrant = entrants.find_by(provider_entrant_id: (entrant_provider_ids - [set.winner_id.to_s]).first)
-    return unless loser_entrant.present? && loser_entrant.seed.present?
+    return unless set.winner_entrant.present?
+    return unless set.entrant1&.seed.present?
+    return unless set.entrant2&.seed.present?
+    return unless set.entrant1_score.present?
+    return unless set.entrant2_score.present?
+    return unless set.entrant1_score > -1
+    return unless set.entrant2_score > -1
 
     # Larger events don't really seed beyond top 256 typically, so upsets
     # beyond that don't really mean anything.
-    return unless loser_entrant.seed <= 256
+    return unless set.loser_entrant.seed <= 256
 
-    upset_factor = self.class.upset_factor(
-      winner_seed: winner_entrant.seed,
-      loser_seed: loser_entrant.seed
-    )
-
-    game_counts = set.slots.reduce({}) do |counts, slot|
-      counts[slot.entrant.id.to_s] = slot.standing&.stats&.score&.value&.to_i
-      counts
-    end
-
-    winner_games = game_counts[winner_entrant.provider_entrant_id.to_s]
-    loser_games = game_counts[loser_entrant.provider_entrant_id.to_s]
-
-    return unless winner_games.present? && loser_games.present? && winner_games > -1 && loser_games > -1
-
-    return unless upset_factor >= upset_factor_threshold
+    # We don't report every upset, just the bigger ones.
+    return unless set.upset_factor >= upset_factor_threshold
 
     initialize_twitter_upset_thread!
 
-    previous_notification = Notification.where(
-      notifiable: self,
-      notification_type: Notification::TYPE_UPSET,
-      platform: Notification::PLATFORM_TWITTER,
-      success: true
-    ).filter { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }.first
-
-    return if previous_notification.present?
-
-    upset_factor = Event.upset_factor(winner_seed: winner_entrant.seed, loser_seed: loser_entrant.seed)
-    Rails.logger.info("Posting upset tweet for #{winner_entrant.tag} (#{winner_entrant.seed}) #{winner_games}-#{loser_games} #{loser_entrant.tag} (#{loser_entrant.seed}) [UF #{upset_factor}]")
-
     Notification.send_notification(
-      self,
+      set,
       type: Notification::TYPE_UPSET,
       platform: Notification::PLATFORM_TWITTER,
-      metadata: { startgg_set_id: set.id }
-    ) do |event|
-      tweet = Twitter::Gateway.upset(
-        event: event,
-        winner_entrant:,
-        winner_games:,
-        loser_entrant:,
-        loser_games:
-      )
+      idempotent: true
+    ) do |set|
+      Rails.logger.info("Posting upset tweet for #{set.winner_entrant.tag} (#{set.winner_entrant.seed}) #{set.winner_score}-#{set.loser_score} #{set.loser_entrant.tag} (#{set.loser_entrant.seed}) [UF #{set.upset_factor}]")
+
+      tweet = Twitter::Gateway.upset(set:)
 
       self.last_upset_tweet_id = tweet['data']['id']
       save!

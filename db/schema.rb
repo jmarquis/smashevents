@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_174500) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_174501) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -47,7 +47,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_174500) do
     t.datetime "created_at", null: false
     t.string "discord_post_id"
     t.bigint "entrant1_id", null: false
+    t.integer "entrant1_score"
     t.bigint "entrant2_id", null: false
+    t.integer "entrant2_score"
     t.bigint "event_id", null: false
     t.string "provider_set_id", null: false
     t.datetime "started_at"

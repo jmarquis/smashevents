@@ -129,15 +129,17 @@ module Startgg
         p
       end
 
-      def set(data)
-        event = Event.find_by(provider: Provider::PROVIDER_NAME, provider_event_id: data.event.id)
+      def set(data, event:)
         set = event.event_sets.find_by(provider_set_id: data.id) || event.event_sets.new
 
         set.provider_set_id = data.id
-        set.started_at = data.started_at
-        set.completed_at = data.completed_at
-        set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id)
-        set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id)
+        set.started_at = data.started_at.present? ? Time.at(data.started_at) : nil
+        set.completed_at = data.completed_at.present? ? Time.at(data.completed_at) : nil
+        set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id) if data.slots&.first&.entrant&.id.present?
+        set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id) if data.slots&.second&.entrant&.id.present?
+        set.entrant1_score = data.slots.first.standing&.stats&.score&.value&.to_i
+        set.entrant2_score = data.slots.second.standing&.stats&.score&.value&.to_i
+        set.winner_entrant = event.entrants.find_by(provider_entrant_id: data.winner_id)
 
         # Look this up by name now to preserve existing behavior. We may be able
         # to use ID instead but the docs are a little unclear about how IDs work

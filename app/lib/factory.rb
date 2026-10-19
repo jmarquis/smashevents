@@ -22,7 +22,7 @@ class Factory
       raise NotImplementedError
     end
 
-    def set(data)
+    def set(data, event:)
       raise NotImplementedError
     end
 

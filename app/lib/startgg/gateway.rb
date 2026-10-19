@@ -260,10 +260,6 @@ module Startgg
                     state
                     winnerId
 
-                    event do
-                      id
-                    end
-
                     phaseGroup do
                       bracketType
                     end

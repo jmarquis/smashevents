@@ -4,6 +4,8 @@
 #
 #  id                :bigint           not null, primary key
 #  completed_at      :datetime
+#  entrant1_score    :integer
+#  entrant2_score    :integer
 #  started_at        :datetime
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
