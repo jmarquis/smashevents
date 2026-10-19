@@ -130,19 +130,17 @@ module Discord
       end
 
       def stream_live(tournament:, stream:)
-        stream = stream.with_indifferent_access
-        game = Game.find_by(twitch_name: stream[:game])
-        return unless game.present?
+        return unless stream.game.present?
 
-        post(game_channel_id(game.slug)) do |builder|
+        post(game_channel_id(stream.game.slug)) do |builder|
           builder.content = "### #{tournament.name.upcase} STREAM IS LIVE"
           builder.add_embed do |embed|
-            embed.title = stream[:name]
-            embed.url = "https://twitch.tv/#{stream[:name]}"
+            embed.title = stream.channel
+            embed.url = stream.url
 
             embed.description = <<~TEXT
-              #{stream[:title]}
-              #{stream[:game]}
+              #{stream.title}
+              #{stream.game_name}
             TEXT
 
             embed.image = Discordrb::Webhooks::EmbedImage.new(url: tournament.banner_image_url) if tournament.banner_image_url.present?

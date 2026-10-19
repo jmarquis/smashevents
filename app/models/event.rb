@@ -351,7 +351,7 @@ class Event < ApplicationRecord
   def process_in_progress_set(set)
     # Most sets don't have a stream, so this filters a ton.
     return unless set.stream.present?
-    return unless set.stream.stream_source.downcase == Tournament::STREAM_SOURCE_TWITCH
+    return unless set.stream.stream_source.downcase == Stream::PLATFORM_TWITCH
 
     # We only care about currently ongoing sets.
     return unless set.started_at.present?

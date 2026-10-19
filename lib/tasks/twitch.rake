@@ -23,42 +23,7 @@ namespace :twitch do
         # ...fetch their statuses from Twitch in bulk...
         live_streams = Twitch::Gateway.streams(channels: streams.map(&:channel))
 
-        # ...and update the tournament's stream data with the results.
-        tournament.stream_data = (tournament.stream_data || []).map do |stream|
-          stream = stream.with_indifferent_access
-          game = Game.find_by(twitch_name: live_streams[stream[:name].downcase][:game]) if stream[:name].downcase.in?(live_streams)
-          potential_events = tournament.events.where(game_slug: game&.slug)
-
-          if stream[:source].downcase == Tournament::STREAM_SOURCE_TWITCH
-            && game.present?
-            && potential_events.any?(&:should_display?)
-
-            should_notify = stream[:status] != Tournament::STREAM_STATUS_LIVE
-
-            stream[:status] = Tournament::STREAM_STATUS_LIVE
-            stream[:game] = live_streams[stream[:name].downcase][:game]
-            stream[:title] = live_streams[stream[:name].downcase][:title]
-
-            if should_notify
-              Rails.logger.info "Sending stream live notification for #{tournament.slug} #{stream[:game]}: #{stream[:name]}"
-
-              Notification.send_notification(
-                tournament,
-                type: Notification::TYPE_STREAM_LIVE,
-                platform: Notification::PLATFORM_DISCORD
-              ) do |tournament|
-                Discord::Gateway.stream_live(tournament:, stream:)
-              end
-            end
-          else
-            stream.delete(:status)
-            stream.delete(:game)
-            stream.delete(:title)
-          end
-
-          stream
-        end
-
+        # ...and update the tournament's streams with the results.
         streams.each do |stream|
           unless stream.channel.downcase.in?(live_streams)
             stream.update!(
@@ -82,15 +47,19 @@ namespace :twitch do
           end
 
           # We only want to notify about streams that correspond to games that
-          # we're displaying events for.
-          should_notify = stream.status != Stream::STATUS_LIVE && tournament.events.where(game_slug: game.slug).any?(&:should_display?)
+          # we're displaying events for. Notify when the stream goes live, or
+          # when an already live stream switches games, since it may have
+          # switched from a game we weren't displaying to one we are.
+          went_live = stream.status != Stream::STATUS_LIVE
+          changed_game = stream.game_name != stream_data[:game]
+          should_notify = (went_live || changed_game) && tournament.events.where(game_slug: game.slug).any?(&:should_display?)
 
           stream.status = Stream::STATUS_LIVE
           stream.game_name = stream_data[:game]
           stream.title = stream_data[:title]
           stream.save!
 
-          next # TODO: unless should_notify
+          next unless should_notify
 
           Rails.logger.info "Sending stream live notification for #{tournament.slug} #{stream.game_name}: #{stream.channel}"
 
@@ -99,18 +68,12 @@ namespace :twitch do
             type: Notification::TYPE_STREAM_LIVE,
             platform: Notification::PLATFORM_DISCORD
           ) do |tournament|
-            # TODO: Update this method to accept a Stream
             Discord::Gateway.stream_live(tournament:, stream:)
           end
         end
 
         # Broadcast changes if there were any.
         tournament.touch if streams.any?(&:saved_changes?)
-
-        if tournament.changed?
-          Rails.logger.info "#{tournament.slug}: #{tournament.changes}"
-          tournament.save
-        end
       rescue Twitch::Error => e
         Rails.logger.error "Error syncing stream: #{e.message}"
       end

@@ -30,11 +30,6 @@
 #
 
 class Tournament < ApplicationRecord
-  STREAM_SOURCE_TWITCH = 'twitch'
-  STREAM_SOURCE_YOUTUBE = 'youtube'
-
-  STREAM_STATUS_LIVE = 'live'
-
   has_many :events, dependent: :destroy
   has_many :notifications, as: :notifiable
   has_one :override, class_name: 'TournamentOverride', foreign_key: :slug, primary_key: :slug
