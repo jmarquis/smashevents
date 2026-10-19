@@ -151,21 +151,21 @@ module Discord
         end
       end
 
-      def set_live(event:, entrant:, opponent:, stream_name:)
-        post(sets_channel_id(event.game.slug)) do |builder|
-          builder.content = "### SET IS LIVE: #{entrant.tag} vs #{opponent.tag}"
+      def set_live(set:)
+        post(sets_channel_id(set.event.game.slug)) do |builder|
+          builder.content = "### SET IS LIVE: #{set.entrant1.tag} vs #{set.entrant2.tag}"
 
           builder.add_embed do |embed|
-            embed.title = stream_name
-            embed.url = "https://twitch.tv/#{stream_name}"
+            embed.title = set.stream.channel
+            embed.url = set.stream.url
 
             embed.description = <<~TEXT
-              #{event.tournament.name}
-              #{event.game.twitch_name}
+              #{set.event.tournament.name}
+              #{set.event.game.twitch_name}
             TEXT
 
-            embed.image = Discordrb::Webhooks::EmbedImage.new(url: event.tournament.banner_image_url) if event.tournament.banner_image_url.present?
-            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: event.tournament.profile_image_url) if event.tournament.profile_image_url.present?
+            embed.image = Discordrb::Webhooks::EmbedImage.new(url: set.event.tournament.banner_image_url) if set.event.tournament.banner_image_url.present?
+            embed.thumbnail = Discordrb::Webhooks::EmbedThumbnail.new(url: set.event.tournament.profile_image_url) if set.event.tournament.profile_image_url.present?
 
             embed.footer = DEFAULT_FOOTER
           end

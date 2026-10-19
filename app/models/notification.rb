@@ -38,7 +38,13 @@ class Notification < ApplicationRecord
     notification.sent_at ||= Time.now
   end
 
-  def self.send_notification(notifiable_or_notifiables, type:, platform:, idempotent: false, metadata: nil)
+  def self.send_notification(
+    notifiable_or_notifiables,
+    type:,
+    platform:,
+    idempotent: false,
+    metadata: nil
+  )
     notifiables = notifiable_or_notifiables.is_a?(Array) ? notifiable_or_notifiables : [notifiable_or_notifiables]
 
     if idempotent

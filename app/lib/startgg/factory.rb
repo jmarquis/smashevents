@@ -131,16 +131,20 @@ module Startgg
 
       def set(data)
         event = Event.find_by(provider: Provider::PROVIDER_NAME, provider_event_id: data.event.id)
-        set = EventSet.find_by(event:, provider: Provider::PROVIDER_NAME, provider_set_id: data.id) || Set.new
+        set = event.event_sets.find_by(provider_set_id: data.id) || event.event_sets.new
 
-        set.event = event
-        set.provider = Provider::PROVIDER_NAME
         set.provider_set_id = data.id
         set.started_at = data.started_at
         set.completed_at = data.completed_at
         set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id)
         set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id)
-        set.stream = event.tournament.streams.with_channel(data.stream.stream_name).first
+
+        # Look this up by name now to preserve existing behavior. We may be able
+        # to use ID instead but the docs are a little unclear about how IDs work
+        # with streams. TODO: Look into this.
+        set.stream = if data.stream&.stream_name.present?
+          event.tournament.streams.with_channel(data.stream.stream_name).first
+        end
 
         set
       end

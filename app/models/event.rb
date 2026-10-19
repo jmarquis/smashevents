@@ -47,6 +47,7 @@ class Event < ApplicationRecord
   has_one :winner_player, class_name: 'Player', through: :winner_entrant, source: :player
   belongs_to :game, foreign_key: :game_slug, primary_key: :slug
   has_many :notifications, as: :notifiable
+  has_many :event_sets, dependent: :destroy
 
   scope :should_sync_entrants, -> {
     where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(entrant_count, 0) * interval '30 seconds' <= ?", 1.day.ago)
@@ -321,7 +322,7 @@ class Event < ApplicationRecord
 
       sets.each do |set|
         StatsD.increment("#{provider::PROVIDER_NAME}.set_fetched.in_progress")
-        process_in_progress_set(set)
+        process_in_progress_set(factory.set(set))
       end
 
       sleep provider.sleep_time
@@ -351,39 +352,29 @@ class Event < ApplicationRecord
   def process_in_progress_set(set)
     # Most sets don't have a stream, so this filters a ton.
     return unless set.stream.present?
-    return unless set.stream.stream_source.downcase == Stream::PLATFORM_TWITCH
+    return unless set.stream.platform == Stream::PLATFORM_TWITCH
 
     # We only care about currently ongoing sets.
     return unless set.started_at.present?
     return unless set.completed_at.blank?
 
     # If the player records aren't set, we can't do anything.
-    return unless set.slots&.first&.entrant&.participants&.first&.player&.present?
-    return unless set.slots&.second&.entrant&.participants&.first&.player&.present?
+    return unless set.entrant1&.player.present?
+    return unless set.entrant2&.player.present?
 
     # If the stream isn't actually live, we're not going to notify about it.
     # Probably the TO intended to stream it but for whatever reason the set
     # started before the stream started.
-    return unless tournament.streams.with_channel(set.stream.stream_name).first&.live?
+    return unless set.stream.live?
 
-    set_entrants = entrants.where(provider_entrant_id: [
-      set.slots.first.entrant.id,
-      set.slots.second.entrant.id
-    ])
+    # At this point there's a decent chance we'll be notifying for this set, so
+    # let's save it. If there are no player subscriptions and the event isn't
+    # displayable we won't, but at this point that's fairly uncommon and low
+    # volume and those unused set records will get cleaned up eventually anyway.
+    set.save!
 
     # Let Setbot do its thing.
-    set_entrants.each do |entrant|
-      opponent = (set_entrants - [entrant]).first
-      next unless opponent.present?
-
-      Setbot.notify_subscriptions(
-        event: self,
-        entrant:,
-        opponent:,
-        stream_name: set.stream.stream_name,
-        startgg_set_id: set.id
-      )
-    end
+    Setbot.notify_subscriptions(set:)
 
     # At this point we may have an event that doesn't meet its game's display
     # threshold but is syncing sets because it has an entrant with an associated
@@ -393,34 +384,13 @@ class Event < ApplicationRecord
     return unless should_display?
 
     # Now update the set Discord channels.
-    entrant = set_entrants.first
-    opponent = (set_entrants - [entrant]).first
-    return unless opponent.present?
-
-    recent_notifications = Notification.where(
-      notifiable: entrant,
-      notification_type: Notification::TYPE_PLAYER_SET_LIVE,
-      platform: Notification::PLATFORM_DISCORD,
-      success: true
-    ).order(sent_at: :desc).first(10)
-
-    return if recent_notifications.any? { |notification| notification.metadata.with_indifferent_access[:startgg_set_id].to_s == set.id.to_s }
-
-    # Attaching this to the first entrant is kind of weird and meaningless, but
-    # we don't store sets so we don't really have anything more sensible to use
-    # as the notifiable.
     Notification.send_notification(
-      entrant,
+      set,
       type: Notification::TYPE_PLAYER_SET_LIVE,
       platform: Notification::PLATFORM_DISCORD,
-      metadata: { startgg_set_id: set.id }
-    ) do |entrant|
-      Discord::Gateway.set_live(
-        event: self,
-        entrant:,
-        opponent:,
-        stream_name: set.stream.stream_name
-      )
+      idempotent: true
+    ) do |set|
+      Discord::Gateway.set_live(set:)
     end
   end
 
