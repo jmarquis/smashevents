@@ -47,9 +47,7 @@ class ApplicationController < BaseController
 
     @tournaments = Tournament.includes(:streams).should_display(games: @games)
       .where('end_at < ?', Time.now + 7.days)
-      .where.not(
-        id: Tournament.joins(:events).where.not(events: { state: Event::STATE_COMPLETED })
-      )
+      .where(events: { state: Event::STATE_COMPLETED })
       .order(end_at: :desc, start_at: :desc, name: :desc)
 
     if params[:player]
