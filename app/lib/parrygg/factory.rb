@@ -88,7 +88,7 @@ module Parrygg
 
         e.event = event
         e.provider = Provider::PROVIDER_NAME
-        e.provider_entrant_id = data[:id]
+        e.provider_entrant_id = data.dig(:entrant, :id)
         e.seed = data[:seed]
 
         # TODO: As of July 2026, the Parrygg API has no ranking data. If/when
