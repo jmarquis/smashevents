@@ -21,6 +21,7 @@ class Setbot < ::Gateway
         StatsD.increment('setbot.command.subscribe')
         handle_subscribe_command(event:)
       end
+
       bot.application_command(Rails.env.production? ? :unsubscribe : :unsubscribe_dev) do |event|
         StatsD.increment('setbot.command.unsubscribe')
         handle_unsubscribe_command(event:)

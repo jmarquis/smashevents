@@ -14,12 +14,12 @@ namespace :parrygg do
     Parrygg::Ingestor.sync_entrants
   end
 
-  task sync_streams: [:environment] do
-    Parrygg::Ingestor.sync_streams
-  end
-
   task sync_sets: [:environment] do
     Parrygg::Ingestor.sync_sets
+  end
+
+  task sync_streams: [:environment] do
+    Parrygg::Ingestor.sync_streams
   end
 
 end
