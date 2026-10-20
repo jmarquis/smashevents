@@ -60,9 +60,12 @@ class Setbot < ::Gateway
       input_value = event.options['player_tag']
       return unless input_value.present?
 
-      slug = input_value.match(%r{/user/([^/]+)})
-      players = if slug.present?
-        Player.where(provider_user_slug: slug[1])
+      startgg_slug = input_value.match(%r{/user/([^/]+)})
+      parrygg_slug = input_value.match(%r{/profile/([^/]+)})
+      players = if startgg_slug.present?
+        Player.where(provider: Startgg::Provider::PROVIDER_NAME, provider_user_slug: startgg_slug[1])
+      elsif parrygg_slug.present?
+        Player.where(provider: Parrygg::Provider::PROVIDER_NAME, provider_user_id: parrygg_slug[1])
       else
         Player.tag_similar_to(input_value).limit(10).uniq
       end

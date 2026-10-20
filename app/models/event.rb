@@ -190,7 +190,7 @@ class Event < ApplicationRecord
       if event_entrants.nil?
         if provider.tournament(slug: tournament.slug).nil?
           Rails.logger.info "Tournament #{tournament.slug} not found. Deleting..."
-          StatsD.increment('startgg.tournament_deleted')
+          StatsD.increment("#{provider::PROVIDER_NAME}.tournament_deleted")
           tournament.destroy
         end
 
