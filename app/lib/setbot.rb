@@ -19,27 +19,27 @@ class Setbot < ::Gateway
 
       bot.application_command(Rails.env.production? ? :subscribe : :subscribe_dev) do |event|
         StatsD.increment('setbot.command.subscribe')
-        handle_subscribe_command(event:)
+        with_error_reporting { handle_subscribe_command(event:) }
       end
 
       bot.application_command(Rails.env.production? ? :unsubscribe : :unsubscribe_dev) do |event|
         StatsD.increment('setbot.command.unsubscribe')
-        handle_unsubscribe_command(event:)
+        with_error_reporting { handle_unsubscribe_command(event:) }
       end
 
       bot.string_select custom_id: custom_id('player_select') do |event|
         StatsD.increment('setbot.string_select.player_select')
-        handle_player_select(event:)
+        with_error_reporting { handle_player_select(event:) }
       end
 
       bot.string_select custom_id: custom_id('delete_subscription_select') do |event|
         StatsD.increment('setbot.string_select.delete_subscription_select')
-        handle_delete_subscription_select(event:)
+        with_error_reporting { handle_delete_subscription_select(event:) }
       end
 
       bot.role_select custom_id: custom_id('role_ping_select') do |event|
         StatsD.increment('setbot.role_select.role_ping_select')
-        handle_role_ping_select(event:)
+        with_error_reporting { handle_role_ping_select(event:) }
       end
 
       at_exit do
@@ -47,6 +47,16 @@ class Setbot < ::Gateway
       end
 
       bot.run
+    end
+
+    # discordrb runs each event handler in its own thread and rescues any
+    # errors, only logging them, so Sentry never sees them. Report them
+    # explicitly and re-raise so discordrb still logs them.
+    def with_error_reporting
+      yield
+    rescue => e
+      Sentry.capture_exception(e)
+      raise
     end
 
     def handle_subscribe_command(event:)
@@ -82,8 +92,8 @@ class Setbot < ::Gateway
             r.string_select(custom_id: custom_id('player_select'), placeholder: 'Choose a player', max_values: 1) do |ss|
               players.each do |player|
                 description = player.name || (player.twitter_username.present? ? "@#{player.twitter_username}" : nil)
-                description = description.present? ? "#{description} " : ''
-                description += "(#{Provider.provider(player.provider)::FORMATTED_NAME})"
+                description = description.present? ? "#{description} | " : ''
+                description += Provider.provider(player.provider)::FORMATTED_NAME
                 ss.option(label: player.tag, value: player.id, description:, emoji: { name: '👤' })
               end
             end
