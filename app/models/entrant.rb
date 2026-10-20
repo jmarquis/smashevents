@@ -15,12 +15,12 @@
 #
 # Indexes
 #
-#  index_entrants_on_event_id                          (event_id)
-#  index_entrants_on_event_id_and_rank                 (event_id,rank)
-#  index_entrants_on_event_id_and_seed                 (event_id,seed)
-#  index_entrants_on_player2_id                        (player2_id)
-#  index_entrants_on_player_id                         (player_id)
-#  index_entrants_on_provider_and_provider_entrant_id  (provider,provider_entrant_id) UNIQUE
+#  idx_on_event_id_provider_provider_entrant_id_a7c486fb18  (event_id,provider,provider_entrant_id) UNIQUE
+#  index_entrants_on_event_id                               (event_id)
+#  index_entrants_on_event_id_and_rank                      (event_id,rank)
+#  index_entrants_on_event_id_and_seed                      (event_id,seed)
+#  index_entrants_on_player2_id                             (player2_id)
+#  index_entrants_on_player_id                              (player_id)
 #
 
 class Entrant < ApplicationRecord

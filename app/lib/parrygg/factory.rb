@@ -85,9 +85,8 @@ module Parrygg
       end
 
       def entrant(data, event:)
-        e = Entrant.find_by(provider: Provider::PROVIDER_NAME, provider_entrant_id: data[:id]) || Entrant.new
+        e = event.entrants.find_by(provider: Provider::PROVIDER_NAME, provider_entrant_id: data.dig(:entrant, :id)) || event.entrants.new
 
-        e.event = event
         e.provider = Provider::PROVIDER_NAME
         e.provider_entrant_id = data.dig(:entrant, :id)
         e.seed = data[:seed]

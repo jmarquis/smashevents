@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_174501) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_203800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -34,12 +34,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_174501) do
     t.integer "rank"
     t.integer "seed"
     t.datetime "updated_at", null: false
+    t.index ["event_id", "provider", "provider_entrant_id"], name: "idx_on_event_id_provider_provider_entrant_id_a7c486fb18", unique: true
     t.index ["event_id", "rank"], name: "index_entrants_on_event_id_and_rank"
     t.index ["event_id", "seed"], name: "index_entrants_on_event_id_and_seed"
     t.index ["event_id"], name: "index_entrants_on_event_id"
     t.index ["player2_id"], name: "index_entrants_on_player2_id"
     t.index ["player_id"], name: "index_entrants_on_player_id"
-    t.index ["provider", "provider_entrant_id"], name: "index_entrants_on_provider_and_provider_entrant_id", unique: true
   end
 
   create_table "event_sets", force: :cascade do |t|
