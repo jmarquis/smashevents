@@ -25,7 +25,7 @@
     <% end %>
   </head>
 
-  <body style="<%= colors_css(action_name) %>"<%= " data-current-tag=\"#{params[:player]}\"".html_safe if params[:player] %>>
+  <body style="<%= colors_css(action_name) %>">
 
     <%= content_for?(:content) ? yield(:content) : yield %>
 

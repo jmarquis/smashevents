@@ -12,16 +12,12 @@
   <nav class="pages">
     <% if action_name == 'index' %>
       Upcoming
-    <% elsif params[:player].present? %>
-      <%= link_to "Upcoming", player_path(player: params[:player], game: params[:game], games: params[:games]) %>
     <% else %>
       <%= link_to "Upcoming", root_path(game: params[:game], games: params[:games]) %>
     <% end %>
     <span>/</span>
     <% if action_name == 'past' %>
       Past
-    <% elsif params[:player].present? %>
-      <%= link_to "Past", player_past_path(player: params[:player], game: params[:game], games: params[:games]) %>
     <% else %>
       <%= link_to "Past", past_events_path(game: params[:game], games: params[:games]) %>
     <% end %>
@@ -42,10 +38,6 @@
         </ul>
       </div>
     <% end %>
-  </nav>
-
-  <nav class="player-selector">
-    <%= react_component "PlayerSelector" %>
   </nav>
 
   <style>
@@ -72,7 +64,6 @@
   <form id="params" action="<%= request.path %>">
     <%= hidden_field_tag 'game', params[:game] if params[:game].present? %>
     <%= hidden_field_tag 'games', params[:games] if params[:games].present? %>
-    <%= hidden_field_tag 'player', params[:player] if params[:player].present? %>
   </form>
 <% end %>
 

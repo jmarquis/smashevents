@@ -18,12 +18,6 @@ class ApplicationController < BaseController
       .where(id: Event.where.not(state: Event::STATE_COMPLETED).select(:tournament_id))
       .order(start_at: :asc, end_at: :asc, name: :asc)
 
-    if params[:player]
-      @tournaments = @tournaments
-        .joins(events: { entrants: :player })
-        .where('LOWER(players.tag) = ?', params[:player].downcase)
-    end
-
     if params[:last_tournament_id].present?
       last_tournament = Tournament.find(params[:last_tournament_id])
       @tournaments = @tournaments.where('(tournaments.start_at, tournaments.end_at, tournaments.name) > (?, ?, ?)', last_tournament.start_at, last_tournament.end_at, last_tournament.name)
@@ -49,12 +43,6 @@ class ApplicationController < BaseController
       .where('end_at < ?', Time.now + 7.days)
       .where(events: { state: Event::STATE_COMPLETED })
       .order(end_at: :desc, start_at: :desc, name: :desc)
-
-    if params[:player]
-      @tournaments = @tournaments
-        .joins(events: { entrants: :player })
-        .where('LOWER(players.tag) = ?', params[:player].downcase)
-    end
 
     if params[:last_tournament_id].present?
       last_tournament = Tournament.find(params[:last_tournament_id])
