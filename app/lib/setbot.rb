@@ -82,8 +82,8 @@ class Setbot < ::Gateway
             r.string_select(custom_id: custom_id('player_select'), placeholder: 'Choose a player', max_values: 1) do |ss|
               players.each do |player|
                 description = player.name || (player.twitter_username.present? ? "@#{player.twitter_username}" : nil)
-                description += ' | ' if description.present?
-                description += Provider.provider(player.provider)::FORMATTED_NAME
+                description = description.present? ? "#{description} " : ''
+                description += "(#{Provider.provider(player.provider)::FORMATTED_NAME})"
                 ss.option(label: player.tag, value: player.id, description:, emoji: { name: '👤' })
               end
             end
