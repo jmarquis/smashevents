@@ -1,6 +1,7 @@
 module Parrygg
   class Provider < ::Provider
     PROVIDER_NAME = 'parrygg'
+    FORMATTED_NAME = 'parry.gg'
 
     class << self
 

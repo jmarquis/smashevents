@@ -1,6 +1,7 @@
 module Startgg
   class Provider < ::Provider
     PROVIDER_NAME = 'startgg'
+    FORMATTED_NAME = 'start.gg'
     ENTRANT_SYNC_BATCH_SIZE = 50
 
     class << self
