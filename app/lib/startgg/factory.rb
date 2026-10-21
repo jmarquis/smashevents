@@ -130,7 +130,7 @@ module Startgg
       end
 
       def set(data, event:)
-        set = event.event_sets.find_by(provider_set_id: data.id) || event.event_sets.new
+        set = event.event_sets.find_by(provider_set_id: data.id) || EventSet.new(event:)
 
         set.provider_set_id = data.id
         set.started_at = data.started_at.present? ? Time.at(data.started_at) : nil
