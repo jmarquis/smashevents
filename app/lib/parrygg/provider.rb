@@ -71,6 +71,16 @@ module Parrygg
         result[:results]&.first&.dig(:placement, :eventEntrant, :entrant, :id)
       end
 
+      def in_progress_sets(provider_event_id:, batch_size:, page:)
+        # Simulate a blank page after the first page to stop the loop, because
+        # as of October 2026 parrygg doesn't currently paginate entrants.
+        return nil if page > 1
+
+        result = Gateway.with_retries(10) do
+          Gateway.matches(event_id: provider_event_id, state: MATCH_STATE_IN_PROGRESS)
+        end
+      end
+
       def sleep_time
         0.1
       end

@@ -62,6 +62,10 @@ module Parrygg
         end
       end
 
+      def matches(event_id:, state:)
+
+      end
+
       # Used for fetching game IDs for one-off stuff.
       def games
         execute('parrygg.services.GameService/GetGames')
