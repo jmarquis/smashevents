@@ -37,6 +37,7 @@
 /config/credentials/development.key
 
 /config/credentials/production.key
+/config/credentials/production.bak.key
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
