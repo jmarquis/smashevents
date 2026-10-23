@@ -145,6 +145,31 @@ module Parrygg
         end
       end
 
+      def set(data, event:)
+        set = event.event_sets.find_by(provider_set_id: data.dig(:match, :id)) || EventSet.new(event:)
+
+        set.provider_set_id = data.dig(:match, :id)
+        set.started_at = data.dig(:match, :startedAt)
+        set.completed_at = data.dig(:match, :endedAt)
+
+        set.entrant1 = if data[:seeds]&.first&.dig(:eventEntrant, :entrant, :id).present?
+          event.entrants.find_by(provider_entrant_id: data[:seeds].first.dig(:eventEntrant, :entrant, :id))
+        end
+
+        set.entrant2 = if data[:seeds]&.second&.dig(:eventEntrant, :entrant, :id).present?
+          event.entrants.find_by(provider_entrant_id: data[:seeds].second.dig(:eventEntrant, :entrant, :id))
+        end
+
+        set.entrant1_score = data.dig(:match, :slots)&.first&.score
+        set.entrant2_score = data.dig(:match, :slots)&.second&.score
+
+        # TODO: set.winner_entrant = ???
+
+        set.stream = if data.dig(:match, :stream_queue_entry).present?
+          event.tournament.streams.find_by(provider_stream_id: data.dig(:match, :stream_queue_entry, :stream_id))
+        end
+      end
+
     end
   end
 end

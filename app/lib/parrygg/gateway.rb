@@ -66,7 +66,7 @@ module Parrygg
         instrument('matches') do
           execute('parrygg.services.MatchService/GetMatches', {
             filter: {
-              event_identifier: {
+              event: {
                 id: event_id
               },
               state:

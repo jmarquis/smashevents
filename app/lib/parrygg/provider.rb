@@ -82,6 +82,8 @@ module Parrygg
         result = Gateway.with_retries(10) do
           Gateway.matches(event_id: provider_event_id, state: MATCH_STATE_IN_PROGRESS)
         end
+
+        result[:matches]
       end
 
       def completed_sets(provider_event_id:, batch_size:, page:)
@@ -92,6 +94,8 @@ module Parrygg
         result = Gateway.with_retries(10) do
           Gateway.matches(event_id: provider_event_id, state: MATCH_STATE_COMPLETED)
         end
+
+        result[:matches]
       end
 
       def sleep_time
