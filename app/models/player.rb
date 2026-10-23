@@ -25,34 +25,43 @@
 class Player < ApplicationRecord
 
   TWITTER_USERNAME_FALLBACKS = {
+    'aklo' => 'NotAklo',
     'chem' => 'Chemjamin',
     'drephen' => 'Drephen',
+    'epoodle' => 'RealEpoodle',
     'faust' => 'FaustSSBM',
     'fiction' => 'FictionIRL',
+    'ginger' => 'SsbmGinger',
     'grab' => 'DthrowDtilt',
+    'hungrybox' => 'LiquidHbox',
     'isai' => 'IsaiAlvaradoSSB',
+    'joshman' => 'LilTrickshot',
     'jmook' => 'jakedirado',
     'junebug' => 'arJunebug',
     'kerokeroppi' => 'KeroKeroppi64',
+    'kodorin' => 'KoDoRiNSSB',
+    'krudo' => 'KrudoKyle',
     'kurabba' => 'Kurabba',
+    'llod' => 'lloD74',
     'mang0' => 'C9Mang0',
     'mvlvchi' => '_mvlvchi_',
     'pewpewu' => '_PewPewU',
     'plup' => 'Plup_Club',
     'rapmonster' => 'Rap1238727',
+    'sdj' => 'SDJ_SSBM',
     'sirmeris' => 'sirmeris',
     'soonsay' => 's00nsay',
     'stango' => 'StangoSSBM',
     'superboomfan' => 'SuPeRbOoMfAnSSB',
     'wizzrobe' => 'Wizzrobe',
-    'zain' => 'ZainNaghmi',
+    'zain' => 'ZainNaghmi'
   }
 
   has_many :entrants
   has_many :events, through: :entrants
   has_many :player_subscriptions
 
-  scope :tag_similar_to, lambda { |query|
+  scope :tag_similar_to, ->(query) {
     quoted_query = ActiveRecord::Base.connection.quote_string(query)
     where('tag % :query', query:).order(Arel.sql("similarity(tag, '#{quoted_query}') desc"))
   }
