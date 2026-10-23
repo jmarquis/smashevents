@@ -15,6 +15,7 @@ module Parrygg
             result[:streams].map do |stream_data|
               stream = tournament.streams.find { |s| s.channel?(stream_data[:channel]) } || tournament.streams.new
 
+              stream.provider_stream_id = stream_data[:id]
               stream.channel = stream_data[:channel]
               stream.platform = case stream_data[:platform]
               when 'STREAM_PLATFORM_TWITCH'
