@@ -8,7 +8,6 @@ namespace :notifications do
     Tournament
       .should_display
       .where('tournaments.start_at > ?', Time.now)
-      .where(provider: Startgg::Provider::PROVIDER_NAME) # TODO: Remove once Parrygg stuff looks good
       .order(start_at: :asc, name: :asc)
       .map(&:events)
       .flatten
