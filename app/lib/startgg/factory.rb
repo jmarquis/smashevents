@@ -135,8 +135,15 @@ module Startgg
         set.provider_set_id = data.id
         set.started_at = data.started_at.present? ? Time.at(data.started_at) : nil
         set.completed_at = data.completed_at.present? ? Time.at(data.completed_at) : nil
-        set.entrant1 = event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id) if data.slots&.first&.entrant&.id.present?
-        set.entrant2 = event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id) if data.slots&.second&.entrant&.id.present?
+
+        set.entrant1 = if data.slots&.first&.entrant&.id.present?
+          event.entrants.find_by(provider_entrant_id: data.slots.first.entrant.id)
+        end
+
+        set.entrant2 = if data.slots&.second&.entrant&.id.present?
+          event.entrants.find_by(provider_entrant_id: data.slots.second.entrant.id)
+        end
+
         set.entrant1_score = data.slots.first.standing&.stats&.score&.value&.to_i
         set.entrant2_score = data.slots.second.standing&.stats&.score&.value&.to_i
         set.winner_entrant = event.entrants.find_by(provider_entrant_id: data.winner_id)
