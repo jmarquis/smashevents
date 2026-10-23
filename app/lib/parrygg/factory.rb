@@ -119,7 +119,9 @@ module Parrygg
         p.provider_user_id = data[:id]
         p.provider_user_slug = nil
         p.tag = data[:gamerTag]
-        p.name = [data[:firstName], data[:lastName]].join(' ')
+        p.name = if data[:firstName].present? || data[:lastName].present?
+          [data[:firstName], data[:lastName]].compact_blank.join(' ')
+        end
 
         startgg_user_id = data[:linkedAccounts]&.find { |account| account[:provider] == LINKED_ACCOUNT_PROVIDER_STARTGG }&.dig(:userId)
         startgg_user = Player.find_by(provider: Startgg::Provider::PROVIDER_NAME, provider_user_id: startgg_user_id.to_s) if startgg_user_id.present?
