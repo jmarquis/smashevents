@@ -66,7 +66,7 @@ cron '5/20 * * * *', locals: { task: 'startgg:sync' }, overlap: false do
 end
 
 # Every 20 minutes (15 minute offset)
-cron '5/20 * * * *', locals: { task: 'parrygg:sync' }, overlap: false do
+cron '15/20 * * * *', locals: { task: 'parrygg:sync' }, overlap: false do
   rake_async('parrygg:sync')
 end
 

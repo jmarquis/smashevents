@@ -63,7 +63,16 @@ module Parrygg
       end
 
       def matches(event_id:, state:)
-
+        instrument('matches') do
+          execute('parrygg.services.MatchService/GetMatches', {
+            filter: {
+              event_identifier: {
+                id: event_id
+              },
+              state:
+            }
+          })
+        end
       end
 
       # Used for fetching game IDs for one-off stuff.

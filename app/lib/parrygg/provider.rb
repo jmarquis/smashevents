@@ -3,6 +3,9 @@ module Parrygg
     PROVIDER_NAME = 'parrygg'
     FORMATTED_NAME = 'parry.gg'
 
+    MATCH_STATE_IN_PROGRESS = 3
+    MATCH_STATE_COMPLETED = 4
+
     class << self
 
       def base_url
@@ -78,6 +81,16 @@ module Parrygg
 
         result = Gateway.with_retries(10) do
           Gateway.matches(event_id: provider_event_id, state: MATCH_STATE_IN_PROGRESS)
+        end
+      end
+
+      def completed_sets(provider_event_id:, batch_size:, page:)
+        # Simulate a blank page after the first page to stop the loop, because
+        # as of October 2026 parrygg doesn't currently paginate entrants.
+        return nil if page > 1
+
+        result = Gateway.with_retries(10) do
+          Gateway.matches(event_id: provider_event_id, state: MATCH_STATE_COMPLETED)
         end
       end
 
