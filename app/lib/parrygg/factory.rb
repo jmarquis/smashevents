@@ -26,8 +26,8 @@ module Parrygg
         t.country = data.dig(:address, :countryCode)
 
         if data[:images].present?
-          t.banner_image_url = data[:images].filter { |image| image[:type] == 'IMAGE_TYPE_BANNER' }.first
-          t.profile_image_url = data[:images].filter { |image| image[:type] == 'IMAGE_TYPE_AVATAR' }.first
+          t.banner_image_url = data[:images].find { |image| image[:type] == 'IMAGE_TYPE_BANNER' }&.dig(:url)
+          t.profile_image_url = data[:images].find { |image| image[:type] == 'IMAGE_TYPE_AVATAR' }&.dig(:url)
         end
 
         events = []
