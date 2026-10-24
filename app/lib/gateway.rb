@@ -45,19 +45,21 @@ class Gateway
         OpenSSL::SSL::SSLError => e
         StatsD.increment("#{api_name}.request_error")
 
+        message = error_details(e)
+
         if retries >= max_retries
-          Rails.logger.info "Retry threshold exceeded talking to #{api_name}, exiting: #{e.message}"
+          Rails.logger.info "Retry threshold exceeded talking to #{api_name}, exiting: #{message}"
           raise e
         end
 
-        Rails.logger.info "Transient error communicating with #{api_name}, will retry: #{e.message}"
+        Rails.logger.info "Transient error communicating with #{api_name}, will retry: #{message}"
 
         sleep [(2 ** retries) + rand(-2..2), 1].max
         retries += 1
 
         next
       rescue StandardError => e
-        Rails.logger.error "Unexpected error communicating with #{api_name}: #{e.message}"
+        Rails.logger.error "Unexpected error communicating with #{api_name}: #{error_details(e)}"
         raise e
       end
 
@@ -65,6 +67,18 @@ class Gateway
     end
 
     private
+
+    def error_details(e)
+      body = e.try(:response_body) || (e.response if e.is_a?(Graphlient::Errors::ServerError))
+
+      [
+        e.class.name,
+        e.message,
+        e.try(:response_status) || e.try(:status_code),
+        body&.to_s&.truncate(1000),
+        e.cause && "caused by #{e.cause.class}: #{e.cause.message}"
+      ].compact_blank.join(' ||| ')
+    end
 
     def instrument(key)
       StatsD.increment("api.#{api_name}.#{key}")
