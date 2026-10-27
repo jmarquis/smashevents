@@ -5,7 +5,7 @@
 ### Initialize the database (first run)
 
 ```
-docker compose run web sh
+docker compose run web bash
 rails db:setup
 ```
 
@@ -18,7 +18,7 @@ docker compose up
 or
 
 ```
-docker compose run --service-ports web sh
+docker compose run --service-ports web bash
 rails s -b0
 ```
 
