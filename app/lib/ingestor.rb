@@ -84,24 +84,35 @@ class Ingestor
           end
 
           if sync_entrants
+            tournament_destroyed = false
+
             events.each do |event|
               next if event.entrants_synced_at.present? && event.entrants_synced_at > 1.hour.ago
 
               entrant_stats = event.sync_entrants!.each_with_object(entrant_stats) do |(key, total), entrant_stats|
                 entrant_stats[key] += total
               end
+
+              # Syncing entrants destroys the tournament if it was deleted
+              # upstream, so don't bother with its other events.
+              if event.tournament.destroyed?
+                tournament_destroyed = true
+                break
+              end
             end
 
-            # Now that we have entrant data, sync the tournament again to
-            # populate the winner entrant if necessary. Only redo once per
-            # tournament so a persistently missing winner can't loop forever.
-            if !winner_resync_data.equal?(data) && events.any? { |event| event.winner_entrant.blank? && event.completed? }
-              winner_resync_data = data
-              redo
-            end
+            unless tournament_destroyed
+              # Now that we have entrant data, sync the tournament again to
+              # populate the winner entrant if necessary. Only redo once per
+              # tournament so a persistently missing winner can't loop forever.
+              if !winner_resync_data.equal?(data) && events.any? { |event| event.winner_entrant.blank? && event.completed? }
+                winner_resync_data = data
+                redo
+              end
 
-            if delete_if_shouldnt_display && !tournament.should_display?
-              tournament.destroy!
+              if delete_if_shouldnt_display && !tournament.should_display?
+                tournament.destroy!
+              end
             end
           end
 
@@ -203,13 +214,12 @@ class Ingestor
       tournaments = Tournament.not_past.reasonable_duration.where(provider: provider_name)
 
       tournaments.each do |tournament|
-        unseeded_in_progress_events = tournament.events.in_progress.where(is_seeded: false)
-        events = tournament.events.should_sync_entrants
-
-        [*unseeded_in_progress_events, *events].each do |event|
+        tournament.events.should_sync_entrants.each do |event|
           stats = event.sync_entrants!.each_with_object(stats) do |(key, total), stats|
             stats[key] += total
           end
+
+          break if event.tournament.destroyed?
 
           num_events += 1
           Rails.logger.info "Scanned #{num_events} events so far..." if num_events % 50 == 0

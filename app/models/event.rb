@@ -51,6 +51,7 @@ class Event < ApplicationRecord
   scope :should_sync_entrants, -> {
     where("coalesce(entrants_synced_at, now() - interval '1 day') - coalesce(entrant_count, 0) * interval '30 seconds' <= ?", 1.day.ago)
       .or(in_progress.where('entrants_synced_at < start_at'))
+      .or(in_progress.where(is_seeded: false))
   }
   scope :in_progress, -> { where(state: STATE_ACTIVE) }
 

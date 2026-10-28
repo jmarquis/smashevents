@@ -37,9 +37,11 @@ module Parrygg
       def tournament(slug:)
         result = Gateway.with_retries(10) do
           Gateway.tournament(slug:)
+        rescue Faraday::ResourceNotFound
+          nil
         end
 
-        result[:tournament]
+        result&.dig(:tournament)
       end
 
       def event_state(provider_event_id:)
@@ -63,7 +65,7 @@ module Parrygg
           Gateway.event_entrants(event_id: provider_event_id)
         end
 
-        [result[:eventEntrants]]
+        [result[:eventEntrants] || []]
       end
 
       def event_winner_entrant_id(provider_event_id:)

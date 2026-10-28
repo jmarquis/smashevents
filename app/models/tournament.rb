@@ -174,10 +174,6 @@ class Tournament < ApplicationRecord
     self
   end
 
-  def sync_entrants!
-    events.each(&:sync_entrants!)
-  end
-
   def in_progress?
     return false unless start_at <= Time.now && end_at + 12.hours >= Time.now
     return false unless events.any? { |e| e.winner_entrant_id.blank? }
