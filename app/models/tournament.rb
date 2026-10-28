@@ -53,10 +53,11 @@ class Tournament < ApplicationRecord
               where("end_at - tournaments.start_at <= interval '7 days'").merge(
                 where.not(events: { entrant_count: nil }).merge(
                   where('coalesce(events.entrant_count, 0) >= 8').merge(
-                    where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.entrant_count, 1) = 0 then 1.0 else (coalesce(events.entrant_count, 1) * coalesce(events.entrant_size, 1))::float end > ?', 0.3).or(
+                    where('coalesce(events.ranked_player_count, 0)::float / case when coalesce(events.entrant_count, 1) = 0 then 1.0 else (coalesce(events.entrant_count, 1) * coalesce(events.entrant_size, 1))::float end > ?', 0.25).or(
                       where('events.ranked_player_count > ?', 10)
                     ).or(
                       where('(coalesce(events.entrant_count, 0) * coalesce(events.entrant_size, 1)) + (coalesce(events.ranked_player_count, 0) * 10) > games.display_threshold')
+                        .where('coalesce(events.real_player_count, 1) > 0')
                     )
                   )
                 )

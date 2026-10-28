@@ -10,6 +10,7 @@
 #  is_seeded           :boolean
 #  name                :string
 #  ranked_player_count :integer
+#  real_player_count   :integer
 #  sets_synced_at      :datetime
 #  should_display      :boolean
 #  slug                :string
@@ -78,6 +79,11 @@ class Event < ApplicationRecord
       return true if ranked_player_count.to_f / player_count.to_f >= 0.25
       return true if ranked_player_count >= 8
     end
+
+    # If an event only has player stubs, it's probably a test event or some kind
+    # of preliminary thing we don't care about. A nil count means entrants
+    # haven't been synced yet, so ignore that.
+    return false if real_player_count&.zero?
 
     score = player_count + ((ranked_player_count || 0) * 10)
     score > game.display_threshold
@@ -251,6 +257,11 @@ class Event < ApplicationRecord
 
     # Denormalize ranked entrant count
     self.ranked_player_count = entrants.filter { |entrant| entrant.rank.present? }.count
+
+    # Denormalize count of players with real accounts (i.e. not stubs)
+    self.real_player_count = entrants.sum do |entrant|
+      [entrant.player, entrant.player2].count { |player| player&.provider_user_id.present? }
+    end
 
     self.entrants_synced_at = Time.now
     save!
