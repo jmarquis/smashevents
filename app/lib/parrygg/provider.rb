@@ -70,7 +70,7 @@ module Parrygg
 
       def event_winner_entrant_id(provider_event_id:)
         result = Gateway.with_retries(10) do
-          Gateway.event_placements(event_id: provider_event_id)
+          Gateway.event_placements(event_id: provider_event_id, page_size: 1, page_number: 1)
         end
 
         result[:results]&.first&.dig(:placement, :eventEntrant, :entrant, :id)

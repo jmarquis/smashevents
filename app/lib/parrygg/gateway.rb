@@ -54,10 +54,14 @@ module Parrygg
         end
       end
 
-      def event_placements(event_id:)
+      def event_placements(event_id:, page_size:, page_number:)
         instrument('event_placements') do
           execute('parrygg.services.EventService/GetEventPlacements', {
-            id: event_id
+            id: event_id,
+            pagination_request: {
+              page_size:,
+              page_number:
+            }
           })
         end
       end
