@@ -92,7 +92,13 @@ class Gateway
       result
     rescue Graphlient::Errors::Error => e
       status_code = e.try(:status_code)
-      error_key = status_code.present? ? status_code.to_s : "#{e.class.name.demodulize.underscore}"
+      error_key = status_code.present? ? status_code.to_s : e.class.name.demodulize.underscore
+      StatsD.increment("api_response.#{api_name}.#{key}.#{error_key}")
+
+      raise e
+    rescue Faraday::ServerError => e
+      status_code = e.response_status
+      error_key = status_code.present? ? status_code.to_s : e.class.name.demodulize.underscore
       StatsD.increment("api_response.#{api_name}.#{key}.#{error_key}")
 
       raise e
