@@ -118,7 +118,7 @@ module Parrygg
         p.provider_player_id = data[:id]
         p.provider_user_id = data[:id]
         p.provider_user_slug = nil
-        p.tag = data[:gamerTag]
+        p.tag = data[:gamerTag].presence || tag
         p.name = if data[:firstName].present? || data[:lastName].present?
           [data[:firstName], data[:lastName]].compact_blank.join(' ')
         end

@@ -78,13 +78,13 @@ class Player < ApplicationRecord
   end
 
   def twitter_username
-    self[:twitter_username] || TWITTER_USERNAME_FALLBACKS[tag.downcase]
+    self[:twitter_username] || TWITTER_USERNAME_FALLBACKS[tag&.downcase]
   end
 
   def twitter_tag
     # Twitter treats words that start with $ as cashtags, so let's replace them
     # with S to avoid this.
-    tag[0] == '$' ? "S#{tag[1..]}" : tag
+    tag&.start_with?('$') ? "S#{tag[1..]}" : tag
   end
 
 end
