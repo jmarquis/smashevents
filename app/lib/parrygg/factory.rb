@@ -18,9 +18,23 @@ module Parrygg
         t.slug = data[:slugs].first[:slug]
         t.name = data[:name]
         t.hashtag = nil # parrygg doesn't have this
-        t.start_at = data[:startDate].present? ? DateTime.parse(data[:startDate]) : nil
-        t.end_at = data[:endDate].present? ? DateTime.parse(data[:endDate]) : nil
         t.timezone = data[:timeZone]
+        t.start_at = data[:startDate].present? ? DateTime.parse(data[:startDate]) : nil
+
+        # Parrygg dates are non-nullable for some reason so we have to detect a
+        # missing end date and basically guess what to do since this case is not
+        # documented. Let's just try setting it to the end of the day in the
+        # tournament's time zone.
+        tournament_end = if data[:endDate].present?
+          DateTime.parse(data[:endDate])
+        end
+
+        t.end_at = if tournament_end.present? && tournament_end != Time.at(0)
+          tournament_end
+        else
+          t.start_at&.in_time_zone(t.timezone.presence || 'America/New_York')&.end_of_day
+        end
+
         t.city = data.dig(:address, :locality)
         t.state = data.dig(:address, :administrativeAreaLevel1)
         t.country = data.dig(:address, :countryCode)
